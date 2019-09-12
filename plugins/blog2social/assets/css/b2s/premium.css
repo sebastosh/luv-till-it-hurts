@@ -1,0 +1,21 @@
+body .thumbnail{
+    border: none;
+}
+
+
+.b2s-premium-h2{
+    margin-top: 0px !important;
+}
+
+.b2s-premium-go-to-text{
+    color: #79B232 !important;
+}
+
+.b2s-premium-line{
+    margin-bottom: 0px!important;
+}
+.b2s-premium-btn-group{
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
