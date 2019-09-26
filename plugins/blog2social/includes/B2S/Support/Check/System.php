@@ -15,7 +15,7 @@ class B2S_Support_Check_System {
         $this->systemData['MYSQLVERSION'] = array("system" => $this->getMysqlVersion(), "req" => B2S_PLUGIN_SYSTEMREQUIREMENT_MYSQLVERSION, "type" => "version", "name" => "MySql Version", "link" => B2S_Tools::getSupportLink("system_requirements"));
         $this->systemData['DATABASERIGHTS'] = array("system" => $this->getDatabaseRights(), "req" => B2S_PLUGIN_SYSTEMREQUIREMENT_DATABASERIGHTS, "type" => "active", "name" => "Database Rights", "link" => B2S_Tools::getSupportLink("system_requirements"));
         $this->systemData['HOTLINKPROTECTION'] = array("system" => $this->getHotlinkProtection(), "req" => B2S_PLUGIN_SYSTEMREQUIREMENT_HOTLINKPROTECTION, "type" => "active", "name" => "Hotlink Protection (disabled)", "link" => B2S_Tools::getSupportLink("hotlink_protection"));
-        $this->systemData['WPJSON'] = array("system" => $this->getWpJson(), "req" => B2S_PLUGIN_SYSTEMREQUIREMENT_WPJSON, "type" => "active", "name" => "WP-JSON", "link" => B2S_Tools::getSupportLink("system_requirements"));
+        $this->systemData['WPJSON'] = array("system" => $this->getWpJson(), "req" => B2S_PLUGIN_SYSTEMREQUIREMENT_WPJSON, "type" => "active", "name" => "REST API / WP-JSON", "link" => B2S_Tools::getSupportLink("system_requirements"));
         $this->systemData['OPENSSL'] = array("system" => $this->getOpenssl(), "req" => B2S_PLUGIN_SYSTEMREQUIREMENT_OPENSSL, "type" => "active", "name" => "OpenSSL", "link" => B2S_Tools::getSupportLink("system_requirements"));
         $this->checkSystemData();
         $this->getPluginData();
@@ -36,12 +36,12 @@ class B2S_Support_Check_System {
         foreach ($this->systemData as $key => $value) {
             $systemHtml .= '<div class="row">
                             <div class="col-sm-4 b2s-text-bold"">
-                                ' . __($value["name"], "blog2social") . '
+                                ' . esc_html__($value["name"], "blog2social") . '
                             </div>
                             <div class="col-sm-3 b2s-debug-req">' .
                     (($value["type"] == "version") ?
                             ((isset($value["req"]) && !empty($value["req"])) ?
-                                    $value["req"] . ' ' . __("or higher", "blog2social") :
+                                    $value["req"] . ' ' . esc_html__("or higher", "blog2social") :
                                     ''
                             ) :
                             (($value["req"]) ?
@@ -62,7 +62,7 @@ class B2S_Support_Check_System {
                             <div class="col-sm-1 b2s-debug-warn">' . (($value["success"]) ? '' : '<i class="glyphicon glyphicon-warning-sign glyphicon-warning pull-right"></i>') . '</div>
                             <div class="col-sm-2">' .
                     ((isset($value["link"]) && !empty($value["link"])) ?
-                            '<a href="' . $value["link"] . '" target="_blank" class="pull-right margin-right-15 ' . (($value["success"]) ? 'b2s-support-link-not-active' : '') . '">' . __("resolve conflict", "blog2social") . '</a>' :
+                            '<a href="' . esc_url($value["link"]) . '" target="_blank" class="pull-right margin-right-15 ' . (($value["success"]) ? 'b2s-support-link-not-active' : '') . '">' . esc_html__("resolve conflict", "blog2social") . '</a>' :
                             '')
                     . '</div>
                         </div>
@@ -75,19 +75,19 @@ class B2S_Support_Check_System {
                 $pluginHtml .= '<div class="b2s-plugin-warn-row"><br>
                     <div class="row">
                         <div class="col-sm-2"></div>
-                        <div class="col-sm-7">' . $value["name"] . '</div>
+                        <div class="col-sm-7">' . esc_html($value["name"]) . '</div>
                         <div class="col-sm-1">
                             <i class="glyphicon glyphicon-warning-sign glyphicon-warning pull-right"></i>
                         </div>
                         <div class="col-sm-2">
-                            <a href="' . B2S_Tools::getSupportLink("system_requirements") . '" target="_blank" class="pull-right margin-right-15">' . __("resolve conflict", "blog2social") . '</a>
+                            <a href="' . esc_url(B2S_Tools::getSupportLink("system_requirements")) . '" target="_blank" class="pull-right margin-right-15">' . esc_html__("resolve conflict", "blog2social") . '</a>
                         </div>
                     </div>
                 </div>';
             }
         }
         if (!empty($pluginHtml)) {
-            $pluginHtml = '<div class="row"><div class="col-sm-10 b2s-text-bold">' . __("Plugin Warnings:", "blog2social") . '</div></div>' . $pluginHtml;
+            $pluginHtml = '<div class="row"><div class="col-sm-10 b2s-text-bold">' . esc_html__("Plugin Warnings:", "blog2social") . '</div></div>' . $pluginHtml;
         }
         return $systemHtml . $pluginHtml;
     }
@@ -136,8 +136,8 @@ class B2S_Support_Check_System {
         if (isset($rights) && !empty($rights) && (strpos($rights, 'ALL PRIVILEGES') != false || strpos($rights, 'CREATE') != false)) {
             return true;
         } else {
-            $tables_count = $wpdb->get_var("SELECT count(*) FROM information_schema.tables WHERE table_name LIKE 'b2s_%%'");
-            if (isset($tables_count) && !empty($tables_count) && $tables_count >= 6) {
+            $tables_count = $wpdb->get_var("SELECT count(*) FROM information_schema.tables WHERE table_name LIKE '{$wpdb->prefix}b2s_%%'");
+            if (isset($tables_count) && !empty($tables_count) && $tables_count >= 7) {
                 return true;
             }
         }

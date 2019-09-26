@@ -51,7 +51,7 @@ jQuery('.b2sSaveSocialMetaTagsSettings').validate({
             type: "POST",
             dataType: "json",
             cache: false,
-            data: jQuery(form).serialize(),
+            data: jQuery(form).serialize() + '&b2s_security_nonce=' + jQuery('#b2s_security_nonce').val(),
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
                 return false;
@@ -73,6 +73,9 @@ jQuery('.b2sSaveSocialMetaTagsSettings').validate({
                         }
                     }
                 } else {
+                    if (data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     jQuery('.b2s-settings-user-error').show();
                 }
             }
@@ -130,6 +133,7 @@ jQuery(document).on('click', '.b2sClearSocialMetaTags', function () {
         cache: false,
         data: {
             'action': 'b2s_reset_social_meta_tags',
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-server-connection-fail').show();
@@ -141,6 +145,9 @@ jQuery(document).on('click', '.b2sClearSocialMetaTags', function () {
             if (data.result == true) {
                 jQuery('.b2s-clear-meta-tags-success').show();
             } else {
+                if (data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                }
                 jQuery('.b2s-clear-meta-tags-error').show();
             }
         }
@@ -201,6 +208,7 @@ jQuery(document).on('click', '#b2s-user-network-settings-short-url', function ()
             data: {
                 'action': 'b2s_user_network_settings',
                 'short_url': jQuery('#b2s-user-network-settings-short-url').val(),
+                'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
             },
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
@@ -218,6 +226,9 @@ jQuery(document).on('click', '#b2s-user-network-settings-short-url', function ()
                         jQuery('#b2s-user-network-settings-short-url').prop('checked', true);
                     }
                 } else {
+                    if(data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     jQuery('.b2s-settings-user-error').show();
                 }
             }
@@ -243,6 +254,7 @@ jQuery(document).on('click', '.b2s-shortener-account-delete-btn', function () {
         data: {
             'action': 'b2s_user_network_settings',
             'shortener_account_auth_delete': provider_id,
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-server-connection-fail').show();
@@ -258,50 +270,13 @@ jQuery(document).on('click', '.b2s-shortener-account-delete-btn', function () {
                 jQuery('#b2s-user-network-settings-short-url').val("1");
                 jQuery('#b2s-user-network-shortener-state[data-provider-id="0"]').val("0");
             } else {
+                if(data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                }
                 jQuery('.b2s-settings-user-error').show();
             }
         }
     });
-    return false;
-});
-
-
-jQuery(document).on('change', '#b2s-user-network-twitter-content', function () {
-
-    if (jQuery('#b2s_user_version').val() == 0) {
-        jQuery('#b2s-user-network-twitter-content').val("0");
-        jQuery('#b2sPreFeatureModal').modal('show');
-        return false;
-    } else {
-        jQuery('.b2s-settings-user-success').hide();
-        jQuery('.b2s-settings-user-error').hide();
-        jQuery(".b2s-loading-area").show();
-        jQuery(".b2s-user-settings-area").hide();
-        jQuery('.b2s-server-connection-fail').hide();
-        jQuery.ajax({
-            url: ajaxurl,
-            type: "POST",
-            dataType: "json",
-            cache: false,
-            data: {
-                'action': 'b2s_user_network_settings',
-                'content_network_twitter': jQuery('#b2s-user-network-twitter-content').val(),
-            },
-            error: function () {
-                jQuery('.b2s-server-connection-fail').show();
-                return false;
-            },
-            success: function (data) {
-                jQuery(".b2s-loading-area").hide();
-                jQuery(".b2s-user-settings-area").show();
-                if (data.result == true) {
-                    jQuery('.b2s-settings-user-success').show();
-                } else {
-                    jQuery('.b2s-settings-user-error').show();
-                }
-            }
-        });
-    }
     return false;
 });
 
@@ -322,7 +297,7 @@ jQuery('#b2s-user-network-settings-auto-post-own').validate({
             type: "POST",
             dataType: "json",
             cache: false,
-            data: jQuery(form).serialize(),
+            data: jQuery(form).serialize() + '&b2s_security_nonce=' + jQuery('#b2s_security_nonce').val(),
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
                 return false;
@@ -333,6 +308,9 @@ jQuery('#b2s-user-network-settings-auto-post-own').validate({
                 if (data.result == true) {
                     jQuery('.b2s-settings-user-success').show();
                 } else {
+                    if(data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     jQuery('.b2s-settings-user-error').show();
                 }
             }
@@ -359,7 +337,7 @@ jQuery('#b2s-user-network-settings-auto-post-imported-own').validate({
             type: "POST",
             dataType: "json",
             cache: false,
-            data: jQuery(form).serialize(),
+            data: jQuery(form).serialize() + '&b2s_security_nonce=' + jQuery('#b2s_security_nonce').val(),
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
                 return false;
@@ -370,6 +348,9 @@ jQuery('#b2s-user-network-settings-auto-post-imported-own').validate({
                 if (data.result == true) {
                     jQuery('.b2s-settings-user-success').show();
                 } else {
+                    if(data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     if (data.type == 'no-auth-selected') {
                         jQuery('.b2s-settings-user-error-no-auth-selected').show();
 
@@ -417,6 +398,7 @@ jQuery(document).on('change', '#b2s-user-time-zone', function () {
     jQuery(".b2s-loading-area").show();
     jQuery(".b2s-user-settings-area").hide();
     jQuery('.b2s-server-connection-fail').hide();
+    jQuery('.b2s-nonce-check-fail').hide();
 
     jQuery.ajax({
         url: ajaxurl,
@@ -425,7 +407,8 @@ jQuery(document).on('change', '#b2s-user-time-zone', function () {
         cache: false,
         data: {
             'action': 'b2s_user_network_settings',
-            'user_time_zone': jQuery(this).val()
+            'user_time_zone': jQuery(this).val(),
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-server-connection-fail').show();
@@ -437,7 +420,11 @@ jQuery(document).on('change', '#b2s-user-time-zone', function () {
             if (data.result == true) {
                 jQuery('.b2s-settings-user-success').show();
             } else {
-                jQuery('.b2s-settings-user-error').show();
+                if (data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                } else {
+                    jQuery('.b2s-settings-user-error').show();
+                }
             }
         }
     });
@@ -457,6 +444,7 @@ jQuery(document).on('click', '#b2s-user-network-settings-allow-shortcode', funct
         data: {
             'action': 'b2s_user_network_settings',
             'allow_shortcode': jQuery('#b2s-user-network-settings-allow-shortcode').val(),
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-server-connection-fail').show();
@@ -474,6 +462,9 @@ jQuery(document).on('click', '#b2s-user-network-settings-allow-shortcode', funct
                     jQuery('#b2s-user-network-settings-allow-shortcode').prop('checked', true);
                 }
             } else {
+                if(data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                }
                 jQuery('.b2s-settings-user-error').show();
             }
         }
@@ -495,6 +486,7 @@ jQuery(document).on('click', '#b2s-user-network-settings-allow-hashtag', functio
         data: {
             'action': 'b2s_user_network_settings',
             'allow_hashtag': jQuery('#b2s-user-network-settings-allow-hashtag').val(),
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-server-connection-fail').show();
@@ -504,6 +496,9 @@ jQuery(document).on('click', '#b2s-user-network-settings-allow-hashtag', functio
             if (data.result == true) {
                 window.location.href = window.location.pathname + "?page=blog2social-settings&b2s-settings-user-success=true";
             } else {
+                if(data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                }
                 jQuery(".b2s-loading-area").hide();
                 jQuery(".b2s-user-settings-area").show();
                 jQuery('.b2s-settings-user-error').show();
@@ -528,6 +523,7 @@ jQuery(document).on('click', '#b2s-general-settings-legacy-mode', function () {
         data: {
             'action': 'b2s_user_network_settings',
             'legacy_mode': jQuery('#b2s-general-settings-legacy-mode').val(),
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-server-connection-fail').show();
@@ -545,158 +541,14 @@ jQuery(document).on('click', '#b2s-general-settings-legacy-mode', function () {
                     jQuery('#b2s-general-settings-legacy-mode').prop('checked', true);
                 }
             } else {
+                if(data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                }
                 jQuery('.b2s-settings-user-error').show();
             }
         }
     });
     return false;
-});
-
-jQuery('.b2sSaveUserSettingsPostFormatFb').validate({
-    ignore: "",
-    errorPlacement: function () {
-        return false;
-    },
-    submitHandler: function (form) {
-        jQuery('.b2s-settings-user-success').hide();
-        jQuery('.b2s-settings-user-error').hide();
-        jQuery(".b2s-loading-area").show();
-        jQuery(".b2s-user-settings-area").hide();
-        jQuery('.b2s-server-connection-fail').hide();
-        jQuery.ajax({
-            processData: false,
-            url: ajaxurl,
-            type: "POST",
-            dataType: "json",
-            cache: false,
-            data: jQuery(form).serialize(),
-            error: function () {
-                jQuery('.b2s-server-connection-fail').show();
-                return false;
-            },
-            success: function (data) {
-                jQuery(".b2s-loading-area").hide();
-                jQuery(".b2s-user-settings-area").show();
-                if (data.result == true) {
-                    jQuery('.b2s-settings-user-success').show();
-                } else {
-                    jQuery('.b2s-settings-user-error').show();
-                }
-            }
-        });
-        return false;
-    }
-});
-
-
-jQuery('.b2sSaveUserSettingsPostFormatTw').validate({
-    ignore: "",
-    errorPlacement: function () {
-        return false;
-    },
-    submitHandler: function (form) {
-        jQuery('.b2s-settings-user-success').hide();
-        jQuery('.b2s-settings-user-error').hide();
-        jQuery(".b2s-loading-area").show();
-        jQuery(".b2s-user-settings-area").hide();
-        jQuery('.b2s-server-connection-fail').hide();
-        jQuery.ajax({
-            processData: false,
-            url: ajaxurl,
-            type: "POST",
-            dataType: "json",
-            cache: false,
-            data: jQuery(form).serialize(),
-            error: function () {
-                jQuery('.b2s-server-connection-fail').show();
-                return false;
-            },
-            success: function (data) {
-                jQuery(".b2s-loading-area").hide();
-                jQuery(".b2s-user-settings-area").show();
-                if (data.result == true) {
-                    jQuery('.b2s-settings-user-success').show();
-                } else {
-                    jQuery('.b2s-settings-user-error').show();
-                }
-            }
-        });
-        return false;
-    }
-});
-
-
-jQuery('.b2sSaveUserSettingsPostFormatLi').validate({
-    ignore: "",
-    errorPlacement: function () {
-        return false;
-    },
-    submitHandler: function (form) {
-        jQuery('.b2s-settings-user-success').hide();
-        jQuery('.b2s-settings-user-error').hide();
-        jQuery(".b2s-loading-area").show();
-        jQuery(".b2s-user-settings-area").hide();
-        jQuery('.b2s-server-connection-fail').hide();
-        jQuery.ajax({
-            processData: false,
-            url: ajaxurl,
-            type: "POST",
-            dataType: "json",
-            cache: false,
-            data: jQuery(form).serialize(),
-            error: function () {
-                jQuery('.b2s-server-connection-fail').show();
-                return false;
-            },
-            success: function (data) {
-                jQuery(".b2s-loading-area").hide();
-                jQuery(".b2s-user-settings-area").show();
-                if (data.result == true) {
-                    jQuery('.b2s-settings-user-success').show();
-                } else {
-                    jQuery('.b2s-settings-user-error').show();
-                }
-            }
-        });
-        return false;
-    }
-});
-
-
-jQuery('.b2sSaveUserSettingsPostFormatIn').validate({
-    ignore: "",
-    errorPlacement: function () {
-        return false;
-    },
-    submitHandler: function (form) {
-        jQuery('.b2s-settings-user-success').hide();
-        jQuery('.b2s-settings-user-error').hide();
-        jQuery(".b2s-loading-area").show();
-        jQuery(".b2s-user-settings-area").hide();
-        jQuery('.b2s-server-connection-fail').hide();
-        jQuery.ajax({
-            processData: false,
-            url: ajaxurl,
-            type: "POST",
-            dataType: "json",
-            cache: false,
-            data: jQuery(form).serialize(),
-            error: function () {
-                jQuery('.b2s-server-connection-fail').show();
-                return false;
-            },
-            success: function (data) {
-                jQuery(".b2s-loading-area").hide();
-                jQuery(".b2s-user-settings-area").show();
-                if (data.result == true) {
-                    jQuery('.b2s-settings-user-success').show();
-                } else {
-                    jQuery('.b2s-settings-user-error').show();
-                }
-            }
-        });
-        return false;
-    }
 });
 
 function padDate(n) {

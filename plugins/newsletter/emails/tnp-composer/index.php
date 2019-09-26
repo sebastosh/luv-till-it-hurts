@@ -63,7 +63,10 @@ $block_options = get_option('newsletter_main');
         <button class="tablinks" onclick="openTab(event, 'tnpc-blocks')" id="defaultOpen"><?php _e('Blocks', 'newsletter') ?></button>
         <?php /* <button class="tablinks" onclick="openTab(event, 'tnpc-general-options')"><?php _e('General Options', 'newsletter') ?></button> */ ?>
         <button class="tablinks" onclick="openTab(event, 'tnpc-mobile-tab')"><i class="fa fa-mobile"></i> <?php _e('Mobile Preview', 'newsletter') ?></button>
+        <?php if ($show_test) { ?>
         <button class="tablinks" onclick="openTab(event, 'tnpc-test-tab')"><i class="fa fa-paper-plane"></i> <?php _e('Test', 'newsletter') ?></button>
+        <?php } ?>
+        
         </div>
 
         <div id="tnpc-blocks" class="tabcontent">
@@ -140,5 +143,6 @@ $block_options = get_option('newsletter_main');
 
 <?php include NEWSLETTER_DIR . '/emails/subjects.php'; ?>
 
-<script xsrc="<?php echo plugins_url('newsletter') ?>/vendor/tinymce/tinymce.min.js"></script>
-<?php wp_enqueue_editor(); ?>
+<!--<script src="<?php echo plugins_url('newsletter') ?>/vendor/tinymce/tinymce.min.js"></script>-->
+
+<?php if (function_exists('wp_enqueue_editor')) wp_enqueue_editor(); ?>

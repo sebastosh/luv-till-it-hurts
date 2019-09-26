@@ -93,15 +93,15 @@ class NewsletterEmails extends NewsletterModule {
         }
         $options = $this->options_decode(stripslashes_deep($_REQUEST['options']));
 
-        $defaults = array(
-            'block_padding_top' => 15,
-            'block_padding_bottom' => 15,
-            'block_padding_right' => 0,
-            'block_padding_left' => 0,
-            'block_background' => '#ffffff'
-        );
-
-        $options = array_merge($defaults, $options);
+//        $defaults = array(
+//            'block_padding_top' => 15,
+//            'block_padding_bottom' => 15,
+//            'block_padding_right' => 0,
+//            'block_padding_left' => 0,
+//            'block_background' => '#ffffff'
+//        );
+//
+//        $options = array_merge($defaults, $options);
 
         $controls = new NewsletterControls($options);
         $fields = new NewsletterFields($controls);
@@ -133,7 +133,7 @@ class NewsletterEmails extends NewsletterModule {
             $preset = $this->get_preset($_REQUEST['id']);
 
             foreach ($preset->blocks as $item) {
-                $content .= $this->render_block($item->block, true, (array) $item->options);
+                $this->render_block($item->block, true, (array) $item->options);
             }
         } else {
 
@@ -150,10 +150,26 @@ class NewsletterEmails extends NewsletterModule {
             }
 
             $content .= '<div class="clear"></div>';
+            echo $content;
         }
 
-        echo $content;
         wp_die();
+    }
+
+    function has_dynamic_blocks($theme) {
+        preg_match_all('/data-json="(.*?)"/m', $theme, $matches, PREG_PATTERN_ORDER);
+        foreach ($matches[1] as $match) {
+            $a = html_entity_decode($match, ENT_QUOTES, 'UTF-8');
+            $options = $this->options_decode($a);
+
+            $block = $this->get_block($options['block_id']);
+            if (!$block) {
+                continue;
+            }
+            if ($block['type'] == 'dynamic')
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -168,32 +184,50 @@ class NewsletterEmails extends NewsletterModule {
      * @param string $theme (Rinominare)
      * @return string
      */
-    function regenerate($theme, $context = '', $last_run = 0) {
+    function regenerate($theme, $context = array()) {
+        $this->logger->debug('Starting email regeneration');
+        $this->logger->debug($context);
+        
+        if (empty($theme)) {
+            $this->logger->debug('The email was empty');
+            return array('body' => '', 'subject' => '');
+        }
+        
+        $context = array_merge(array('last_run' => 0, 'type' => ''), $context);
+
         preg_match_all('/data-json="(.*?)"/m', $theme, $matches, PREG_PATTERN_ORDER);
         $result = '';
         $all_empty = true; // If all dynamic content blocks return an empty html
+        $has_dynamic_blocks = false;
+        $subject = '';
+
         foreach ($matches[1] as $match) {
             $a = html_entity_decode($match, ENT_QUOTES, 'UTF-8');
             $options = $this->options_decode($a);
 
-            if (empty($options['block_id']))
-                continue;
-
             $block = $this->get_block($options['block_id']);
-
-            $options['block_last_run'] = $last_run;
-            $options['block_context'] = $context;
+            if (!$block) {
+                $this->logger->debug('Unable to load the block ' . $options['block_id']);
+                continue;
+            }
 
             ob_start();
-            $this->render_block($options['block_id'], true, $options, true);
+            $out = $this->render_block($options['block_id'], true, $options, $context);
+            if (empty($subject) && !empty($out['subject'])) {
+                $subject = $out['subject'];
+            }
             $block_html = ob_get_clean();
-            $result .= trim($block_html);
-            // If a dynamic blocks return something, we need to return a regenerated template
-            if ($last_run && $block['content'] == 'dynamic' && !empty($block_html))
-                $all_empty = false;
+            $result .= $block_html;
+            // If a dynamic block return something, we need to return a regenerated template
+            if ($block['type'] == 'dynamic') {
+                $has_dynamic_blocks = true;
+                if (!empty($block_html)) {
+                    $all_empty = false;
+                }
+            }
         }
 
-        if ($last_run && $all_empty) {
+        if (!empty($context['last_run']) && $has_dynamic_blocks && $all_empty) {
             return '';
         }
 
@@ -204,7 +238,7 @@ class NewsletterEmails extends NewsletterModule {
         } else {
             
         }
-        return $result;
+        return array('body' => $result, 'subject' => $subject);
     }
 
     function remove_block_data($text) {
@@ -219,7 +253,7 @@ class NewsletterEmails extends NewsletterModule {
      * @param type $wrapper
      * @param type $options
      */
-    function render_block($block_id = null, $wrapper = false, $options = array(), $false_on_empty = false) {
+    function render_block($block_id = null, $wrapper = false, $options = array(), $context = array()) {
         include_once NEWSLETTER_INCLUDES_DIR . '/helper.php';
 
         $width = 600;
@@ -227,20 +261,10 @@ class NewsletterEmails extends NewsletterModule {
 
         $info = Newsletter::instance()->get_options('info');
 
-        $defaults = array(
-            'block_padding_top' => 15,
-            'block_padding_bottom' => 15,
-            'block_padding_right' => 0,
-            'block_padding_left' => 0,
-            'block_background' => '#ffffff'
-        );
-
         // Just in case...
         if (!is_array($options)) {
             $options = array();
         }
-
-        //$options = array_merge($defaults, $options);
 
         $block_options = get_option('newsletter_main');
 
@@ -251,7 +275,7 @@ class NewsletterEmails extends NewsletterModule {
             if ($wrapper) {
                 echo '<table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" style="border-collapse: collapse; width: 100%;" class="tnpc-row tnpc-row-block" data-id="', esc_attr($block_id), '">';
                 echo '<tr>';
-                echo '<td data-options="', esc_attr($data), '" bgcolor="#ffffff" align="center" style="padding: 0; font-family: Helvetica, Arial, sans-serif;" class="edit-block">';
+                echo '<td data-options="" bgcolor="#ffffff" align="center" style="padding: 0; font-family: Helvetica, Arial, sans-serif;" class="edit-block">';
             }
             echo '<!--[if mso]><table border="0" cellpadding="0" align="center" cellspacing="0" width="' . $width . '"><tr><td width="' . $width . '"><![endif]-->';
             echo "\n";
@@ -264,21 +288,28 @@ class NewsletterEmails extends NewsletterModule {
             }
             return;
         }
-        $is_old_block = isset($block['filename']) && strpos($block['filename'], '.block');
 
-        if ($is_old_block) {
-            ob_start();
-            include NEWSLETTER_DIR . '/emails/tnp-composer/blocks/' . $block['filename'] . '.php';
-            $content = ob_get_clean();
-        } else {
-            ob_start();
-            include $block['dir'] . '/block.php';
-            $content = ob_get_clean();
+        $out = array('subject' => '');
 
-            if ($false_on_empty && empty($content)) {
-                return false;
-            }
+
+        ob_start();
+        $logger = $this->logger;
+        include $block['dir'] . '/block.php';
+        $content = trim(ob_get_clean());
+
+        if (empty($content)) {
+            return $out;
         }
+
+        $common_defaults = array(
+            'block_padding_top' => 0,
+            'block_padding_bottom' => 0,
+            'block_padding_right' => 0,
+            'block_padding_left' => 0,
+            'block_background' => '#ffffff'
+        );
+
+        $options = array_merge($common_defaults, $options);
 
         // Obsolete
         $content = str_replace('{width}', $width, $content);
@@ -303,53 +334,37 @@ class NewsletterEmails extends NewsletterModule {
         $style .= 'padding-bottom: ' . $options['block_padding_bottom'] . 'px; ';
         $style .= 'background-color: ' . $options['block_background'] . ';';
 
-        // Old block type
-        if ($is_old_block) {
 
-            echo '<table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" style="border-collapse: collapse; width: 100%;" class="tnpc-row" data-id="', esc_attr($block_id), "\">\n";
-            echo "<tr>\n";
-            echo '<td align="center" style="padding: 0;">', "\n";
-            echo '<!--[if mso]><table border="0" cellpadding="0" align="center" cellspacing="0" width="' . $width . '"><tr><td width="' . $width . '"><![endif]-->', "\n";
 
-            echo '<table border="0" cellpadding="0" align="center" cellspacing="0" width="100%" style="width: 100%!important; max-width: ', $width, 'px!important">', "\n";
-            echo "<tr>\n";
-            echo '<td class="edit-block" align="center" style="', $style, '" bgcolor="', $options['block_background'], '" width="100%">', "\n";
-
-            echo $content;
-
-            echo "\n</td></tr></table>";
-            echo '<!--[if mso]></td></tr></table><![endif]-->';
-            echo "</td></tr></table>\n";
-        } else {
-
-            $data = $this->options_encode($options);
-            // First time block creation wrapper
-            if ($wrapper) {
-                echo '<table type="block" border="0" cellpadding="0" cellspacing="0" align="center" width="100%" style="border-collapse: collapse; width: 100%;" class="tnpc-row tnpc-row-block" data-id="', esc_attr($block_id), '">', "\n";
-                echo "<tr>\n";
-                echo '<td align="center" style="padding: 0;" class="edit-block">', "\n";
-            }
-
-            // Container that fixes the width and makes the block responsive
-            echo '<!--[if mso]><table border="0" cellpadding="0" align="center" cellspacing="0" width="' . $width . '"><tr><td width="' . $width . '"><![endif]-->';
-            echo "\n";
-            echo '<table type="options" data-json="', esc_attr($data), '" class="tnpc-block-content" border="0" cellpadding="0" align="center" cellspacing="0" width="100%" style="width: 100%!important; max-width: ', $width, 'px!important">', "\n";
+        $data = $this->options_encode($options);
+        // First time block creation wrapper
+        if ($wrapper) {
+            echo '<table type="block" border="0" cellpadding="0" cellspacing="0" align="center" width="100%" style="border-collapse: collapse; width: 100%;" class="tnpc-row tnpc-row-block" data-id="', esc_attr($block_id), '">', "\n";
             echo "<tr>";
-            echo '<td align="center" style="', $style, '" bgcolor="', $options['block_background'], '" width="100%">', "\n";
-
-            //echo "<!-- block generated content -->\n";
-            echo $content;
-            //echo "\n<!-- /block generated content -->\n";
-
-            echo "\n</td></tr></table>";
-            echo '<!--[if mso]></td></tr></table><![endif]-->';
-
-            // First time block creation wrapper
-            if ($wrapper) {
-                echo "</td></tr></table>";
-            }
-            echo "\n";
+            echo '<td align="center" style="padding: 0;" class="edit-block">', "\n";
         }
+
+        // Container that fixes the width and makes the block responsive
+        echo '<!--[if mso]><table border="0" cellpadding="0" align="center" cellspacing="0" width="' . $width . '"><tr><td width="' . $width . '"><![endif]-->';
+        echo "\n";
+        echo '<table type="options" data-json="', esc_attr($data), '" class="tnpc-block-content" border="0" cellpadding="0" align="center" cellspacing="0" width="100%" style="width: 100%!important; max-width: ', $width, 'px!important">', "\n";
+        echo "<tr>";
+        echo '<td align="center" style="', $style, '" bgcolor="', $options['block_background'], '" width="100%">', "\n";
+
+        //echo "<!-- block generated content -->\n";
+        echo $content;
+        //echo "\n<!-- /block generated content -->\n";
+
+        echo "\n</td></tr></table>";
+        echo '<!--[if mso]></td></tr></table><![endif]-->';
+
+        // First time block creation wrapper
+        if ($wrapper) {
+            echo "</td></tr></table>";
+        }
+        echo "\n";
+
+        return $out;
     }
 
     /**
@@ -398,7 +413,7 @@ class NewsletterEmails extends NewsletterModule {
         }
     }
 
-    /** 
+    /**
      * Returns the button linked to the correct "edit" page for the passed newsletter. The edit page can be an editor
      * or the targeting page (it depends on newsletter status).
      * 
@@ -439,7 +454,7 @@ class NewsletterEmails extends NewsletterModule {
             $editor_type = NewsletterEmails::EDITOR_COMPOSER;
         }
         // End backward compatibility
-        
+
         return $editor_type;
     }
 
@@ -516,13 +531,10 @@ class NewsletterEmails extends NewsletterModule {
                 break;
 
             case 'emails-preview':
-                if (!current_user_can('manage_categories')) {
+                if (!Newsletter::instance()->is_allowed()) {
                     die('Not enough privileges');
                 }
 
-                if (Newsletter::instance()->options['editor'] != 1 && !current_user_can('manage_options')) {
-                    die('Not enough privileges');
-                }
                 if (!check_admin_referer('view')) {
                     die();
                 }
@@ -539,11 +551,7 @@ class NewsletterEmails extends NewsletterModule {
 
             case 'emails-preview-text':
                 header('Content-Type: text/plain;charset=UTF-8');
-                if (!current_user_can('manage_categories')) {
-                    die('Not enough privileges');
-                }
-
-                if (Newsletter::instance()->options['editor'] != 1 && !current_user_can('manage_options')) {
+                if (!Newsletter::instance()->is_allowed()) {
                     die('Not enough privileges');
                 }
 
@@ -565,11 +573,7 @@ class NewsletterEmails extends NewsletterModule {
 
             case 'emails-create':
 
-                if (!current_user_can('manage_categories')) {
-                    die('Not enough privileges');
-                }
-
-                if ($newsletter->options['editor'] != 1 && !current_user_can('manage_options')) {
+                if (!Newsletter::instance()->is_allowed()) {
                     die('Not enough privileges');
                 }
 
@@ -719,6 +723,36 @@ class NewsletterEmails extends NewsletterModule {
         }
     }
 
+    function build_block($dir) {
+        $file = basename($dir);
+        $block_id = sanitize_key($file);
+        $full_file = $dir . '/block.php';
+        if (!is_file($full_file)) {
+            return new WP_Error('1', 'Missing block.php file in ' . $dir);
+        }
+
+        if (!is_file($dir . '/icon.png')) {
+            $relative_dir = substr($dir, strlen(WP_CONTENT_DIR));
+            $data['icon'] = content_url($relative_dir . '/icon.png');
+        }
+
+        $data = get_file_data($full_file, array('name' => 'Name', 'section' => 'Section', 'description' => 'Description', 'type' => 'Type'));
+        $defaults = array('section' => 'content', 'name' => $file, 'descritpion' => '', 'icon' => NEWSLETTER_URL . '/images/block-icon.png', 'content' => '');
+        $data = array_merge($defaults, $data);
+
+        if (is_file($dir . '/icon.png')) {
+            $relative_dir = substr($dir, strlen(WP_CONTENT_DIR));
+            $data['icon'] = content_url($relative_dir . '/icon.png');
+        }
+
+        $data['id'] = $block_id;
+
+        // Absolute path of the block files
+        $data['dir'] = $dir;
+
+        return $data;
+    }
+
     function scan_blocks_dir($dir) {
 
         if (!is_dir($dir)) {
@@ -733,33 +767,13 @@ class NewsletterEmails extends NewsletterModule {
             if ($file == '.' || $file == '..')
                 continue;
 
-            // The block unique key, we should find out how to biuld it, maybe an hash of the (relative) dir?
-            $block_id = sanitize_key($file);
+            $data = $this->build_block($dir . '/' . $file);
 
-            $full_file = $dir . '/' . $file . '/block.php';
-            if (!is_file($full_file)) {
+            if (is_wp_error($data)) {
+                $this->logger->error($data);
                 continue;
             }
-
-            $data = get_file_data($full_file, array('name' => 'Name', 'section' => 'Section', 'description' => 'Description', 'content' => 'Content'));
-
-            if (empty($data['name'])) {
-                $data['name'] = $file;
-            }
-            if (empty($data['section'])) {
-                $data['section'] = 'content';
-            }
-            if (empty($data['description'])) {
-                $data['description'] = '';
-            }
-            if (empty($data['content'])) {
-                $data['content'] = '';
-            }
-            // Absolute path of the block files
-            $data['dir'] = $dir . '/' . $file;
-
-            $data['icon'] = content_url($relative_dir . '/' . $file . '/icon.png');
-            $list[$block_id] = $data;
+            $list[$data['id']] = $data;
         }
         closedir($handle);
         return $list;
@@ -778,42 +792,37 @@ class NewsletterEmails extends NewsletterModule {
         if (!is_null($blocks))
             return $blocks;
 
-        $blocks = array();
+        $blocks = $this->scan_blocks_dir(__DIR__ . '/blocks');
 
-        // Legacy blocks
-        $handle = opendir(NEWSLETTER_DIR . '/emails/tnp-composer/blocks');
-        while ($file = readdir($handle)) {
-            if (strpos($file, '.php') === false) {
-                continue;
-            }
+        $extended = $this->scan_blocks_dir(WP_CONTENT_DIR . '/extensions/newsletter/blocks');
 
-            $path_parts = pathinfo($file);
-            $filename = $path_parts['filename'];
-            $section = substr($filename, 0, strpos($filename, '-'));
-            $index = substr($filename, strpos($filename, '-') + 1, 2);
-            $block = array();
-            $block['name'] = substr($filename, strrpos($filename, '-') + 1);
-            $block['filename'] = $filename;
-            $block['icon'] = plugins_url('newsletter') . '/emails/tnp-composer/blocks/' . $filename . '.png';
-            $block['section'] = $section;
-            $block['description'] = '';
-            // The block ID is the file name for legacy blocks
-            $blocks[sanitize_key($filename)] = $block;
-        }
-        closedir($handle);
-
-        // Packaged standard blocks
-        $list = $this->scan_blocks_dir(__DIR__ . '/blocks');
-
-        $blocks = array_merge($list, $blocks);
+        $blocks = array_merge($extended, $blocks);
 
         $dirs = apply_filters('newsletter_blocks_dir', array());
+        
+        $this->logger->debug('Block dirs: ' . print_r($dirs, true));
 
         foreach ($dirs as $dir) {
             $dir = str_replace('\\', '/', $dir);
             $list = $this->scan_blocks_dir($dir);
             $blocks = array_merge($list, $blocks);
         }
+
+        do_action('newsletter_register_blocks');
+
+        foreach (TNP_Composer::$block_dirs as $dir) {
+            $block = $this->build_block($dir);
+            if (is_wp_error($block)) {
+                $this->logger->error($block);
+                continue;
+            }
+            if (!isset($blocks[$block['id']])) {
+                $blocks[$block['id']] = $block;
+            } else {
+                $this->logger->error('The block "' . $block['id'] . '" is already registered');
+            }
+        }
+
         $blocks = array_reverse($blocks);
         return $blocks;
     }
@@ -927,19 +936,14 @@ class NewsletterEmails extends NewsletterModule {
 
     function get_composer_css() {
         $css = file_get_contents(__DIR__ . '/tnp-composer/css/newsletter.css');
-        $dirs = apply_filters('newsletter_blocks_dir', array());
-        array_push($dirs, __DIR__ . '/blocks');
-        foreach ($dirs as $dir) {
-            $dir = str_replace('\\', '/', $dir);
-            $list = NewsletterEmails::instance()->scan_blocks_dir($dir);
-
-            foreach ($list as $key => $data) {
-                if (!file_exists($data['dir'] . '/style.css'))
-                    continue;
-                $css .= "\n\n";
-                $css .= "/* " . $data['name'] . " */\n";
-                $css .= file_get_contents($data['dir'] . '/style.css');
+        $blocks = $this->get_blocks();
+        foreach ($blocks as $block) {
+            if (!file_exists($block['dir'] . '/style.css')) {
+                continue;
             }
+            $css .= "\n\n";
+                $css .= "/* " . $block['name'] . " */\n";
+                $css .= file_get_contents($block['dir'] . '/style.css');
         }
         return $css;
     }

@@ -35,7 +35,8 @@ jQuery(window).on("load", function () {
                     dataType: "json",
                     cache: false,
                     data: {
-                        'action': 'b2s_post_meta_box'
+                        'action': 'b2s_post_meta_box',
+                        'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
                     },
                     error: function () {
                         jQuery('.b2s-loading-area').hide();
@@ -67,6 +68,9 @@ jQuery(window).on("load", function () {
                             }
                             wp.heartbeat.connectNow();
                         } else {
+                            if (data.error == 'nonce') {
+                                jQuery('.b2s-nonce-check-fail').show();
+                            }
                             jQuery('#b2s-server-connection-fail').show();
                         }
                     }
@@ -100,7 +104,8 @@ jQuery(document).on('click', '#b2s-meta-box-btn-customize', function () {
             cache: false,
             data: {
                 'action': 'b2s_get_blog_post_status',
-                'post_id': jQuery('#post_ID').val()
+                'post_id': jQuery('#post_ID').val(),
+                'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
             },
             error: function () {
                 jQuery('#b2s-post-meta-box-state-no-publish-future-customize').show();
@@ -110,14 +115,17 @@ jQuery(document).on('click', '#b2s-meta-box-btn-customize', function () {
                 if (data != 'publish' && data != 'future') {
                     jQuery('#b2s-post-meta-box-state-no-publish-future-customize').show();
                 } else {
+                    if (data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     jQuery('#b2s-post-meta-box-state-no-publish-future-customize').hide();
-                    window.location.href = jQuery('#b2s-redirect-url-customize').val()+jQuery('#post_ID').val();
+                    window.location.href = jQuery('#b2s-redirect-url-customize').val() + jQuery('#post_ID').val();
                 }
             }
         });
     } else {
         jQuery('#b2s-post-meta-box-state-no-publish-future-customize').hide();
-        window.location.href = jQuery('#b2s-redirect-url-customize').val()+jQuery('#post_ID').val();
+        window.location.href = jQuery('#b2s-redirect-url-customize').val() + jQuery('#post_ID').val();
     }
 });
 
@@ -135,7 +143,7 @@ jQuery(document).on('click', '#b2s-post-box-calendar-btn', function () {
             eventLimit: 2,
             contentHeight: 530,
             timeFormat: 'H:mm',
-            eventSources: ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=all',
+            eventSources: ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=all' + '&b2s_security_nonce=' + jQuery('#b2s_security_nonce').val(),
             eventRender: function (event, element) {
                 show = true;
                 $header = jQuery("<div>").addClass("b2s-calendar-header");
@@ -198,11 +206,13 @@ jQuery(document).on('click', '#b2s-post-meta-box-time-dropdown-publish', functio
                 dataType: "json",
                 cache: false,
                 data: {
-                    'action': 'b2s_post_meta_box'
+                    'action': 'b2s_post_meta_box',
+                    'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
                 },
                 error: function () {
                     jQuery('.b2s-loading-area').hide();
                     jQuery('#b2s-server-connection-fail').show();
+                    jQuery('#b2s-post-meta-box-time-dropdown-publish').prop('checked', false);
                     return false;
                 },
                 success: function (data) {
@@ -227,10 +237,19 @@ jQuery(document).on('click', '#b2s-post-meta-box-time-dropdown-publish', functio
 
                         } else {
                             jQuery('#b2s-server-connection-fail').show();
+                            jQuery('#b2s-post-meta-box-time-dropdown-publish').prop('checked', false);
                         }
                         wp.heartbeat.connectNow();
                     } else {
-                        jQuery('#b2s-server-connection-fail').show();
+                        if (data.error == 'nonce') {
+                            jQuery('.b2s-nonce-check-fail').show();
+                        }
+                        if (data.content == 'no_auth') {
+                            jQuery('#b2s-post-meta-box-state-no-auth').show();
+                        } else {
+                            jQuery('#b2s-server-connection-fail').show();
+                        }
+                        jQuery('#b2s-post-meta-box-time-dropdown-publish').prop('checked', false);
                     }
                 }
             });
@@ -270,10 +289,13 @@ jQuery(document).on('click', '#publish', function () {
                 cache: false,
                 data: {
                     'action': 'b2s_lock_auto_post_import',
-                    'userId': jQuery('#b2sBlogUserId').val()
+                    'userId': jQuery('#b2sBlogUserId').val(),
+                    'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
                 },
                 success: function (data) {
-
+                    if(data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                 }
             });
         }
@@ -292,10 +314,13 @@ jQuery(document).on('click', '.editor-post-publish-button', function () {
                 cache: false,
                 data: {
                     'action': 'b2s_lock_auto_post_import',
-                    'userId': jQuery('#b2sBlogUserId').val()
+                    'userId': jQuery('#b2sBlogUserId').val(),
+                    'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
                 },
                 success: function (data) {
-
+                    if(data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                 }
             });
         }

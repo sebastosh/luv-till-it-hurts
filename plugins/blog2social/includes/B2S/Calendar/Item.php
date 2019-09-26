@@ -34,7 +34,6 @@ class B2S_Calendar_Item {
             $this
                     ->setSchedData($data->sched_data)
                     ->setSchedDate($data->sched_date)
-                    ->setPublishDate($data->publish_date)
                     ->setNetworkId($data->network_id)
                     ->setPostTitle($data->post_title)
                     ->setPostType($data->post_type)
@@ -50,25 +49,31 @@ class B2S_Calendar_Item {
                     ->setRelayPrimaryPostId($data->relay_primary_post_id)
                     ->setPostForRelay($data->post_for_relay)
                     ->setPostForApprove($data->post_for_approve)
-                    ->setStatus($data->publish_error_code)
                     ->setPublishLink($data->publish_link);
 
-            if ($data->network_id == 1 || $data->network_id == 2 || $data->network_id == 3) {
+            if ($data->network_id == 1 || $data->network_id == 2 || $data->network_id == 3 || ($data->network_id == 19 && $data->network_type == 0)) {
                 $this->setPostFormat();
             }
             if ($data->network_id == 2 && isset($data->relay_primary_sched_date)) {
                 $this->setRelayPrimarySchedDate($data->relay_primary_sched_date);
                 $this->setRelayDelayMin($data->relay_delay_min);
             }
+            if (isset($data->publish_date)) {
+                $this->setPublishDate($data->publish_date);
+            }
+            if (isset($data->publish_error_code)) {
+                $this->setStatus($data->publish_error_code);
+            }
         }
     }
-    
-    public function setPublishLink($value){
+
+    public function setPublishLink($value) {
         $this->publish_link = trim($value);
         return $this;
     }
-    public function getPublishLink(){
-        return $this->publish_link ;
+
+    public function getPublishLink() {
+        return $this->publish_link;
     }
 
     public function setPostForRelay($value) {
@@ -123,7 +128,7 @@ class B2S_Calendar_Item {
     public function setSchedDate($value) {
         if (is_numeric($value) || is_null($value)) {
             $this->sched_date = $value;
-        } else if (is_string($value) && $value !="0000-00-00 00:00:00") {
+        } else if (is_string($value) && $value != "0000-00-00 00:00:00") {
             $this->sched_date = strtotime($value);
         }
 
@@ -136,15 +141,15 @@ class B2S_Calendar_Item {
     public function getSchedDate() {
         return $this->sched_date;
     }
-    
+
     /**
      * @param integer $value
      * @return $this
      */
     public function setPublishDate($value) {
         if (is_numeric($value) || is_null($value)) {
-            $this->publish_date= $value;
-        } else if (is_string($value) && $value !="0000-00-00 00:00:00") {
+            $this->publish_date = $value;
+        } else if (is_string($value) && $value != "0000-00-00 00:00:00") {
             $this->publish_date = strtotime($value);
         }
         return $this;
@@ -464,12 +469,12 @@ class B2S_Calendar_Item {
 
         return $res;
     }
-    
+
     public function setStatus($error = "") {
-        if(!empty($error)){
+        if (!empty($error)) {
             $this->status = "error";
         } else {
-            if($this->sched_date == null && $this->publish_date != null){
+            if ($this->sched_date == null && $this->publish_date != null) {
                 $this->status = "published";
             } else {
                 $this->status = "scheduled";
@@ -477,7 +482,7 @@ class B2S_Calendar_Item {
         }
         return $this;
     }
-    
+
     public function getStaus() {
         return $this->status;
     }
@@ -501,12 +506,12 @@ class B2S_Calendar_Item {
      * @return array
      */
     public function asCalendarArray() {
-                
+
         return ["title" => $this->getPostTitle(),
             "post_type" => $this->getPostType(),
             "avatar" => $this->getAvatar(),
             "author" => $this->getAuthor(),
-            "start" => (($this->getSchedDate() != null && (int) $this->getSchedDate() > 0) ? date("Y-m-d H:i:s", $this->getSchedDate()) : (($this->getPublishDate() != null &&  (int)$this->getPublishDate() > 0) ? date("Y-m-d H:i:s", $this->getPublishDate()) : date("Y-m-d H:i:s"))),
+            "start" => (($this->getSchedDate() != null && (int) $this->getSchedDate() > 0) ? date("Y-m-d H:i:s", $this->getSchedDate()) : (($this->getPublishDate() != null && (int) $this->getPublishDate() > 0) ? date("Y-m-d H:i:s", $this->getPublishDate()) : date("Y-m-d H:i:s"))),
             "color" => $this->getColor(),
             "network_name" => $this->getNetworkName(),
             "network_id" => $this->getNetworkId(),
@@ -557,7 +562,9 @@ class B2S_Calendar_Item {
             'relay_primary_post_id' => $this->getRelayPrimaryPostId(),
             'post_for_relay' => $this->getPostForRelay(),
             'post_for_approve' => $this->getPostForApprove(),
-            'view' => $view);
+            'view' => $view,
+            'networkTosGroupId' => '',
+            'networkKind' => 0);
 
         return $this->ship_item()->getItemHtml((object) $itemData, false);
     }

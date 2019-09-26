@@ -21,6 +21,7 @@ jQuery(document).on('click', '#b2s-plugin-deactivate-btn', function () {
         data: {
             'action': 'b2s_plugin_deactivate_delete_sched_post',
             'delete_sched_post': isChecked,
+            'b2s_deactivate_nonce': jQuery('#b2s_deactivate_nonce').val()
         },
         error: function () {
             window.location.reload();

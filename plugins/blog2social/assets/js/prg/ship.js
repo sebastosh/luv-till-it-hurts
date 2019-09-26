@@ -91,7 +91,7 @@ jQuery("#prgShip").validate({
             type: "POST",
             dataType: "json",
             cache: false,
-            data: jQuery(form).serialize(),
+            data: jQuery(form).serialize() + '&b2s_security_nonce=' + jQuery('#b2s_security_nonce').val(),
             success: function (data) {
                 if (data.result == false) {
                     var errorCode = unescape(data.error);

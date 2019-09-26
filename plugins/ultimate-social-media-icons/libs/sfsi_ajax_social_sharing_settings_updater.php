@@ -6,8 +6,6 @@ function update_sharing_settings() {
 		echo  json_encode(array('res'=>"error")); exit;
 	}
     if(!current_user_can('manage_options')){ echo json_encode(array('res'=>'not allowed'));die(); }
-
-
 	
 	$option5  = unserialize(get_option('sfsi_section5_options',false));
 	$option5['sfsi_custom_social_hide'] = $_POST['sfsi_custom_social_hide'];

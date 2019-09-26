@@ -106,6 +106,8 @@ class NewsletterFields {
     }
 
     public function wp_editor($name, $label = '', $attrs = array()) {
+        global $wp_version;
+
         $attrs = $this->_merge_attrs($attrs);
         $this->_open();
         $this->_label($label);
@@ -113,11 +115,17 @@ class NewsletterFields {
         if (is_array($value)) {
             $value = implode("\n", $value);
         }
+        if (version_compare($wp_version, '4.8', '<')) {
+            echo '<p><strong>Rich editor available only with WP 4.8+</strong></p>';
+        } 
         echo '<textarea id="options-' . esc_attr($name) . '" name="options[' . esc_attr($name) . ']" style="width: 100%;height:250px">';
         echo esc_html($value);
         echo '</textarea>';
-        echo '<script>wp.editor.remove("options-', $name, '");';
-        echo 'wp.editor.initialize("options-', $name, '", { tinymce: {toolbar1: "undo redo | formatselect fontselect fontsizeselect | bold italic forecolor backcolor | link unlink | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help", fontsize_formats: "11px 12px 14px 16px 18px 24px 36px 48px", plugins: "link textcolor colorpicker", default_link_target: "_blank", relative_urls : false, convert_urls: false}});</script>';
+
+        if (version_compare($wp_version, '4.8', '>=')) {
+            echo '<script>wp.editor.remove("options-', $name, '");';
+            echo 'wp.editor.initialize("options-', $name, '", { tinymce: {toolbar1: "undo redo | formatselect fontselect fontsizeselect | bold italic forecolor backcolor | link unlink | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help", fontsize_formats: "11px 12px 14px 16px 18px 24px 36px 48px", plugins: "link textcolor colorpicker", default_link_target: "_blank", relative_urls : false, convert_urls: false}});</script>';
+        }
         $this->_description($attrs);
         $this->_close();
     }
@@ -256,19 +264,23 @@ class NewsletterFields {
                 'author' => '',
                 'author_name' => '',
                 'post_status' => 'publish',
-                'suppress_filters' => true
+                'suppress_filters' => true,
+                'last_post_option'=>false
             )), $args);
         $args['filters']['posts_per_page'] = $count;
 
         $posts = get_posts($args['filters']);
         $options = array();
+        if ($args['last_post_option']) {
+            $options['last'] = 'Most recent post';
+        }
         foreach ($posts as $post) {
             $options['' . $post->ID] = $post->post_title;
         }
 
         $this->select($name, $label, $options);
     }
-    
+
     function lists($name, $label, $attrs = array()) {
         $attrs = $this->_merge_attrs($attrs);
         $this->_open();
@@ -288,10 +300,13 @@ class NewsletterFields {
      * @param type $attrs
      */
     public function media($name, $label = '', $attrs = array()) {
-        $attrs = $this->_merge_attrs($attrs);
+        $attrs = $this->_merge_attrs($attrs, array('alt'=>false));
         $this->_open();
         $this->_label($label);
         $this->controls->media($name);
+        if ($attrs['alt']) {
+            $this->controls->text($name . '_alt', 20, 'Alternative text');
+        }
         $this->_description($attrs);
         $this->_close();
     }

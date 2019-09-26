@@ -3,16 +3,16 @@
 /*
  * Plugin Name:Blog2Social: Social Media Auto Post & Scheduler
  * Plugin URI: https://www.blog2social.com
- * Description:Auto publish, schedule & share posts on social media: Facebook, Twitter, Google+, XING, LinkedIn, Instagram, ... crosspost to pages & groups
+ * Description:Auto publish, schedule & share posts on social media: Facebook, Twitter, XING, LinkedIn, Instagram, ... crosspost to pages & groups
  * Author: Blog2Social, Adenion
  * Text Domain: blog2social
  * Domain Path: /languages
- * Version: 5.4.1
+ * Version: 5.8.0
  * Author URI: https://www.blog2social.com
  * License: GPL2+
  */
-//B2SDefine
-define('B2S_PLUGIN_VERSION', '541');
+
+define('B2S_PLUGIN_VERSION', '580');
 define('B2S_PLUGIN_LANGUAGE', serialize(array('de_DE', 'en_US')));
 define('B2S_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('B2S_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -30,7 +30,9 @@ define('B2S_PLUGIN_SERVER_URL', 'https://developer.blog2social.com');
 
 //B2SLoader
 require_once(B2S_PLUGIN_DIR . 'includes/Loader.php');
-require_once (B2S_PLUGIN_DIR . 'includes/System.php');
+require_once(B2S_PLUGIN_DIR . 'includes/Tools.php');
+require_once(B2S_PLUGIN_DIR . 'includes/System.php');
+require_once(B2S_PLUGIN_DIR . 'includes/Options.php');
 
 $b2sLoad = new B2S_Loader();
 register_uninstall_hook(B2S_PLUGIN_FILE, 'uninstallPlugin');
@@ -46,15 +48,44 @@ if ($b2sCheck->check() === true) {
 }
 
 function uninstallPlugin() {
-    require_once (plugin_dir_path(__FILE__) . 'includes/System.php');
+    require_once(plugin_dir_path(__FILE__) . 'includes/Tools.php');
+    require_once(plugin_dir_path(__FILE__) . 'includes/System.php');
     $b2sCheck = new B2S_System();
     if ($b2sCheck->check() === true) {
         global $wpdb;
-        $sql = "SELECT token,blog_user_id FROM `b2s_user`";
-        $data = $wpdb->get_results($sql, ARRAY_A);
-        if (!empty($data) && is_array($data)) {
-            require_once (plugin_dir_path(__FILE__) . 'includes/B2S/Api/Post.php');
-            B2S_Api_Post::post('https://developer.blog2social.com/wp/v3/', array('action' => 'uninstallPlugin', 'blog_url' => get_option('home'), 'data' => serialize($data)));
+        if (is_multisite()) {
+            $sql = "SELECT blog_id FROM {$wpdb->base_prefix}blogs";
+            $blog_ids = $wpdb->get_results($sql, ARRAY_A);
+            if (is_array($blog_ids) && !empty($blog_ids)) {
+                $union = "";
+                foreach ($blog_ids as $key => $blog_data) {
+                    $blog_prefix = $wpdb->get_blog_prefix($blog_data['blog_id']);
+                    if (!empty($blog_prefix)) {
+                        $existsTable = $wpdb->get_results('SHOW TABLES LIKE "' . $blog_prefix . 'b2s_user"');
+                        if (is_array($existsTable) && !empty($existsTable)) {
+                            if (!empty($union)) {
+                                $union .= " UNION ALL ";
+                            }
+                            $union .= " SELECT  token,blog_user_id FROM {$blog_prefix}b2s_user ";
+                        }
+                    }
+                }
+                if (!empty($union)) {
+                    $sql = "SELECT * FROM ( " . $union . " ) as all_tokens";
+                    $data = $wpdb->get_results($sql, ARRAY_A);
+                    if (!empty($data) && is_array($data)) {
+                        require_once (plugin_dir_path(__FILE__) . 'includes/B2S/Api/Post.php');
+                        B2S_Api_Post::post('https://developer.blog2social.com/wp/v3/', array('action' => 'uninstallPlugin', 'blog_url' => get_option('home'), 'data' => serialize($data), 'is_multisite' => true));
+                    }
+                }
+            }
+        } else {
+            $sql = "SELECT token,blog_user_id FROM `{$wpdb->prefix}b2s_user`";
+            $data = $wpdb->get_results($sql, ARRAY_A);
+            if (!empty($data) && is_array($data)) {
+                require_once (plugin_dir_path(__FILE__) . 'includes/B2S/Api/Post.php');
+                B2S_Api_Post::post('https://developer.blog2social.com/wp/v3/', array('action' => 'uninstallPlugin', 'blog_url' => get_option('home'), 'data' => serialize($data), 'is_multisite' => false));
+            }
         }
     }
     //global $wpdb;

@@ -31,3 +31,27 @@
         line-height: 1.6;
     }
 }
+
+#editor .wp-block-atomic-blocks-ab-profile-box.square .ab-remove-image {
+	top: 5px;
+	right: 5px;
+}
+
+#editor .ab-has-avatar {
+
+	.ab-profile-image-square {
+		button {
+			top: 0;
+			left: 0;
+			height: 100%;
+		}
+
+		.ab-change-image {
+			transition: .2s ease;
+
+			&:hover {
+				opacity: .7;
+			}
+		}
+	}
+}

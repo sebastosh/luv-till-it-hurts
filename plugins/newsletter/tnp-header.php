@@ -7,6 +7,8 @@ $dismissed = get_option('newsletter_dismissed', array());
 
 $user_count = $wpdb->get_var("select count(*) from " . NEWSLETTER_USERS_TABLE . " where status='C'");
 
+$is_administrator = current_user_can('administrator');
+
 function newsletter_print_entries($group) {
     $entries = apply_filters('newsletter_menu_' . $group, array());
     if ($entries) {
@@ -100,20 +102,11 @@ $warning |= empty($status_options['mail']);
         </li>
         <li><a href="#"><i class="fa fa-cog"></i> <?php _e('Settings', 'newsletter') ?> <i class="fa fa-chevron-down"></i></a>
             <ul>
-                <?php if (current_user_can('manage_options')) { ?>
+                <?php if ($is_administrator) { ?>
                 <li>
                     <a href="?page=newsletter_main_main"><i class="fa fa-cogs"></i> <?php _e('General Settings', 'newsletter') ?>
                         <small><?php _e('Delivery speed, sender details, ...', 'newsletter') ?></small></a>
                 </li>
-                <?php } ?>
-                        
-                <li><a href="?page=newsletter_main_info"><i class="fa fa-info"></i> <?php _e('Company Info', 'newsletter') ?>
-                        <small><?php _e('Social, address, logo and general info', 'newsletter') ?></small></a></li>
-                <li>
-                    <a href="?page=newsletter_subscription_template"><i class="fa fa-file-alt"></i> <?php _e('Messages Template', 'newsletter') ?>
-                        <small><?php _e('Change the look of your service emails', 'newsletter') ?></small></a>
-                </li>
-                <?php if (current_user_can('manage_options')) { ?>
                 <?php if (!class_exists('NewsletterSmtp')) { ?>
                     <li>
                         <a href="?page=newsletter_main_smtp"><i class="fa fa-server"></i> <?php _e('SMTP', 'newsletter') ?>
@@ -122,6 +115,13 @@ $warning |= empty($status_options['mail']);
                     </li>
                 <?php } ?>
                 <?php } ?>
+                        
+                <li><a href="?page=newsletter_main_info"><i class="fa fa-info"></i> <?php _e('Company Info', 'newsletter') ?>
+                        <small><?php _e('Social, address, logo and general info', 'newsletter') ?></small></a></li>
+                <li>
+                    <a href="?page=newsletter_subscription_template"><i class="fa fa-file-alt"></i> <?php _e('Messages Template', 'newsletter') ?>
+                        <small><?php _e('Change the look of your service emails', 'newsletter') ?></small></a>
+                </li>
 
                 <?php
                 newsletter_print_entries('settings');
@@ -129,7 +129,7 @@ $warning |= empty($status_options['mail']);
             </ul>
         </li>
 
-        <?php if (current_user_can('manage_options')) { ?>
+        <?php if ($is_administrator) { ?>
         <li>
             <a href="?page=newsletter_main_status"><i class="fa fa-thermometer"></i> <?php _e('Status', 'newsletter') ?>
                 <?php if ($warning) { ?>

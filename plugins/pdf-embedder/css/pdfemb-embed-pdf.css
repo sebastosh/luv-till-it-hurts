@@ -9,48 +9,7 @@ div.pdfemb-viewer {
 	text-align: left;
 	direction: ltr;
     background-color: lightGrey;
-    touch-action: none;
 }
-
-
-/* new code start */
-
-/* Fix for bouncing behaviour when scrolling on mobile devices */
-div.pdfemb-viewer{ 
-    touch-action: none;
-}
-canvas.pdfemb-the-canvas {
-    touch-action: none;
-}
-@media only screen and (min-width:375px) and (max-width: 1200px){
-    .pdfemb-pagescontainer{
-        overflow: scroll !important;
-    }
-}
-
-
-.pdfemb-inner-div {
-    background-color: white !important;
-}
-
-a@media only screen and (min-width:375px) and (max-width: 768px){
-    div.pdfemb-toolbar div {
-        margin: 6px 5px 6px 2px !important;
-    }
-}
-
-/* Hide text shadow */
-.textLayer.pdfembTextLayer div {
-     display: none !important; 
-}
-
-/* Hide an embedded PDF on Print */
-@media print {
-	div.pdfemb-viewer {
-		display: none !important;
-	}
-}
-/* new code end */
 
 div.pdfemb-inner-div {
 	overflow: hidden;
@@ -128,7 +87,7 @@ div.pdfemb-wantmobile-fsarea {
   cursor: -moz-grabbing;
   cursor: grabbing;
 
-  z-index: 50000; / should be higher than anything else in PDF.js! /
+  z-index: 50000; /* should be higher than anything else in PDF.js! */
 }
 
 div.pdfemb-loadingmsg {
@@ -174,7 +133,7 @@ div.pdfemb-toolbar-top {
 div.pdfemb-toolbar-bottom {
 	bottom: 0px;
 	left: 0px;
-	/ padding-top: 1px; /
+	/* padding-top: 1px; */
 }
 
 div.pdfemb-toolbar button, div.pdfemb-toolbar button[disabled] {
@@ -371,7 +330,7 @@ input.pdfemb-page-num {
 	height: 100%;
 }
 
-.pdfembAnnotationLayer .linkAnnotation > a / -ms-a /  {
+.pdfembAnnotationLayer .linkAnnotation > a /* -ms-a */  {
 	background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat;
     border: none;
 	opacity: 0;
@@ -453,22 +412,16 @@ input.pdfemb-page-num {
 }
 
 .pdfemb-pagescontainer {
-	overflow: scroll !important;
+	overflow: hidden ;
 	display: block;
 	position: relative;
 	background-color: lightGrey;
 }
+.poweredby{
+	float: right !important;
+}
 
-.pdfemb-pagescontainer::-webkit-scrollbar { 
-    display: none; 
-} 
-
-.pdfemb-pagescontainer { -ms-overflow-style: none; }
-
-.pdfemb-pagescontainer { overflow: -moz-scrollbars-none; }
-
-
-/ Safari 6.1+ (9.0 is the latest version of Safari at this time) /
+/* Safari 6.1+ (9.0 is the latest version of Safari at this time) */
 
 @media screen and (min-color-index:0)
 and(-webkit-min-device-pixel-ratio:0) { @media
@@ -476,5 +429,14 @@ and(-webkit-min-device-pixel-ratio:0) { @media
     .pdfemb-pagescontainer {
         margin-left: 1px;
     }
+}}
+
+.scrollbar-none{
+    overflow: scroll;
+    scrollbar-width: none
 }
-}
+
+.scrollbar-none::-webkit-scrollbar { 
+    display: none; 
+} 
+.scrollbar-none { -ms-overflow-style: none; }

@@ -10,9 +10,9 @@ class B2S_Curation_Save {
 
     public function insertContent() {
         $post = array(
-            'post_title' => wp_strip_all_tags($this->data['title']),
+            'post_title' => sanitize_text_field($this->data['title']),
             'post_content' => $this->data['content'],
-            'guid' => $this->data['url'],
+            'guid' => esc_url($this->data['url']),
             'post_status' => 'private',
             'post_author' => $this->data['author_id'],
             'post_type' => 'b2s_ex_post',
@@ -27,19 +27,19 @@ class B2S_Curation_Save {
         if ($source == "b2s_browser_extension") {
             $post = array(
                 'ID' => $this->data['ID'],
-                'post_title' => wp_strip_all_tags($this->data['title']),
+                'post_title' => sanitize_text_field($this->data['title']),
                 'post_content' => $this->data['content']
             );
             $res = wp_update_post($post, true);
-            update_post_meta($this->data['ID'], 'b2s_original_url', trim($this->data['url']));
+            update_post_meta($this->data['ID'], 'b2s_original_url', trim(esc_url($this->data['url'])));
         }
 
         if (empty($source)) {
             $post = array(
                 'ID' => $this->data['ID'],
-                'post_title' => wp_strip_all_tags($this->data['title']),
+                'post_title' => sanitize_text_field($this->data['title']),
                 'post_content' => $this->data['content'],
-                'guid' => $this->data['url']
+                'guid' => esc_url($this->data['url'])
             );
             $res = wp_update_post($post, true);
         }

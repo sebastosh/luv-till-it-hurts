@@ -10,7 +10,7 @@ $email = $current_user->user_email;
 		<!-- <a target="_blank" href="https://goo.gl/MU6pTN#no-topic-0" >we'll still respond quickly</a> -->
 	</p>
 	<ul class="tab-changer">
-		<li class="tab-link active"><p style="text-align:center"><a href="#sfsi_technical"></a>Technical question<br><span>(for the free plugin)</span></span></p></li>
+		<li class="tab-link active"><p style="text-align:center"><a href="#sfsi_technical"></a>Technical question<br><span>(for the free plugin)</span></p></li>
 		<li class="tab-link"><p style="text-align:center"><a href="#sfsi_sales"></a>Pre-sales question<br><span>(for the Premium plugin)</span></p></li>
 	</ul>
 	<div class="clear"></div>
@@ -19,11 +19,11 @@ $email = $current_user->user_email;
 			<h5>Please ask your question in the...</h5>
 			<div class="support-forum-green-div">
 				<!-- <span style="width: 25%">   </span> -->
-				<a target="_blank" href="https://goo.gl/auxJ9C#no-topic-0" class="support-forum-green-bg" stype='width: 25%'>
+				<a target="_blank" href="https://goo.gl/auxJ9C#no-topic-0" class="support-forum-green-bg" >
 	                <img src="<?php echo SFSI_PLUGURL ?>images/support.png">
 	                <p class="support-forum">Support Forum</p>
 	            </a>
-	            <span class="sfsi-button-right-side" stype='width: 25%'><span class="sfsi-button-right-side-icon"></span>Click here</span>
+	            <span class="sfsi-button-right-side" ><span class="sfsi-button-right-side-icon"></span>Click here</span>
 	        </div>
 	        <!-- <p class="sfsi-button-right-side" ><span class="sfsi-button-right-side-icon"></span>Click here</p> -->
 			<h5>We‘ll respond <span style="text-decoration: underline;"><b>quickly!</b></span></h5>

@@ -55,7 +55,8 @@ jQuery(document).on('click', '.b2s-modal-privacy-policy-accept-btn', function ()
         cache: false,
         data: {
             'action': 'b2s_accept_privacy_policy',
-            'accept': true
+            'accept': true,
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-server-connection-fail').show();
@@ -71,6 +72,7 @@ jQuery(document).on('click', '.b2s-key-area-btn-submit', function () {
     jQuery('.b2s-key-area-success').hide();
     jQuery('.b2s-key-area-fail').hide();
     jQuery('.b2s-key-area-fail-max-use').hide();
+    jQuery('.b2s-key-area-fail-no-token').hide();
 
     if (jQuery('.b2s-key-area-input').val() == "") {
         jQuery('.b2s-key-area-input').addClass('error');
@@ -86,6 +88,8 @@ jQuery(document).on('click', '.b2s-key-area-btn-submit', function () {
             data: {
                 'action': 'b2s_update_user_version',
                 'key': jQuery('.b2s-key-area-input').val(),
+                'user_id': jQuery('#b2s-license-user').val(),
+                'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
             },
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
@@ -97,11 +101,21 @@ jQuery(document).on('click', '.b2s-key-area-btn-submit', function () {
                 jQuery('.b2s-trail-premium-info-area').hide();
                 if (data.result == true) {
                     jQuery('.b2s-key-area-success').show();
-                    jQuery('.b2s-key-area-key-name').html(data.lizenzName);
-                    jQuery('.b2s-key-name').html(data.lizenzName);
+                    if(data.licenseName != false) {
+                        jQuery('.b2s-key-area-key-name').html(data.licenseName);
+                        jQuery('.b2s-key-name').html(data.licenseName);
+                    }
+                    jQuery('#b2s-license-user-select').empty();
+                    jQuery('#b2s-license-user-select').append(jQuery('<option value="0"></option>'));
+                    jQuery('#b2s-license-user-select').trigger("chosen:updated");
                 } else {
+                    if(data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     if (data.reason != null && data.reason == 1) {
                         jQuery('.b2s-key-area-fail-max-use').show();
+                    } else if (data.reason != null && data.reason == 2) {
+                        jQuery('.b2s-key-area-fail-no-token').show();
                     } else {
                         jQuery('.b2s-key-area-fail').show();
                     }
@@ -156,7 +170,8 @@ jQuery(document).on('click', '.b2s-trail-btn-start', function () {
                 'vorname': jQuery('#trial_vorname').val(),
                 'nachname': jQuery('#trial_nachname').val(),
                 'email': jQuery('#trial_email').val(),
-                'url': jQuery('#trial_url').val()
+                'url': jQuery('#trial_url').val(),
+                'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
             },
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
@@ -173,6 +188,9 @@ jQuery(document).on('click', '.b2s-trail-btn-start', function () {
                     jQuery('.b2s-key-name').html(data.lizenzName);
                     jQuery('.b2s-trail-premium-info-area').hide();
                 } else {
+                    if(data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     jQuery('.b2s-trail-modal-fail').show();
                 }
 
@@ -224,7 +242,8 @@ function isEmail(email) {
 function hideRating(forever)
 {
     var data = {
-        'action': 'b2s_hide_rating'
+        'action': 'b2s_hide_rating',
+        'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
     };
 
     if (forever) {
@@ -264,7 +283,7 @@ jQuery(document).on("click", ".b2s-hide-premium-message", function (e) {
         type: "POST",
         dataType: "json",
         cache: false,
-        data: {action: 'b2s_hide_premium_message'}
+        data: {action: 'b2s_hide_premium_message', 'b2s_security_nonce': jQuery('#b2s_security_nonce').val()}
     });
     jQuery(this).closest('.panel').remove();
 });
@@ -276,7 +295,7 @@ jQuery(document).on("click", ".b2s-hide-trail-message", function (e) {
         type: "POST",
         dataType: "json",
         cache: false,
-        data: {action: 'b2s_hide_trail_message'}
+        data: {action: 'b2s_hide_trail_message', 'b2s_security_nonce': jQuery('#b2s_security_nonce').val()}
     });
     jQuery(this).closest('.panel').remove();
 });
@@ -288,7 +307,7 @@ jQuery(document).on("click", ".b2s-hide-trail-ended-modal", function (e) {
         type: "POST",
         dataType: "json",
         cache: false,
-        data: {action: 'b2s_hide_trail_ended_message'}
+        data: {action: 'b2s_hide_trail_ended_message', 'b2s_security_nonce': jQuery('#b2s_security_nonce').val()}
     });
     jQuery(this).closest('.panel').remove();
 });
@@ -310,3 +329,6 @@ jQuery(document).on("click", ".b2s-scroll-modal-down", function (e) {
     return false;
 });
 
+jQuery(document).on('click', '.b2s-network-auth-info-close', function() {
+    jQuery(this).closest('.b2s-network-auth-info').hide();
+});

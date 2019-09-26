@@ -38,3 +38,7 @@
 .b2s-post-approve-info{
     display: none;
 }
+
+.loadDraftBtn {
+    margin-right: 5px;
+}

@@ -117,7 +117,7 @@ if (!empty($options['image']['id'])) {
         <tr>
             <td class="padding-copy tnpc-row-edit">
                 <a href="<?php echo $url ?>" target="_blank" rel="noopener nofollow">
-                    <img src="<?php echo $image ?>" border="0" alt="" inline-class="hero-image">
+                    <img src="<?php echo $image ?>" border="0" alt="Image" inline-class="hero-image">
                 </a>
             </td>
         </tr>

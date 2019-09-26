@@ -8,15 +8,13 @@ import Inspector from './components/inspector';
 import NoticeBox from './components/notice';
 import DismissButton from './components/button';
 import icons from './components/icons';
-import * as uniqueID from './../../utils/helper';
-import md5 from 'md5';
 
 // Import CSS
 import './styles/style.scss';
 import './styles/editor.scss';
 
 // Internationalization
-const { __ } = wp.i18n; 
+const { __ } = wp.i18n;
 
 // Extend component
 const { Component } = wp.element;
@@ -28,18 +26,8 @@ const { registerBlockType } = wp.blocks;
 const {
 	RichText,
 	AlignmentToolbar,
-	BlockControls,
-	BlockAlignmentToolbar,
-	MediaUpload,
+	BlockControls
 } = wp.editor;
-
-// Register components
-const {
-	Button,
-	SelectControl,
-	withFallbackStyles,
-	withState,
-} = wp.components;
 
 class ABNoticeBlock extends Component {
 
@@ -52,42 +40,31 @@ class ABNoticeBlock extends Component {
 				noticeContent,
 				noticeAlignment,
 				noticeBackgroundColor,
-				noticeTextColor,
 				noticeTitleColor,
-				noticeFontSize,
 				noticeDismiss
 			},
-			attributes,
-			isSelected,
-			editable,
-			className,
 			setAttributes
 		} = this.props;
 
-		const onSelectImage = img => {
-			setAttributes( {
-				imgID: img.id,
-				imgURL: img.url,
-				imgAlt: img.alt,
-			} );
-		};
-
 		return [
+
 			// Show the alignment toolbar on focus
 			<BlockControls key="controls">
 				<AlignmentToolbar
 					value={ noticeAlignment }
-					onChange={ ( value ) => setAttributes( { noticeAlignment: value } ) }
+					onChange={ ( value ) => setAttributes({ noticeAlignment: value }) }
 				/>
 			</BlockControls>,
+
 			// Show the block controls on focus
 			<Inspector
 				{ ...{ setAttributes, ...this.props } }
 			/>,
+
 			// Show the block markup in the editor
 			<NoticeBox { ...this.props }>
-				{	// Check if the notice is dismissable and output the button
-					noticeDismiss && (
+				{	// Check if the notice is dismissible and output the button
+					( noticeDismiss && 'ab-dismissable' === noticeDismiss ) && (
 					<DismissButton { ...this.props }>
 						{ icons.dismiss }
 					</DismissButton>
@@ -102,9 +79,9 @@ class ABNoticeBlock extends Component {
 						'ab-notice-title'
 					) }
 					style={ {
-						color: noticeTitleColor,
+						color: noticeTitleColor
 					} }
-					onChange={ ( value ) => setAttributes( { noticeTitle: value } ) }
+					onChange={ ( value ) => setAttributes({ noticeTitle: value }) }
 				/>
 
 				<RichText
@@ -116,9 +93,9 @@ class ABNoticeBlock extends Component {
 						'ab-notice-text'
 					) }
 					style={ {
-						borderColor: noticeBackgroundColor,
+						borderColor: noticeBackgroundColor
 					} }
-					onChange={ ( value ) => setAttributes( { noticeContent: value } ) }
+					onChange={ ( value ) => setAttributes({ noticeContent: value }) }
 				/>
 			</NoticeBox>
 		];
@@ -134,20 +111,20 @@ registerBlockType( 'atomic-blocks/ab-notice', {
 	keywords: [
 		__( 'notice', 'atomic-blocks' ),
 		__( 'message', 'atomic-blocks' ),
-		__( 'atomic', 'atomic-blocks' ),
+		__( 'atomic', 'atomic-blocks' )
 	],
 	attributes: {
 		noticeTitle: {
 			type: 'string',
-			selector: '.ab-notice-title',
+			selector: '.ab-notice-title'
 		},
 		noticeContent: {
 			type: 'array',
 			selector: '.ab-notice-text',
-			source: 'children',
+			source: 'children'
 		},
 		noticeAlignment: {
-			type: 'string',
+			type: 'string'
 		},
 		noticeBackgroundColor: {
 			type: 'string',
@@ -167,8 +144,8 @@ registerBlockType( 'atomic-blocks/ab-notice', {
 		},
 		noticeDismiss: {
             type: 'string',
-            default: '',
-        },
+            default: ''
+        }
 	},
 
 	// Render the block components
@@ -181,18 +158,15 @@ registerBlockType( 'atomic-blocks/ab-notice', {
 		const {
 			noticeTitle,
 			noticeContent,
-			noticeAlignment,
 			noticeBackgroundColor,
-			noticeTextColor,
 			noticeTitleColor,
-			noticeFontSize,
 			noticeDismiss
 		} = props.attributes;
 
 		// Save the block markup for the front end
 		return (
 			<NoticeBox { ...props }>
-				{ noticeDismiss && (
+				{ ( noticeDismiss && 'ab-dismissable' === noticeDismiss ) && (
 					<DismissButton { ...props }>
 						{ icons.dismiss }
 					</DismissButton>
@@ -200,7 +174,7 @@ registerBlockType( 'atomic-blocks/ab-notice', {
 
 				{ noticeTitle && (
 					<div
-						class="ab-notice-title"
+						className="ab-notice-title"
 						style={ {
 							color: noticeTitleColor
 						} }
@@ -215,7 +189,7 @@ registerBlockType( 'atomic-blocks/ab-notice', {
 				{ noticeContent && (
 					<RichText.Content
 						tagName="div"
-						class="ab-notice-text"
+						className="ab-notice-text"
 						style={ {
 							borderColor: noticeBackgroundColor
 						} }
@@ -224,5 +198,5 @@ registerBlockType( 'atomic-blocks/ab-notice', {
 				) }
 			</NoticeBox>
 		);
-	},
-} );
+	}
+});

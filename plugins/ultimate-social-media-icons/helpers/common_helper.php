@@ -170,8 +170,6 @@ if(!function_exists('sfsi_icon_generate_other_icon_effect_admin_html')){
 
                 $iconNameStr = $iconName;
             }
-
-
             if(false != $iconImgVal && !filter_var($iconImgVal, FILTER_VALIDATE_URL)){
 
                 $iconImgVal = SFSI_UPLOAD_DIR_BASEURL.$iconImgVal;
@@ -183,17 +181,17 @@ if(!function_exists('sfsi_icon_generate_other_icon_effect_admin_html')){
             $attrIconName = 'data-iconname="'.$iconName.'"';
 
             ?>
-            <div <?php echo $attrCustomIconIndex;?> <?php echo $attrIconName; ?> class="col-md-3 bottommargin20 <?php echo $displayIconClass; ?>">
+            <div <?php echo $attrCustomIconIndex;?><?php echo $attrIconName; ?> class="col-md-3 bottommargin20 <?php echo $displayIconClass; ?>">
 
                 <label <?php echo $attrCustomIconSrNo; ?> class="mouseover_other_icon_label"><?php echo ucfirst($iconNameStr); ?> </label>
 
-                <img data-defaultImg="<?php echo $defaultIconImgUrl; ?>" class="mouseover_other_icon_img" src="<?php echo $activeIconImgUrl; ?>">
+                <img data-defaultImg="<?php echo $defaultIconImgUrl; ?>" class="mouseover_other_icon_img" src="<?php echo $activeIconImgUrl; ?>" alt="error">
 
-                <input <?php echo $attrCustomIconIndex; ?> <?php echo $attrIconName; ?> type="hidden" value="<?php echo $iconImgVal; ?>" name="mouseover_other_icon_<?php echo $iconName; ?>">
+                <input <?php echo $attrCustomIconIndex; ?><?php echo $attrIconName; ?> type="hidden" value="<?php echo $iconImgVal; ?>" name="mouseover_other_icon_<?php echo $iconName; ?>">
 
-                <a <?php echo $attrCustomIconIndex; ?> <?php echo $attrIconName; ?> id="btn_mouseover_other_icon_<?php echo $iconName; ?>" class="mouseover_other_icon_change_link" href="javascript:void(0)" class="mouseover_other_icon">Change</a>
+                <a <?php echo $attrCustomIconIndex; ?><?php echo $attrIconName; ?> id="btn_mouseover_other_icon_<?php echo $iconName; ?>" class="mouseover_other_icon_change_link mouseover_other_icon" href="javascript:void(0)" >Change</a>
 
-                <a <?php echo $attrCustomIconIndex; ?> <?php echo $attrIconName; ?> class="<?php echo $classForRevertLink; ?> mouseover_other_icon_revert_link" href="javascript:void(0)" class="mouseover_other_icon">Revert</a>
+                <a <?php echo $attrCustomIconIndex; ?><?php echo $attrIconName; ?> class="<?php echo $classForRevertLink; ?> mouseover_other_icon_revert_link mouseover_other_icon" href="javascript:void(0)">Revert</a>
 
             </div>
 

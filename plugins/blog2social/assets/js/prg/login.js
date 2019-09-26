@@ -25,7 +25,8 @@ jQuery(document).on('click', '#prgLoginBtn', function () {
                     'action': 'b2s_prg_login',
                     'postId': postId,
                     'username': jQuery('#username').val(),
-                    'password': jQuery('#password').val()
+                    'password': jQuery('#password').val(),
+                    'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
                 },
                 success: function (data) {
                     if (data.result == false) {
@@ -34,6 +35,9 @@ jQuery(document).on('click', '#prgLoginBtn', function () {
                             jQuery("#prgLoginInfoSSL").show();
                         } else {
                             jQuery("#prgLoginInfoFail").show();
+                        }
+                        if(data.error == 'nonce'){
+                            jQuery('.b2s-nonce-check-fail').show();
                         }
                     } else {
                         window.location.href = window.location.pathname + "?page=prg-ship&postId=" + postId;

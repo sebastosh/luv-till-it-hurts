@@ -8,8 +8,8 @@ class B2S_QuickPost {
     private $title;
 
     public function __construct($content = '', $title = '') {
-        $this->content = strip_tags($content);
-        $this->title = strip_tags($title);
+        $this->content = sanitize_text_field($content);
+        $this->title = sanitize_text_field($title);
     }
 
     public function prepareShareData($networkAuthId = 0, $networkId = 0, $networkType = 0) {

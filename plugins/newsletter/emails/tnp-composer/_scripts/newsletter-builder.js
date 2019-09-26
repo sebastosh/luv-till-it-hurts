@@ -292,7 +292,7 @@ function tnpc_save(form) {
 
     let css = jQuery.trim(form.elements["options[css]"].value);
 
-    let export_content = '<!DOCTYPE html>\n<html>\n<head>\n<title>Newsletter</title>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<meta http-equiv="X-UA-Compatible" content="IE=edge">\n';
+    let export_content = '<!DOCTYPE html>\n<html>\n<head>\n<title>{subject}</title>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<meta http-equiv="X-UA-Compatible" content="IE=edge">\n';
     export_content += '<style type="text/css">' + css + '</style>';
     export_content += '</head>\n<body style="margin: 0; padding: 0;">\n';
     export_content += preload_export_html;

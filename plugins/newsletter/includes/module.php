@@ -2,6 +2,24 @@
 
 defined('ABSPATH') || exit;
 
+class TNP_Composer {
+
+    static $block_dirs = array();
+
+    static function register_block($dir) {
+        // Checks
+
+        if (!file_exists($dir . '/block.php')) {
+            $error = new WP_Error('1', 'block.php missing on folder ' . $dir);
+            NewsletterEmails::instance()->logger->error($error);
+            return $error;
+        }
+        self::$block_dirs[] = $dir;
+        return true;
+    }
+
+}
+
 /**
  * @property int $id The list unique identifier
  * @property string $name The list name
@@ -80,6 +98,88 @@ class TNP_Theme {
 
 }
 
+class NewsletterAddon {
+
+    var $logger;
+    var $admin_logger;
+    var $name;
+    var $options;
+    var $version;
+
+    public function __construct($name, $version = '0.0.0') {
+        $this->name = $name;
+        $this->version = $version;
+        if (is_admin()) {
+            $old_version = get_option('newsletter_' . $name . '_version');
+            if ($version != $old_version) {
+                $this->upgrade($old_version === false);
+                update_option('newsletter_' . $name . '_version', $version, false);
+            }
+        }
+        add_action('newsletter_init', array($this, 'init'));
+
+        if (is_admin()) {
+            if (!class_exists('NewsletterExtensions')) {
+                add_filter('plugin_row_meta', function ($plugin_meta, $plugin_file) {
+                    if ($plugin_file === 'newsletter-' . $this->name . '/' . $this->name . '.php') {
+                        $plugin_meta[] = '<a href="admin.php?page=newsletter_main_extensions" style="font-weight: bold">Newsletter Addons Manager required</a>';
+                    }
+                    return $plugin_meta;
+                }, 10, 2);
+            }
+        }
+    }
+
+    function upgrade($first_install = false) {
+    }
+
+    function init() {
+        
+    }
+
+    function get_logger() {
+        if (!$this->logger) {
+            $this->logger = new NewsletterLogger($this->name);
+        }
+        return $this->logger;
+    }
+
+    function get_admin_logger() {
+        if (!$this->admin_logger) {
+            $this->admin_logger = new NewsletterLogger($this->name . '-admin');
+        }
+        return $this->admin_logger;
+    }
+
+    function setup_options() {
+        if ($this->options)
+            return;
+        $this->options = get_option('newsletter_' . $this->name, array());
+    }
+
+    function save_options($options) {
+        update_option('newsletter_' . $this->name, $options);
+        $this->setup_options();
+    }
+
+    /**
+     * @global wpdb $wpdb
+     * @param string $query
+     */
+    function query($query) {
+        global $wpdb;
+
+        $r = $wpdb->query($query);
+        if ($r === false) {
+            $logger = $this->get_logger();
+            $logger->fatal($query);
+            $logger->fatal($wpdb->last_error);
+        }
+        return $r;
+    }
+
+}
+
 class NewsletterModule {
 
     /**
@@ -109,8 +209,6 @@ class NewsletterModule {
      */
     var $version;
     var $old_version;
-    var $module_id;
-    var $available_version;
 
     /**
      * Prefix for all options stored on WordPress options table.
@@ -127,7 +225,6 @@ class NewsletterModule {
     function __construct($module, $version, $module_id = null, $components = array()) {
         $this->module = $module;
         $this->version = $version;
-        $this->module_id = $module_id;
         $this->prefix = 'newsletter_' . $module;
         array_unshift($components, '');
         $this->components = $components;
@@ -157,7 +254,6 @@ class NewsletterModule {
             }
 
             add_action('admin_menu', array($this, 'admin_menu'));
-            $this->available_version = get_option($this->prefix . '_available_version');
         }
     }
 
@@ -226,20 +322,6 @@ class NewsletterModule {
             $this->logger->debug($wpdb->last_error);
         }
         $wpdb->suppress_errors($suppress_errors);
-    }
-
-    /**
-     * Kept for compatibility.
-     */
-    static function get_available_version($module_id, $force = false) {
-        return '';
-    }
-
-    /**
-     * Kept for compatibility.
-     */
-    function new_version_available($force = false) {
-        return false;
     }
 
     /** Returns a prefix to be used for option names and other things which need to be uniquely named. The parameter
@@ -321,8 +403,9 @@ class NewsletterModule {
     }
 
     function merge_options($options, $sub = '', $language = '') {
-        if (!is_array($options))
+        if (!is_array($options)) {
             $options = array();
+        }
         $old_options = $this->get_options($sub, $language);
         $this->save_options(array_merge($old_options, $options), $sub, null, $language);
     }
@@ -372,10 +455,13 @@ class NewsletterModule {
             $time = 60;
         //usleep(rand(0, 1000000));
         if (($value = get_transient($this->get_prefix() . '_' . $name)) !== false) {
-            $this->logger->error('Blocked by transient ' . $this->get_prefix() . '_' . $name . ' set ' . (time() - $value) . ' seconds ago');
+            list($t, $v) = explode(';', $value, 2);
+            $this->logger->error('Blocked by transient ' . $this->get_prefix() . '_' . $name . ' set ' . (time() - $t) . ' seconds ago by ' . $v);
             return false;
         }
-        set_transient($this->get_prefix() . '_' . $name, time(), $time);
+        //$ip = ''; //gethostbyname(gethostname());
+        $value = time() . ";" . ABSPATH . ';' . gethostname();
+        set_transient($this->get_prefix() . '_' . $name, $value, $time);
         return true;
     }
 
@@ -658,23 +744,18 @@ class NewsletterModule {
     }
 
     function add_menu_page($page, $title, $capability = '') {
-        global $newsletter;
+        if (!Newsletter::instance()->is_allowed())
+            return;
         $name = 'newsletter_' . $this->module . '_' . $page;
-        if (empty($capability)) {
-            $capability = ($newsletter->options['editor'] == 1) ? 'manage_categories' : 'manage_options';
-        }
-        add_submenu_page('newsletter_main_index', $title, $title, $capability, $name, array($this, 'menu_page'));
+        add_submenu_page('newsletter_main_index', $title, $title, 'exist', $name, array($this, 'menu_page'));
     }
 
-    function add_admin_page($page, $title, $capability = '') {
-        if (empty($capability)) {
-            $newsletter = Newsletter::instance();
-            $capability = ($newsletter->options['editor'] == 1) ? 'manage_categories' : 'manage_options';
-        }
-
+    function add_admin_page($page, $title) {
+        if (!Newsletter::instance()->is_allowed())
+            return;
         $name = 'newsletter_' . $this->module . '_' . $page;
         $name = apply_filters('newsletter_admin_page', $name);
-        add_submenu_page(null, $title, $title, $capability, $name, array($this, 'menu_page'));
+        add_submenu_page(null, $title, $title, 'exist', $name, array($this, 'menu_page'));
     }
 
     function sanitize_file_name($name) {
@@ -689,10 +770,8 @@ class NewsletterModule {
         $page = $this->sanitize_file_name($parts[2]);
         $page = str_replace('_', '-', $page);
 
-        $file = WP_CONTENT_DIR . '/extensions/newsletter/' . $module . '/' . $page . '.php';
-        if (!is_file($file)) {
-            $file = NEWSLETTER_DIR . '/' . $module . '/' . $page . '.php';
-        }
+        $file = NEWSLETTER_DIR . '/' . $module . '/' . $page . '.php';
+
         require $file;
     }
 
@@ -824,7 +903,7 @@ class NewsletterModule {
     }
 
     function get_email_status_slug($email) {
-	    $email = (object)$email;
+        $email = (object) $email;
         if ($email->status == 'sending' && $email->send_on > time()) {
             return 'scheduled';
         }
@@ -832,7 +911,7 @@ class NewsletterModule {
     }
 
     function get_email_status_label($email) {
-	    $email = (object)$email;
+        $email = (object) $email;
         $status = $this->get_email_status_slug($email);
         switch ($status) {
             case 'sending':
@@ -860,9 +939,9 @@ class NewsletterModule {
 
     function show_email_progress_bar($email, $attrs = array()) {
 
-    	$email = (object)$email;
+        $email = (object) $email;
 
-    	$attrs = array_merge(array('format' => 'percent', 'numbers' => false, 'scheduled' => false), $attrs);
+        $attrs = array_merge(array('format' => 'percent', 'numbers' => false, 'scheduled' => false), $attrs);
 
         if ($email->status == 'sending' && $email->send_on > time()) {
             if ($attrs['scheduled']) {
@@ -951,13 +1030,15 @@ class NewsletterModule {
 
         if (isset($id)) {
             $user = $this->get_user($id);
-            if ($context == 'preconfirm') {
-                if ($token != md5($user->token)) {
-                    $user = null;
-                }
-            } else {
-                if ($token != $user->token) {
-                    $user = null;
+            if ($user) {
+                if ($context == 'preconfirm') {
+                    if ($token != md5($user->token)) {
+                        $user = null;
+                    }
+                } else {
+                    if ($token != $user->token) {
+                        $user = null;
+                    }
                 }
             }
         }
@@ -1696,7 +1777,7 @@ class NewsletterModule {
 
 // Company info
 // TODO: Move to another module
-        $options = Newsletter::instance()->options;
+        $options = Newsletter::instance()->get_options('info');
         $text = str_replace('{company_address}', $options['footer_contact'], $text);
         $text = str_replace('{company_name}', $options['footer_title'], $text);
 

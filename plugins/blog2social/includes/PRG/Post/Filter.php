@@ -7,18 +7,14 @@ class PRG_Post_Filter {
     protected $searchAuthorId;
     protected $searchPostType;
     protected $searchPostTitle;
-    protected $searchPublishDate;
-    protected $searchSchedDate;
     protected $postAuthor;
 
-    function __construct($type, $title = "", $authorId = "", $postType = "",$postStatus="", $publishDate = "", $schedDate = "") {  //type=all,publish,sched
+    function __construct($type, $title = "", $authorId = 0, $postType = "",$postStatus="") {  //type=all,publish,sched
         $this->type = $type;
         $this->searchPostTitle = $title;
-        $this->searchAuthorId = $authorId;
+        $this->searchAuthorId = (int)$authorId;
         $this->searchPostType = $postType;
         $this->searchPostStatus = $postStatus;
-        $this->searchPublishDate = $publishDate;
-        $this->searchSchedDate = $schedDate;
     }
 
     public function getAutorData() {
@@ -28,10 +24,10 @@ class PRG_Post_Filter {
     }
 
     private function getAutorHtml() {
-        $autor = '<div class="form-group"><select name="prgSortPostAuthor" class="form-control b2s-select"><option value="">'. __('All Authors', 'blog2social').'</option>';
+        $autor = '<div class="form-group"><select name="prgSortPostAuthor" class="form-control b2s-select"><option value="">'. esc_html__('All Authors', 'blog2social').'</option>';
         foreach ($this->postAuthor as $var) {
-            $selected = (!empty($this->searchAuthorId) && $var->ID == (int) $this->searchAuthorId) ? 'selected' : '';
-            $autor.='<option ' . $selected . ' value="' . $var->ID . '">' . $var->display_name . '</option>';
+            $selected = ($var->ID == (int) $this->searchAuthorId) ? 'selected' : '';
+            $autor.='<option ' . $selected . ' value="' . esc_attr($var->ID) . '">' . esc_html($var->display_name) . '</option>';
         }
         $autor.='</select></div>';
         return $autor;
@@ -39,18 +35,18 @@ class PRG_Post_Filter {
 
     private function getPostStatusHtml() {
        $typeData = array(array('key' => 'publish', 'value' =>  __('published', 'blog2social')), array('key' => 'future', 'value' =>  __('scheduled', 'blog2social')));
-       $type = '<div class="form-group"><select name="prgSortPostStatus" class="form-control b2s-select"><option value="">'. __('All Types', 'blog2social').'</option>';
+       $type = '<div class="form-group"><select name="prgSortPostStatus" class="form-control b2s-select"><option value="">'. esc_html__('All Types', 'blog2social').'</option>';
         foreach ($typeData as $var) {
             $var = (object) $var;
             $selected = (!empty($this->searchPostStatus) && $var->key == $this->searchPostStatus) ? 'selected' : '';
-            $type.='<option ' . $selected . ' value="' . $var->key . '">' . $var->value . '</option>';
+            $type.='<option ' . $selected . ' value="' . esc_attr($var->key) . '">' . esc_html($var->value) . '</option>';
         }
         $type .='</select></div>';
         return $type;
     }
     
         private function getPostTypeHtml() {
-        $type = '<div class="form-group"><select id="prgSortPostType" name="prgSortPostType" class="form-control b2s-select"><option value="">' . __('all post types', 'blog2social') . '</option>';
+        $type = '<div class="form-group"><select id="prgSortPostType" name="prgSortPostType" class="form-control b2s-select"><option value="">' . esc_html__('all post types', 'blog2social') . '</option>';
         $post_types = get_post_types(array('public' => true));
         if (is_array($post_types) && !empty($post_types)) {
             foreach ($post_types as $k => $v) {
@@ -60,7 +56,7 @@ class PRG_Post_Filter {
                       if (function_exists('mb_strlen') && function_exists('mb_substr')) {
                             $v = mb_strlen($v,'UTF-8') > 27 ? mb_substr($v, 0, 27,'UTF-8') . '...' : $v;
                       }
-                    $type .= '<option ' . $selected . ' value="' . $v . '">' . ucfirst($v) . '</option>';
+                    $type .= '<option ' . $selected . ' value="' . esc_attr($v) . '">' . esc_html(ucfirst($v)) . '</option>';
                 }
             }
         }
@@ -71,7 +67,7 @@ class PRG_Post_Filter {
     public function getItemHtml() {
         $this->getAutorData();
         $this->postFilter .= '<div class="form-group">
-                                    <input id="pref-search" name="prgSortPostTitle" maxlength="30" class="form-control input-sm" value="' . (empty($this->searchPostTitle) ? '' : $this->searchPostTitle) . '" placeholder="' . (empty($this->searchPostTitle) ?  __('Search Title', 'blog2social') : '') . '" type="text">
+                                    <input id="pref-search" name="prgSortPostTitle" maxlength="30" class="form-control input-sm" value="' . esc_attr((empty($this->searchPostTitle) ? '' : $this->searchPostTitle)) . '" placeholder="' . esc_attr((empty($this->searchPostTitle) ?  __('Search Title', 'blog2social') : '')) . '" type="text">
                              </div>';
         if (B2S_PLUGIN_ADMIN) {
             $this->postFilter .=$this->getAutorHtml();
@@ -82,8 +78,8 @@ class PRG_Post_Filter {
         }
         
         $this->postFilter .='<div class="form-group">
-                                    <button class="btn btn-primary btn-sm" type="submit">'. __('sort', 'blog2social').'</button>
-                                    <a class="btn btn-primary btn-sm" href="admin.php?page=prg-post">'. __('reset', 'blog2social').'</a>
+                                    <button class="btn btn-primary btn-sm" type="submit">'. esc_html__('sort', 'blog2social').'</button>
+                                    <a class="btn btn-primary btn-sm" href="admin.php?page=prg-post">'. esc_html__('reset', 'blog2social').'</a>
                              </div>';
 
 

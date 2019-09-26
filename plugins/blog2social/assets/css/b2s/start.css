@@ -43,6 +43,7 @@
 }
 .b2s-widget-block-image-content > img{
     margin-right: 10px;
+    min-width: 200px;
 }
 body .form-inline{
     display: block;

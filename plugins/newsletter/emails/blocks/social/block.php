@@ -31,7 +31,7 @@ $configured = false;
                 $configured = true;
                 ?>
                 <span class="tnpc-row-edit" data-type="image">
-                    <a href="<?php echo $block_options['facebook_url'] ?>"><img src="<?php echo $social_icon_url ?>/facebook.png" alt=""></a>
+                    <a href="<?php echo $block_options['facebook_url'] ?>"><img src="<?php echo $social_icon_url ?>/facebook.png" alt="Facebook"></a>
                 </span>
             <?php } ?>
             <?php

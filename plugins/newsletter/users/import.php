@@ -229,7 +229,7 @@ if ($controls->is_action('import')) {
                         <div class="tnp-tip">
                             <span class="tip-button">Tip</span>
                             <span class="tip-content">
-                                Simply paste CVS text here.
+                                Simply paste CSV text here.
                             </span>
                         </div>
                     </th>

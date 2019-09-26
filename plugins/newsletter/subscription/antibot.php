@@ -121,11 +121,9 @@ if ($controls->is_action()) {
                             </td>
                         </tr>
                         <tr>
-                            <th><?php _e('Captcha', 'newsletter') ?></th>
+                            <th><?php _e('Captcha', 'newsletter') ?> </th>
                             <td>
-                                <?php
-                                $controls->enabled('captcha');
-                                ?>
+                                <?php $controls->enabled('captcha'); ?> <?php $controls->field_help('https://www.thenewsletterplugin.com/documentation/antiflood#captcha')?>
                             </td>
                         </tr>
                         <?php /*

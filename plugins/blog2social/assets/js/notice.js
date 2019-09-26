@@ -7,7 +7,8 @@ jQuery(document).on('click', '.b2s-hide-notice-area', function () {
         dataType: "json",
         cache: false,
         data: {
-            'action': 'b2s_notice_hide',            
+            'action': 'b2s_notice_hide',   
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         success: function (data) {
         }

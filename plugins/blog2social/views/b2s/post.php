@@ -1,4 +1,5 @@
 <?php
+wp_nonce_field('b2s_security_nonce', 'b2s_security_nonce');
 /* Data */
 require_once (B2S_PLUGIN_DIR . 'includes/B2S/Post/Filter.php');
 require_once (B2S_PLUGIN_DIR . 'includes/Util.php');
@@ -8,7 +9,7 @@ require_once (B2S_PLUGIN_DIR . 'includes/Util.php');
         <div class="col-md-12 del-padding-left">
             <div class="col-md-9 del-padding-left del-padding-right">
                 <!--Header|Start - Include-->
-                <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
+                <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.php'); ?>
                 <!--Header|End-->
                 <div class="clearfix"></div>
                 <div class="panel panel-default">
@@ -16,7 +17,7 @@ require_once (B2S_PLUGIN_DIR . 'includes/Util.php');
                         <!--Filter Start-->
                         <div class="b2s-post">
                             <div class="grid-body">
-                                <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/post.navbar.phtml'); ?>
+                                <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/post.navbar.php'); ?>
                                 <!-- Filter Post Start-->
                                 <form class="b2sSortForm form-inline pull-left" action="#">
                                     <input id="b2sType" type="hidden" value="all" name="b2sType">
@@ -37,21 +38,21 @@ require_once (B2S_PLUGIN_DIR . 'includes/Util.php');
                                 <br>
                                 <div class="b2s-loader-impulse b2s-loader-impulse-md"></div>
                                 <div class="clearfix"></div>
-                                <div class="text-center b2s-loader-text"><?php _e("Loading...", "blog2social"); ?></div>
+                                <div class="text-center b2s-loader-text"><?php esc_html_e("Loading...", "blog2social"); ?></div>
                             </div>
                             <div class="row b2s-sort-result-area">
                                 <div class="col-md-12">
                                     <ul class="list-group b2s-sort-result-item-area"></ul>
                                     <br>
                                     <nav class="b2s-sort-pagination-area text-center"></nav>
-                                    <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/footer.phtml'); ?> 
+                                    <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/footer.php'); ?> 
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/sidebar.phtml'); ?>
+            <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/sidebar.php'); ?>
         </div>
     </div>
 </div>

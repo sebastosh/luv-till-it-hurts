@@ -3,7 +3,7 @@
  * Name: Last posts
  * Section: content
  * Description: Last posts list with different layouts
- * Content: dynamic
+ * Type: dynamic
  */
 
 /* @var $options array */
@@ -11,7 +11,6 @@
 
 $defaults = array(
     'title' => 'Last news',
-    'block_background' => '#E6E9ED',
     'color' => '#999999',
     'font_family' => 'Helvetica, Arial, sans-serif',
     'font_size' => '16',
@@ -59,18 +58,19 @@ if (!empty($options['tags'])) {
 
 // Filter by time?
 //$options['block_last_run'] = time();
-if (!empty($options['block_last_run'])) {
+if (!empty($context['last_run'])) {
     $filters['date_query'] = array(
-        'after' => gmdate('c', $options['block_last_run'])
+        'after' => gmdate('c', $context['last_run'])
     );
 }
 
 $posts = Newsletter::instance()->get_posts($filters, $options['language']);
 
-// TODO: Check the context or not?
-if (empty($posts) && $options['block_context'] == 'automated') {
+if (empty($posts) && !empty($context['last_run'])) {
     return;
 }
+
+$out['subject'] = $posts[0]->post_title;
 
 $button_background = $options['button_background'];
 $button_label = $options['button_label'];
@@ -150,7 +150,7 @@ $alternative_2 = plugins_url('newsletter') . '/emails/blocks/posts/images/blank-
                 <?php if ($show_image) { ?>
                     <td valign="top" style="padding: 30px 0 0 0; width: 105px!important" class="mobile-hide">
                         <a href="<?php echo tnp_post_permalink($post) ?>" target="_blank">
-                            <img src="<?php echo tnp_post_thumbnail_src($post, array(105, 105, true), $alternative) ?>" width="105" height="105" border="0" style="display: block; font-family: Arial; color: #666666; font-size: 14px; min-width: 105px!important; width: 105px!important;">
+                            <img src="<?php echo tnp_post_thumbnail_src($post, array(105, 105, true), $alternative) ?>" width="105" height="105" alt="Image" border="0" style="display: block; font-family: Arial; color: #666666; font-size: 14px; min-width: 105px!important; width: 105px!important;">
                         </a>
                     </td>
                 <?php } ?>
@@ -263,7 +263,7 @@ $alternative_2 = plugins_url('newsletter') . '/emails/blocks/posts/images/blank-
                                         <tr>
                                             <td align="center" valign="middle" class="tnpc-row-edit" data-type="image">
                                                 <a href="<?php echo tnp_post_permalink($row[0]) ?>" target="_blank">
-                                                    <img src="<?php echo tnp_post_thumbnail_src($row[0], array(240, 160, true), $alternative_2) ?>" width="240" height="160" border="0" class="img-max">
+                                                    <img src="<?php echo tnp_post_thumbnail_src($row[0], array(240, 160, true), $alternative_2) ?>" alt="Image" width="240" height="160" border="0" class="img-max">
                                                 </a>
                                             </td>
                                         </tr>
@@ -308,7 +308,7 @@ $alternative_2 = plugins_url('newsletter') . '/emails/blocks/posts/images/blank-
                                             <tr>
                                                 <td align="center" valign="middle" class="tnpc-row-edit" data-type="image">
                                                     <a href="<?php echo tnp_post_permalink($row[1]) ?>" target="_blank">
-                                                        <img src="<?php echo tnp_post_thumbnail_src($row[1], array(240, 160, true), $alternative_2) ?>" width="240" height="160" border="0" class="img-max">
+                                                        <img src="<?php echo tnp_post_thumbnail_src($row[1], array(240, 160, true), $alternative_2) ?>" alt="Image" width="240" height="160" border="0" class="img-max">
                                                     </a>
                                                 </td>
                                             </tr>

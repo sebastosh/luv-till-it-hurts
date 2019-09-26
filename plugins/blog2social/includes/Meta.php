@@ -124,7 +124,7 @@ class B2S_Meta {
             if ($type == 'og') {
                 echo '<meta property="og:title" content="' . esc_attr(apply_filters('b2s_og_meta_title', $title)) . '"/>' . "\n";
             } else {
-                echo '<meta property="twitter:title" content="' . esc_attr(apply_filters('b2s_card_meta_title', $title)) . '"/>' . "\n";
+                echo '<meta name="twitter:title" content="' . esc_attr(apply_filters('b2s_card_meta_title', $title)) . '"/>' . "\n";
             }
         } else {
             return $title;
@@ -134,12 +134,12 @@ class B2S_Meta {
     private function getDesc($type = 'og') {
         if (is_singular()) {
             if (isset($this->metaData[$type . '_desc']) && !empty($this->metaData[$type . '_desc'])) {
-                $desc = str_replace("\r\n", ' ', strip_tags(strip_shortcodes($this->metaData[$type . '_desc'])));
+                $desc = str_replace("\r\n", ' ', sanitize_text_field(strip_shortcodes($this->metaData[$type . '_desc'])));
             } else {
                 if (has_excerpt($this->post->ID)) {
-                    $desc = strip_tags(strip_shortcodes(get_the_excerpt()));
+                    $desc = sanitize_text_field(strip_shortcodes(get_the_excerpt()));
                 } else {
-                    $desc = str_replace("\r\n", ' ', substr(strip_tags(strip_shortcodes($this->post->post_content)), 0, 160));
+                    $desc = str_replace("\r\n", ' ', substr(sanitize_text_field(strip_shortcodes($this->post->post_content)), 0, 160));
                 }
             }
         } else {
@@ -150,7 +150,7 @@ class B2S_Meta {
             if ($type == 'og') {
                 echo '<meta property="og:description" content="' . esc_attr(apply_filters('b2s_og_meta_desc', $desc)) . '"/>' . "\n";
             } else {
-                echo '<meta property="twitter:description" content="' . esc_attr(apply_filters('b2s_card_meta_desc', $desc)) . '"/>' . "\n";
+                echo '<meta name="twitter:description" content="' . esc_attr(apply_filters('b2s_card_meta_desc', $desc)) . '"/>' . "\n";
             }
         } else {
             return $desc;
@@ -199,7 +199,7 @@ class B2S_Meta {
                 if ($type == 'og') {
                     echo '<meta property="og:image" content="' . esc_url(apply_filters('b2s_og_meta_image', $image)) . '"/>' . "\n";
                 } else {
-                    echo '<meta property="twitter:image" content="' . esc_url(apply_filters('b2s_card_meta_image', $image)) . '"/>' . "\n";
+                    echo '<meta name="twitter:image" content="' . esc_url(apply_filters('b2s_card_meta_image', $image)) . '"/>' . "\n";
                 }
             }
         } else {

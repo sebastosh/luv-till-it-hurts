@@ -33,7 +33,8 @@ function getWidgetFaq() {
         dataType: "json",
         cache: false,
         data: {
-            'action': 'b2s_get_faq_entries'
+            'action': 'b2s_get_faq_entries',
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         error: function () {
             jQuery('.b2s-faq-area').hide();
@@ -44,12 +45,23 @@ function getWidgetFaq() {
                 jQuery('.b2s-loading-area-faq').hide();
                 jQuery('.b2s-faq-content').html(data.content);
             } else {
+                if (data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                }
                 jQuery('.b2s-faq-area').hide();
             }
         }
     });
 }
 
+
+function base64EncodeUnicode(str) {
+    var utf8Bytes = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+        return String.fromCharCode('0x' + p1);
+    });
+
+    return btoa(utf8Bytes);
+}
 
 
 function initTroubleshootTool() {
@@ -72,7 +84,7 @@ function initTroubleshootTool() {
             type: "GET",
             dataType: "json",
             cache: false,
-            data: {'action': 'b2s_support_systemrequirements'},
+            data: {'action': 'b2s_support_systemrequirements', 'b2s_security_nonce': jQuery('#b2s_security_nonce').val()},
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
                 jQuery('.b2s-loading-area').hide();
@@ -86,6 +98,9 @@ function initTroubleshootTool() {
                     jQuery('#b2s-main-debug').show();
                     return false;
                 } else if (data.result != true) {
+                    if (data.error == 'nonce') {
+                        jQuery('.b2s-nonce-check-fail').show();
+                    }
                     if (data.error == 'admin') {
                         jQuery('.b2s-loading-area').hide();
                         jQuery('#b2s-support-no-admin').show();
@@ -102,7 +117,7 @@ function initTroubleshootTool() {
                             jQuery('#b2s-debug-export').removeClass('b2s-support-link-not-active');
                             jQuery('#b2s-debug-export').attr(
                                     "href", "data:application/octet-stream;charset=utf-8;base64," +
-                                    btoa(JSON.stringify(data.blogData, undefined, 2))
+                                    base64EncodeUnicode(JSON.stringify(data.blogData, undefined, 2))
                                     );
                         } else {
                             jQuery('#b2s-debug-export').addClass('b2s-support-link-not-active');
@@ -117,6 +132,7 @@ function initTroubleshootTool() {
                         return false;
                     }
                 }
+
             }
         });
 

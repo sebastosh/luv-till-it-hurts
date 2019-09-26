@@ -10,7 +10,11 @@ $default_options = array(
     'font_family' => $font_family,
     'font_size' => 13,
     'font_color' => '#999999',
-    'font_weight' => 'normal'
+    'font_weight' => 'normal',
+    'block_padding_top' => 15,
+    'block_padding_bottom' => 15,
+    'block_padding_left' => 15,
+    'block_padding_right' => 15    
 );
 $options = array_merge($default_options, $options);
 ?>

@@ -1,4 +1,4 @@
-/** Navbar */ 
+/** Navbar */
 #b2s-wrapper {
     padding-right: 0;
     -webkit-transition: all 0.5s ease;
@@ -24,10 +24,10 @@
         width: 100% !important;
     }
     .b2s-network-thumb{
-        width:20% !important;    
+        width:20% !important;
     }
     .b2s-network-details{
-        width: 60% !important;    
+        width: 60% !important;
     }
     .b2s-network-status{
         width: 15% !important;
@@ -50,7 +50,7 @@
 }
 
 .b2s-network-details-legend{
-    color:#FFFFFF; 
+    color:#FFFFFF;
     text-align: center;
     opacity: 0.6;
 }
@@ -246,7 +246,7 @@
     color: #fff;
     font-weight: 400;
     text-transform: uppercase;
-    margin-top:3px; 
+    margin-top:3px;
     margin-bottom: 5px;
 }
 
@@ -277,7 +277,7 @@
     float: left;
 }
 .b2s-post-item-thumb{
-    width: 5%;  
+    width: 5%;
     margin-right: 8px;
 }
 
@@ -312,7 +312,7 @@
 }
 .b2s-post-item-details p{
     font-size: 12px;
-    margin: 0px 3px; 
+    margin: 0px 3px;
 
 }
 
@@ -331,7 +331,7 @@
 
 .b2s-post-item-details-item-message-input-allow-html{
     min-height: 200px;
-} 
+}
 .b2s-post-item-message-info{
     margin-left:15px !important;
     font-weight: 600;
@@ -357,7 +357,7 @@
 
 .b2s-no-image-area{
     margin-left: 15px;
-} 
+}
 .b2s-no-image-area-text{
     font-size: 12px;
     margin-left: 2px;
@@ -392,7 +392,7 @@
 }
 .b2s-post-item-details-release-area{
     float: left;
-    width: 100%;    
+    width: 100%;
 }
 
 .b2s-post-item-details-release-area-details, .b2s-post-item-relay-area-details{
@@ -400,7 +400,7 @@
     width: 100%;
 }
 .b2s-post-item-details-release-input-daySelect input{
-    margin-right: 15px;    
+    margin-right: 15px;
 }
 
 .b2s-post-item-details-tag-input{
@@ -513,7 +513,7 @@ input[type="checkbox"], input[type="radio"] {
     margin:0px 4px 0px 4px;
 }
 .ad-tag-btn:hover,.remove-tag-btn:hover{
-    color:#000; 
+    color:#000;
 }
 
 .b2s-post-details{
@@ -663,7 +663,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 .xing-url-title{
-    margin-top: 0px; 
+    margin-top: 0px;
     margin-bottom: 4px;
     font-size: 18px;
     font-weight: normal;
@@ -759,17 +759,17 @@ input[type="checkbox"], input[type="radio"] {
     margin-right: 5px !important;
 }
 .b2s-img-required{
-    border-color: #d9534f !important;   
+    border-color: #d9534f !important;
 }
 .b2s-post-item-details-url-image{
     cursor: pointer;
 }
 
-.b2s-user-network-settings-post-format-area label > input{ 
-    visibility: hidden; 
-    position: absolute; 
+.b2s-user-network-settings-post-format-area label > input{
+    visibility: hidden;
+    position: absolute;
 }
-.b2s-user-network-settings-post-format-area label > input + img{ 
+.b2s-user-network-settings-post-format-area label > input + img{
     cursor:pointer;
     border:2px solid transparent;
 }
@@ -832,4 +832,24 @@ input[type="number"]{
 
 .b2s-sidebar-menu-item{
     font-weight: 600 !important;
+}
+
+.b2s-submit-btn {
+    margin-left: 5px;
+}
+
+.b2s-loader-btn-ship{
+    height: 24px;
+    width: 24px;
+    margin-top: -10px !important;
+    margin-bottom: -6px !important;
+    display: none;
+}
+
+.b2s-login-form-label {
+    padding-top: 7px;
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: right;
+    font-weight: bold;
 }

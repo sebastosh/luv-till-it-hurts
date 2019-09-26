@@ -16,39 +16,28 @@ class PRG_Post_Item {
     public $currentPage = 0;
     public $type;
 
-    function __construct($type = 'all', $title = "", $authorId = "", $postType = "", $postStatus = "", $publishDate = '', $schedDate = '', $currentPage = 0, $userLang = 'en') {
+    function __construct($type = 'all', $title = "", $authorId = 0, $postType = "", $postStatus = "", $currentPage = 0, $userLang = 'en') {
         $this->type = $type;
         $this->searchPostTitle = $title;
-        $this->searchAuthorId = $authorId;
+        $this->searchAuthorId = (int) $authorId;
         $this->searchPostType = $postType;
         $this->searchPostStatus = $postStatus;
-        $this->searchPublishDate = $publishDate;
-        $this->searchSchedDate = $schedDate;
         $this->currentPage = $currentPage;
         $this->userLang = $userLang; //Plugin: qTranslate
     }
 
     protected function getData() {
         global $wpdb;
-
         $addSearchAuthorId = '';
         $addSearchPostTitle = '';
         $order = 'ID';
         $sortType = 'DESC';
-        if (!empty($this->searchPublishDate)) {
-            $sortType = $this->searchPublishDate;
-        }
-        if (!empty($this->searchSchedDate)) {
-            $sortType = $this->searchSchedDate;
-        }
         if (!empty($this->searchPostTitle)) {
             $addSearchPostTitle = $wpdb->prepare(' AND `post_title` LIKE %s', '%' . trim($this->searchPostTitle) . '%');
         }
-
         if (!empty($this->searchAuthorId)) {
             $addSearchAuthorId = $wpdb->prepare(' AND `post_author` = %d', $this->searchAuthorId);
         }
-
         if (!empty($this->searchPostStatus)) {
             $addSearchType = $wpdb->prepare(' `post_status` = %s', $this->searchPostStatus);
         } else {
@@ -97,7 +86,7 @@ class PRG_Post_Item {
         $postStatus = array('publish' => __('published', 'blog2social'), 'pending' => __('draft', 'blog2social'), 'future' => __('scheduled', 'blog2social'));
 
         if (empty($this->postData)) {
-            $text = __('You have no posts published or scheduled', 'blog2social');
+            $text = esc_html__('You have no posts published or scheduled', 'blog2social');
             return '<li class="list-group-item"><div class="media"><div class="media-body"></div>' . $text . '</div></li>';
         }
 
@@ -123,13 +112,13 @@ class PRG_Post_Item {
                 $userInfo = get_user_meta($var->post_author);
                 $this->postItem .= '<li class="list-group-item">
                                 <div class="media">
-                                    <img class="post-img-10 pull-left hidden-xs" src="' . plugins_url('/assets/images/prg/' . $postType . '-icon.png', B2S_PLUGIN_FILE) . '" alt="posttype">
+                                    <img class="post-img-10 pull-left hidden-xs" src="' . esc_url(plugins_url('/assets/images/prg/' . $postType . '-icon.png', B2S_PLUGIN_FILE)) . '" alt="posttype">
                                         <div class="media-body">
-                                                <strong><a target="_blank" href="' . get_permalink($var->ID) . '">' . $postTitle . '</a></strong>
+                                                <strong><a target="_blank" href="' . esc_url(get_permalink($var->ID)) . '">' . esc_html($postTitle) . '</a></strong>
                                             <span class="pull-right b2s-publish-btn">
-                                                <a href="admin.php?page=prg-login&postId=' . $var->ID . '" class="btn btn-primary btn-sm">' . __('Publish on PR-Gateway', 'blog2social') . '</a>
+                                                <a href="admin.php?page=prg-login&postId=' . $var->ID . '" class="btn btn-primary btn-sm">' . esc_html__('Publish on PR-Gateway', 'blog2social') . '</a>
                                             </span>
-                                            <p class="info hidden-xs">#' . $var->ID . ' | ' . __('Author', 'blog2social') . ' <a href="' . get_author_posts_url($var->post_author) . '">' . (isset($userInfo['nickname'][0]) ? $userInfo['nickname'][0] : '-') . '</a> | ' . $postStatus[trim(strtolower($var->post_status))] . ' ' . __('on Blog', 'blog2social') . ' ' . B2S_Util::getCustomDateFormat($var->post_date, substr(B2S_LANGUAGE, 0, 2)) . '</p>
+                                            <p class="info hidden-xs">#' . esc_html($var->ID) . ' | ' . esc_html__('Author', 'blog2social') . ' <a href="' . esc_url(get_author_posts_url($var->post_author)) . '">' . esc_html((isset($userInfo['nickname'][0]) ? $userInfo['nickname'][0] : '-')) . '</a> | ' . esc_html($postStatus[trim(strtolower($var->post_status))]) . ' ' . esc_html__('on Blog', 'blog2social') . ' ' . esc_html(B2S_Util::getCustomDateFormat($var->post_date, substr(B2S_LANGUAGE, 0, 2))) . '</p>
                                         </div>
                                     </div>
                                 </li>';
@@ -146,27 +135,26 @@ class PRG_Post_Item {
             $start = (($this->currentPage - $this->postPaginationLinks ) > 0 ) ? $this->currentPage - $this->postPaginationLinks : 1;
             $end = (( $this->currentPage + $this->postPaginationLinks ) < $last ) ? $this->currentPage + $this->postPaginationLinks : $last;
             $page = 'page=' . $page;
-            $searchParams = '&b2sSortPostType=' . $this->searchPostType . '&b2sSortPostTitle=' . $this->searchPostTitle . '&b2sSortPostAuthor=' . $this->searchAuthorId . '&b2sSortPostPublishDate=' . $this->searchPublishDate . '&b2sSortPostSchedDate=' . $this->searchSchedDate;
-
+            $searchParams = '&b2sSortPostType=' . $this->searchPostType . '&b2sSortPostTitle=' . $this->searchPostTitle . '&b2sSortPostAuthor=' . $this->searchAuthorId;
             $this->postPagination = '<ul class="pagination">';
             $class = ( $this->currentPage == 1 ) ? "disabled" : "";
             $linkpre = ( $this->currentPage == 1 ) ? '#' : ('?' . $page . $searchParams . '&b2sPage=' . ( $this->currentPage - 1 ));
-            $this->postPagination .= '<li class="' . $class . '"><a href="' . $linkpre . '">&laquo;</a></li>';
+            $this->postPagination .= '<li class="' . esc_attr($class) . '"><a href="' . $linkpre . '">&laquo;</a></li>';
             if ($start > 1) {
                 $this->postPagination .= '<li><a href="?' . $page . $searchParams . '&b2sPage=1">1</a></li>';
                 $this->postPagination .= '<li class="disabled"><span>...</span></li>';
             }
             for ($i = $start; $i <= $end; $i++) {
                 $class = ( $this->currentPage == $i ) ? "active" : "";
-                $this->postPagination .= '<li class="' . $class . '"><a href="?' . $page . $searchParams . '&b2sPage=' . $i . '">' . $i . '</a></li>';
+                $this->postPagination .= '<li class="' . esc_attr($class) . '"><a href="?' . $page . $searchParams . '&b2sPage=' . $i . '">' . esc_html($i) . '</a></li>';
             }
             if ($end < $last) {
                 $this->postPagination .= '<li class="disabled"><span>...</span></li>';
-                $this->postPagination .= '<li><a href="?' . $page . $searchParams . '&b2sPage=' . $last . '">' . $last . '</a></li>';
+                $this->postPagination .= '<li><a href="?' . $page . $searchParams . '&b2sPage=' . $last . '">' . esc_html($last) . '</a></li>';
             }
             $class = ( $this->currentPage == $last ) ? "disabled" : "";
             $linkpast = ( $this->currentPage == $last ) ? '#' : ('?' . $page . $searchParams . '&b2sPage=' . ( $this->currentPage + 1 ));
-            $this->postPagination .= '<li class="' . $class . '"><a href="' . $linkpast . '">&raquo;</a></li>';
+            $this->postPagination .= '<li class="' . esc_attr($class) . '"><a href="' . $linkpast . '">&raquo;</a></li>';
             $this->postPagination .= '</ul>';
         }
         return $this->postPagination;

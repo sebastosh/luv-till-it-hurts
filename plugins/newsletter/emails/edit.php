@@ -46,7 +46,7 @@ if ($controls->is_action('abort')) {
 
 if ($controls->is_action('change-private')) {
     $data = array();
-    $data['private'] = $controls->data['private'] ? 0 : 1;
+    $data['private'] = $controls->data['private'] ? 1 : 0;
     $data['id'] = $email['id'];
     $email = Newsletter::instance()->save_email($data, ARRAY_A);
     $controls->add_message_saved();
@@ -116,7 +116,9 @@ if ($controls->is_action('test') || $controls->is_action('save') || $controls->i
 
     $email['subject'] = $controls->data['subject'];
     $email['track'] = $controls->data['track'];
+    $email['editor'] = $editor_type;
     $email['private'] = $controls->data['private'];
+    $email['message_text'] = $controls->data['message_text'];
     if ($controls->is_action('send')) {
         $email['send_on'] = time();
     } else {

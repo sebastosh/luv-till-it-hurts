@@ -11,30 +11,32 @@ class B2S_Tools {
     }
 
     public static function setUserDetails() {
-        delete_option('B2S_PLUGIN_USER_VERSION_' . B2S_PLUGIN_BLOG_USER_ID);
-        delete_option('B2S_PLUGIN_PRIVACY_POLICY_USER_ACCEPT_' . B2S_PLUGIN_BLOG_USER_ID);
-        $version = json_decode(B2S_Api_Post::post(B2S_PLUGIN_API_ENDPOINT, array('action' => 'getUserDetails', 'token' => B2S_PLUGIN_TOKEN, 'version' => B2S_PLUGIN_VERSION), 30));
-        $tokenInfo['B2S_PLUGIN_USER_VERSION'] = (isset($version->version) ? $version->version : 0);
-        $tokenInfo['B2S_PLUGIN_VERSION'] = B2S_PLUGIN_VERSION;
-        if (!defined("B2S_PLUGIN_USER_VERSION")) {
-            define('B2S_PLUGIN_USER_VERSION', $tokenInfo['B2S_PLUGIN_USER_VERSION']);
-        }
-        if (isset($version->trial) && $version->trial != "") {
-            $tokenInfo['B2S_PLUGIN_TRAIL_END'] = $version->trial;
-
-            if (!defined("B2S_PLUGIN_TRAIL_END")) {
-                define('B2S_PLUGIN_TRAIL_END', $tokenInfo['B2S_PLUGIN_TRAIL_END']);
+        if (defined("B2S_PLUGIN_TOKEN")) {
+            delete_option('B2S_PLUGIN_USER_VERSION_' . B2S_PLUGIN_BLOG_USER_ID);
+            delete_option('B2S_PLUGIN_PRIVACY_POLICY_USER_ACCEPT_' . B2S_PLUGIN_BLOG_USER_ID);
+            $version = json_decode(B2S_Api_Post::post(B2S_PLUGIN_API_ENDPOINT, array('action' => 'getUserDetails', 'token' => B2S_PLUGIN_TOKEN, 'version' => B2S_PLUGIN_VERSION), 30));
+            $tokenInfo['B2S_PLUGIN_USER_VERSION'] = (isset($version->version) ? $version->version : 0);
+            $tokenInfo['B2S_PLUGIN_VERSION'] = B2S_PLUGIN_VERSION;
+            if (!defined("B2S_PLUGIN_USER_VERSION")) {
+                define('B2S_PLUGIN_USER_VERSION', $tokenInfo['B2S_PLUGIN_USER_VERSION']);
             }
-        }
-        if (!isset($version->version)) {
-            define('B2S_PLUGIN_NOTICE', 'CONNECTION');
-        } else {
-            $tokenInfo['B2S_PLUGIN_USER_VERSION_NEXT_REQUEST'] = time() + 3600;
-            update_option('B2S_PLUGIN_USER_VERSION_' . B2S_PLUGIN_BLOG_USER_ID, $tokenInfo, false);
-        }
+            if (isset($version->trial) && $version->trial != "") {
+                $tokenInfo['B2S_PLUGIN_TRAIL_END'] = $version->trial;
 
-        if (isset($version->show_privacy_policy) && !empty($version->show_privacy_policy)) {
-            update_option('B2S_PLUGIN_PRIVACY_POLICY_USER_ACCEPT_' . B2S_PLUGIN_BLOG_USER_ID, $version->show_privacy_policy, false);
+                if (!defined("B2S_PLUGIN_TRAIL_END")) {
+                    define('B2S_PLUGIN_TRAIL_END', $tokenInfo['B2S_PLUGIN_TRAIL_END']);
+                }
+            }
+            if (!isset($version->version)) {
+                define('B2S_PLUGIN_NOTICE', 'CONNECTION');
+            } else {
+                $tokenInfo['B2S_PLUGIN_USER_VERSION_NEXT_REQUEST'] = time() + 3600;
+                update_option('B2S_PLUGIN_USER_VERSION_' . B2S_PLUGIN_BLOG_USER_ID, $tokenInfo, false);
+            }
+
+            if (isset($version->show_privacy_policy) && !empty($version->show_privacy_policy)) {
+                update_option('B2S_PLUGIN_PRIVACY_POLICY_USER_ACCEPT_' . B2S_PLUGIN_BLOG_USER_ID, $version->show_privacy_policy, false);
+            }
         }
     }
 
@@ -42,14 +44,14 @@ class B2S_Tools {
         $check = false;
         $blogUrl = get_option('home');
         global $wpdb;
-        $sql = "SELECT token,state_url FROM b2s_user WHERE blog_user_id = %d";
+        $sql = "SELECT token,state_url FROM {$wpdb->prefix}b2s_user WHERE blog_user_id = %d";
         $result = $wpdb->get_results($wpdb->prepare($sql, B2S_PLUGIN_BLOG_USER_ID));
         if (is_array($result) && !empty($result) && isset($result[0]->token)) {
             if (isset($result[0]->state_url) && (int) $result[0]->state_url != 1) {
                 $checkBlogUrl = json_decode(B2S_Api_Post::post(B2S_PLUGIN_API_ENDPOINT, array('action' => 'getBlogUrl', 'token' => $result[0]->token, 'blog_url' => strtolower($blogUrl), 'state_url' => (int) $result[0]->state_url)));
                 if (isset($checkBlogUrl->result) && (int) $checkBlogUrl->result == 1) {
                     if (isset($checkBlogUrl->update) && (int) $checkBlogUrl->update == 1) {
-                        $wpdb->update('b2s_user', array('state_url' => "1"), array('blog_user_id' => B2S_PLUGIN_BLOG_USER_ID), array('%d'), array('%d'));
+                        $wpdb->update($wpdb->prefix . 'b2s_user', array('state_url' => "1"), array('blog_user_id' => B2S_PLUGIN_BLOG_USER_ID), array('%d'), array('%d'));
                     }
                     $check = true;
                 }
@@ -112,7 +114,7 @@ class B2S_Tools {
             return 'https://service.blog2social.com/' . (((int) $affiliateId != 0) ? '?aid=' . $affiliateId : '');
         }
         if ($type == 'feature') {
-            return 'https://blog2social.com/' . (($lang == 'en') ? 'en/features' : 'de/funktionen');
+            return 'https://blog2social.com/' . (($lang == 'en') ? 'en/plugin/wordpress/premium-trial/' : 'de/plugin/wordpress/premium-testen/');
         }
         if ($type == 'trial') {
             return 'https://service.blog2social.com/' . (($lang == 'en') ? 'en/trial' : 'de/trial');
@@ -124,7 +126,7 @@ class B2S_Tools {
             return 'https://www.blog2social.com/' . (($lang == 'en') ? 'en/terms' : 'de/agb');
         }
         if ($type == 'privacy_policy') {
-            return 'https://www.adenion.de/' . (($lang == 'en') ? 'privacy-policy' : 'datenschutz');
+            return 'https://www.blog2social.com/' . (($lang == 'en') ? 'privacy-policy' : 'de/datenschutz');
         }
         if ($type == 'userTimeSettings') {
             return ($lang == 'en') ? 'https://www.blog2social.com/en/faq/index.php?action=artikel&cat=5&id=32&artlang=en' : 'https://www.blog2social.com/de/faq/index.php?action=artikel&cat=5&id=43&artlang=de';
@@ -188,10 +190,76 @@ class B2S_Tools {
         if ($type == 'xing_auto_posting') {
             return ($lang == 'en') ? 'https://faq.xing.com/en/groups/code-conduct-group-members' : 'https://faq.xing.com/de/gruppen/verhaltenskodex-f%C3%BCr-gruppenmitglieder';
         }
+        if ($type == 'system') {
+            return ($lang == 'en') ? 'https://www.blog2social.com/en/faq/content/1/58/en/system-requirements-for-installing-blog2social.html' : 'https://www.blog2social.com/de/faq/content/1/63/de/systemvoraussetzungen-fuer-die-installation-von-blog2social.html';
+        }
+        if ($type == 'share_error') {
+            return ($lang == 'en') ? 'https://www.blog2social.com/en/faq/category/9/troubleshooting-for-error-messages.html' : 'https://www.blog2social.com/de/faq/index.php?action=show&cat=9';
+        }
+        if ($type == 'instagram_without_text') {
+            return ($lang == 'en') ? 'https://www.blog2social.com/en/faq/index.php?action=artikel&cat=9&id=154&artlang=en' : 'https://www.blog2social.com/de/faq/index.php?action=artikel&cat=9&id=152&artlang=de';
+        }
+        if($type == 'auto_poster_m'){
+            return ($lang == 'en') ? 'https://www.blog2social.com/en/faq/index.php?action=artikel&cat=3&id=72&artlang=en' : 'https://www.blog2social.com/de/faq/content/3/79/de/wie-kann-ich-meine-blogbeitraege-automatisiert-und-zeitgesteuert-auf-social-media-planen-social-media-auto_poster.html';
+        }
+         if($type == 'auto_poster_a'){
+            return ($lang == 'en') ? 'https://www.blog2social.com/en/faq/index.php?action=artikel&cat=3&id=116&artlang=en' : 'https://www.blog2social.com/de/faq/index.php?action=artikel&cat=3&id=116&artlang=de';
+        }
+        
+        
+        
     }
 
     public static function getAffiliateId() {
         return (defined("B2S_PLUGIN_AFFILIATE_ID")) ? B2S_PLUGIN_AFFILIATE_ID : 0;
+    }
+
+    public static function getTokenById($user_id = 0) {
+        if ($user_id == 0) {
+            $user_id = get_current_user_id();
+        }
+        $user = get_user_by('id', $user_id);
+        global $wpdb;
+        $sql = $wpdb->prepare("SELECT token FROM `{$wpdb->prefix}b2s_user` WHERE `blog_user_id` = %d", $user->data->ID);
+        $userExist = $wpdb->get_row($sql);
+        if (empty($userExist) || !isset($userExist->token)) {
+            $postData = array('action' => 'getToken', 'blog_user_id' => $user->data->ID, 'blog_url' => get_option('home'), 'email' => $user->data->user_email, 'is_multisite' => is_multisite());
+            $result = json_decode(B2S_Tools::getToken($postData));
+            if (isset($result->result) && (int) $result->result == 1 && isset($result->token)) {
+                $state_url = (isset($result->state_url)) ? (int) $result->state_url : 0;
+                $sqlInsertToken = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}b2s_user` (`token`, `blog_user_id`,`register_date`,`state_url`) VALUES (%s,%d,%s,%d);", $result->token, (int) $user->data->ID, date('Y-m-d H:i:s'), $state_url);
+                $wpdb->query($sqlInsertToken);
+                return $result->token;
+            } else {
+                return false;
+            }
+        } else {
+            return $userExist->token;
+        }
+    }
+
+    public static function searchUser($search = "", $selectId = 0) {
+        $getUser = new WP_User_Query(array(
+            'search' => '*' . esc_attr($search) . '*',
+            'search_columns' => array(
+                'display_name',
+            ),
+        ));
+        $userResult = $getUser->get_results();
+        $options = '<option value="0"></option>';
+        if (!empty($userResult) && is_array($userResult)) {
+            foreach ($userResult as $k => $user) {
+                if (isset($user->data->ID) && isset($user->data->display_name) && isset($user->data->user_email)) {
+                    $userDetails = get_option('B2S_PLUGIN_USER_VERSION_' . $user->data->ID);
+                    $ver = "";
+                    if (isset($userDetails['B2S_PLUGIN_USER_VERSION']) && (int) $userDetails['B2S_PLUGIN_USER_VERSION'] > 0) {
+                        $ver = " (Blog2Social " . esc_html__('License', 'blog2social') . ": " . unserialize(B2S_PLUGIN_VERSION_TYPE)[$userDetails['B2S_PLUGIN_USER_VERSION']] . ")";
+                    }
+                    $options .= '<option value="' . $user->data->ID . '" ' . (($user->data->ID == $selectId) ? "selected" : "") . '>' . esc_attr($user->data->display_name) . " (" . esc_attr($user->data->user_email) . ")" . $ver . '</option>';
+                }
+            }
+        }
+        return $options;
     }
 
 }

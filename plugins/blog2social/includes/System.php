@@ -42,7 +42,7 @@ class B2S_System {
         $return = false;
 
         //ExistsColumn
-        $b2sUserCols = $wpdb->get_results('SHOW COLUMNS FROM b2s_user');
+        $b2sUserCols = $wpdb->get_results('SHOW COLUMNS FROM '.$wpdb->prefix.'b2s_user');
         if (is_array($b2sUserCols) && isset($b2sUserCols[0])) {
             $b2sUserColsData = array();
             foreach ($b2sUserCols as $key => $value) {
@@ -55,7 +55,7 @@ class B2S_System {
             }
         }
         //ExistsTable
-        if ($wpdb->get_var("SHOW TABLES LIKE 'b2s_posts_sched_details'") != 'b2s_posts_sched_details') {
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$wpdb->prefix}b2s_posts_sched_details'") != $wpdb->prefix.'b2s_posts_sched_details') {
             $return = false;
         }
         return $return;
@@ -66,22 +66,22 @@ class B2S_System {
         if (is_array($errors) && !empty($errors)) {
             foreach ($errors as $error => $status) {
                 if ($error == 'curl' && $status == false) {
-                    $output .= __('Blog2Social used cURL. cURL is not installed in your PHP installation on your server. Install cURL and activate Blog2Social again.', 'blog2social');
+                    $output .= esc_html__('Blog2Social used cURL. cURL is not installed in your PHP installation on your server. Install cURL and activate Blog2Social again.', 'blog2social');
                     $output .= (!$removeBreakline) ? '<br>' : ' ';
                     $output .= (!$removeBreakline) ? '<br>' : ' ';
-                    $output .= __('Please see <a href="https://www.blog2social.com/en/faq/content/1/58/en/system-requirements-for-installing-blog2social.html" target="_blank">FAQ</a>', 'blog2social') . '</a>';
+                    $output .= sprintf(__('<a href="%s" target="_blank">Please find more Information and help in our FAQ</a>', 'blog2social'), esc_url(B2S_Tools::getSupportLink('system')));
                 }
                 if ($error == 'php' && $status == false) {
-                    $output .= __('Blog2Social used PHP. Your installed PHP version on your server is not high enough to use Blog2Social. Update your PHP version on 5.5.3 or higher.', 'blog2social');
+                    $output .= esc_html__('Blog2Social used PHP. Your installed PHP version on your server is not high enough to use Blog2Social. Update your PHP version on 5.5.3 or higher.', 'blog2social');
                     $output .= (!$removeBreakline) ? '<br>' : ' ';
                     $output .= (!$removeBreakline) ? '<br>' : ' ';
-                    $output .= __('Please see <a href="https://www.blog2social.com/en/faq/content/1/58/en/system-requirements-for-installing-blog2social.html" target="_blank">FAQ</a>', 'blog2social') . '</a>';
+                    $output .= sprintf(__('<a href="%s" target="_blank">Please find more Information and help in our FAQ</a>', 'blog2social'), esc_url(B2S_Tools::getSupportLink('system')));
                 }
                 if ($error == 'dbTable' && $status == false) {
-                    $output .= __('Blog2Social does not seem to have permission to write in your WordPress database. Please assign Blog2Social the permission to write in the WordPress database. Please also make sure that your MySQL server runs on v5.5.3 or higher, or ask your server administrator to do it for you.', 'blog2social');
+                    $output .= esc_html__('Blog2Social does not seem to have permission to write in your WordPress database. Please assign Blog2Social the permission to write in the WordPress database. Please also make sure that your MySQL server runs on v5.5.3 or higher, or ask your server administrator to do it for you.', 'blog2social');
                     $output .= (!$removeBreakline) ? '<br>' : ' ';
                     $output .= (!$removeBreakline) ? '<br>' : ' ';
-                    $output .= __('<a href="https://www.blog2social.com/en/faq/content/1/58/en/system-requirements-for-installing-blog2social.html" target="_blank"> Please find more Information and help in our FAQ</a>', 'blog2social') . '</a>.';
+                    $output .= sprintf(__('<a href="%s" target="_blank">Please find more Information and help in our FAQ</a>', 'blog2social'), esc_url(B2S_Tools::getSupportLink('system')));
                 }
             }
         }
@@ -90,6 +90,46 @@ class B2S_System {
 
     public function deactivatePlugin() {
         deactivate_plugins(B2S_PLUGIN_BASENAME);
+    }
+
+    //V5.7.0 White-Label-Solution
+    public static function isblockedArea($area = '', $isAdmin = false, $general = false) {
+        if (defined('B2S_PLUGIN_WHITE_LABEL')) {
+            if (B2S_PLUGIN_WHITE_LABEL === true) {
+                if ($general) {
+                    return true;
+                }
+                if (defined('B2S_PLUGIN_WHITE_LABEL_BLOCKED_AREA')) {
+                    $blocked = unserialize(B2S_PLUGIN_WHITE_LABEL_BLOCKED_AREA);
+                    if (is_array($blocked) && !empty($blocked)) {
+                        if (in_array(trim($area), $blocked)) {
+                            if ((trim($area) == 'B2S_LICENSE_MODUL_EDIT' || trim($area) == 'B2S_MENU_ITEM_LICENSE') && $isAdmin) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    //V5.7.0 White-Label-Solution 
+    public static function customizeArea() {
+        if (defined('B2S_PLUGIN_WHITE_LABEL')) {
+            if (B2S_PLUGIN_WHITE_LABEL === true) {
+                if (defined('B2S_PLUGIN_WHITE_LABEL_LOGO')) {
+                    if (!empty(B2S_PLUGIN_WHITE_LABEL_LOGO)) {
+                        $file = get_home_path() . B2S_PLUGIN_WHITE_LABEL_LOGO;
+                        if (file_exists($file)) {
+                            return array('image_path' => $file);
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }

@@ -258,6 +258,13 @@ class NewsletterControls {
         'YE' => 'Yemen',
         'ZM' => 'Zambia',
         'ZW' => 'Zimbabwe',
+        'XX' => 'Undefined',
+        
+        'CW' => 'Curaçao',
+        'SS' => 'South Sudan',
+        'EU' => 'Europe (generic)',
+        'A1' => 'Anonymous IP',
+        'A2' => 'Satellite IP'
     );
 
     function __construct($options = null) {
@@ -788,6 +795,14 @@ class NewsletterControls {
         echo esc_html(__('Reset', 'newsletter'));
         echo '</button>';
     }
+    
+    function button_link($url, $label) {
+        echo '<a href="', esc_attr($url), '" class="button-primary">', $label, '</a>';
+    }
+    
+    function button_configure($url) {
+        echo '<a href="', esc_attr($url), '" class="button-primary"><i class="fa fa-cog"></i>', _e('Configure', 'newsletter'), '</a>';
+    }    
 
     function button_back($url) {
         echo '<a href="';
@@ -913,7 +928,7 @@ class NewsletterControls {
         if ($label != '') {
             echo '<label>';
         }
-        echo '<input type="checkbox" id="' . esc_attr($name) . '" name="options[' . esc_attr($name) . ']" value="1"';
+        echo '<input type="checkbox" id="options-' . esc_attr($name) . '" name="options[' . esc_attr($name) . ']" value="1"';
         if (!empty($this->data[$name])) {
             echo ' checked';
         }
@@ -1571,9 +1586,7 @@ class NewsletterControls {
     }
 
     static function field_help($url, $text = '') {
-        if (empty($text))
-            $text = __('Read more', 'newsletter');
-        echo '<i class="fa fa-question-circle"></i>&nbsp;<a href="', $url, '" target="_blank">', $text, '</a>';
+        echo '<a href="', $url, '" target="_blank" style="text-decoration: none" title="' . esc_attr(__('Read more', 'newsletter')) . '"><i class="fa fa-question-circle"></i>&nbsp;', $text, '</a>';
     }
 
     /**
@@ -1657,7 +1670,7 @@ class NewsletterControls {
         echo '<input type="hidden" name="options[subject]" id="options-subject" value="', $value, '">';
     }
 
-    function composer_load($name = 'body', $show_subject = false) {
+    function composer_load($name = 'body', $show_subject = false, $show_test = true) {
 
         global $controls;
         global $tnpc_show_subject;

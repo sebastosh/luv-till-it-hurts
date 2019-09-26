@@ -6,7 +6,7 @@
 ?>
 
 <?php $controls->hidden('placeholder') ?>
-<?php $fields->media('image') ?>
+<?php $fields->media('image', null, array('alt'=>true)) ?>
 
 <?php $fields->url('url', 'URL') ?>
 

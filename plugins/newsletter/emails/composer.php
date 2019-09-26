@@ -5,9 +5,6 @@ require_once NEWSLETTER_INCLUDES_DIR . '/controls.php';
 $controls = new NewsletterControls();
 $module = NewsletterEmails::instance();
 
-//wp_enqueue_style('wp-color-picker');
-//wp_enqueue_script('wp-color-picker');
-// TNP Composer style
 wp_enqueue_style('tnpc-style', plugins_url('/tnp-composer/_css/newsletter-builder.css', __FILE__), array(), time());
 wp_enqueue_style('tnpc-newsletter-style', home_url('/') . '?na=emails-composer-css');
 
@@ -44,6 +41,7 @@ To change your subscription follow: {profile_url}.';
     } else {
 
         $email['id'] = $_GET['id'];
+        $email['editor'] = NewsletterEmails::EDITOR_COMPOSER;
         $email['message'] = $controls->data['body'];
         $email['subject'] = $controls->data['subject'];
         $email = Newsletter::instance()->save_email($email, ARRAY_A);

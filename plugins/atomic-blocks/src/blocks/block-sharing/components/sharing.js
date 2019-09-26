@@ -19,7 +19,7 @@ export default class ShareLinks extends Component {
 
 	render() {
 
-		return (	
+		return (
 			<div
 				className={ classnames(
 					this.props.className,
@@ -27,7 +27,7 @@ export default class ShareLinks extends Component {
 					this.props.attributes.shareButtonShape,
 					this.props.attributes.shareButtonSize,
 					this.props.attributes.shareButtonColor,
-					this.props.attributes.shareAlignment,
+					this.props.attributes.shareAlignment ? 'ab-align-' + this.props.attributes.shareAlignment : undefined,
 					'ab-block-sharing'
 				) }
 			>

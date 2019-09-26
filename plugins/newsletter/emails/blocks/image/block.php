@@ -12,14 +12,15 @@ $defaults = array(
     'image' => '',
     'url' => '',
     'block_background' => '#ffffff',
-    'block_padding_left'=>0,
-    'block_padding_right'=>0,
-    'block_padding_bottom'=>15,
-    'block_padding_top'=>15    
+    'block_padding_left' => 0,
+    'block_padding_right' => 0,
+    'block_padding_bottom' => 15,
+    'block_padding_top' => 15
 );
 
 $options = array_merge($defaults, $options);
 
+$alt = '';
 if (empty($options['image']['id'])) {
     // A placeholder can be set by a preset and it is kept indefinitely
     if (!empty($options['placeholder'])) {
@@ -29,16 +30,14 @@ if (empty($options['image']['id'])) {
     }
 } else {
     $image = tnp_media_resize($options['image']['id'], array(600, 0));
+    $alt = $options['image_alt'];
 }
 
 $url = $options['url'];
 ?>
 
 <?php if (!empty($url)) { ?>
-
-    <a href="<?php echo $url ?>" target="_blank"><img src="<?php echo $image ?>" border="0" alt="" style="max-width: 100%!important; height: auto!important; display: block;"></a>                
-
+    <a href="<?php echo $url ?>" target="_blank"><img src="<?php echo $image ?>" border="0" alt="" style="max-width: 100%!important; height: auto!important; display: inline-block;"></a>                
 <?php } else { ?>
-    <img src="<?php echo $image ?>" border="0" alt="" style="max-width: 100%!important; height: auto!important; display: block;">              
-
+    <img src="<?php echo $image ?>" border="0" alt="<?php echo esc_attr($alt) ?>" style="max-width: 100%!important; height: auto!important; display: inline-block;">              
 <?php } ?>

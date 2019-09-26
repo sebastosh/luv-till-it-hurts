@@ -12,7 +12,7 @@ jQuery(document).ready(function () {
             showall: {
                 text: 'show full calendar',
                 click: function () {
-                    window.open('admin.php?page=blog2social-calendar',"_self");
+                    window.open('admin.php?page=blog2social-calendar', "_self");
                 }
             }
         },
@@ -21,7 +21,7 @@ jQuery(document).ready(function () {
             center: '',
             right: 'showall today prev,next'
         },
-        eventSources: ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=all',
+        eventSources: ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=all' + '&b2s_security_nonce=' + jQuery('#b2s_security_nonce').val(),
         eventRender: function (event, element) {
             show = true;
             $header = jQuery("<div>").addClass("b2s-calendar-header");
@@ -79,7 +79,8 @@ jQuery(document).on('click', '.b2s-mail-btn', function () {
             data: {
                 'action': 'b2s_post_mail_update',
                 'email': jQuery('#b2s-mail-update-input').val(),
-                'lang': jQuery('#user_lang').val()
+                'lang': jQuery('#user_lang').val(),
+                'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
             }
         });
         jQuery('.b2s-mail-update-area').hide();
@@ -120,14 +121,19 @@ function getWidgetContent() {
             cache: false,
             data: {
                 'action': 'b2s_get_multi_widget_content',
+                'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
             },
             success: function (content) {
                 data = content;
-                widget.data('position', 0); //random: new Date().getSeconds() % data.length;
-                show();
-                setInterval(function () {
-                    jQuery('.b2s-dashboard-multi-widget .glyphicon-chevron-left').trigger("click");
-                }, 30000);
+                if (data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                } else {
+                    widget.data('position', 0); //random: new Date().getSeconds() % data.length;
+                    show();
+                    setInterval(function () {
+                        jQuery('.b2s-dashboard-multi-widget .glyphicon-chevron-left').trigger("click");
+                    }, 30000);
+                }
             }
         });
 
@@ -177,98 +183,102 @@ function drawBasic() {
         cache: false,
         data: {
             'action': 'b2s_get_stats',
-            'from': jQuery('#b2s-activity-date-picker').val()
+            'from': jQuery('#b2s-activity-date-picker').val(),
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
         },
         success: function (content) {
-            jQuery('#chart_div').html("<canvas id=\"b2s_activity_chart\" style=\"max-width:690px !important; max-height:320px !important;\"></canvas>");
-            var ctx = document.getElementById("b2s_activity_chart").getContext('2d');
-            var published = [];
-            var published_colors = [];
-            var scheduled = [];
-            var scheduled_colors = [];
-            function dateToYMD(date) {
-                var d = date.getUTCDate();
-                var m = date.getUTCMonth() + 1;
-                var y = date.getUTCFullYear();
-                return '' + y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
-            }
-
-            function dateToDMY(date) {
-                var d = date.getUTCDate();
-                var m = date.getUTCMonth() + 1;
-                var y = date.getUTCFullYear();
-                return '' + (d <= 9 ? '0' + d : d) + '.' + (m <= 9 ? '0' + m : m) + '.' + y;
-            }
-
-            jQuery(Object.keys(content)).each(function () {
-                if (published.length > 0) {
-                    var diff = parseInt((new Date(published[published.length - 1].x).getTime() - new Date(this).getTime()) / (24 * 3600 * 1000));
-                    while (diff < -1) {
-                        var date = new Date(published[published.length - 1].x.toString());
-                        var newDate = new Date(date.setTime(date.getTime() + 86400000));
-                        published.push({x: dateToYMD(newDate), y: 0});
-                        published_colors.push('rgba(121,178,50,0.8)');
-                        scheduled_colors.push('rgba(192,192,192,0.8)');
-                        scheduled.push({x: dateToYMD(newDate), y: 0});
-                        diff = parseInt((new Date(published[published.length - 1].x).getTime() - new Date(this).getTime()) / (24 * 3600 * 1000));
-                    }
+            if (content.error == 'nonce') {
+                jQuery('.b2s-nonce-check-fail').show();
+            } else {
+                jQuery('#chart_div').html("<canvas id=\"b2s_activity_chart\" style=\"max-width:690px !important; max-height:320px !important;\"></canvas>");
+                var ctx = document.getElementById("b2s_activity_chart").getContext('2d');
+                var published = [];
+                var published_colors = [];
+                var scheduled = [];
+                var scheduled_colors = [];
+                function dateToYMD(date) {
+                    var d = date.getUTCDate();
+                    var m = date.getUTCMonth() + 1;
+                    var y = date.getUTCFullYear();
+                    return '' + y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
                 }
 
-                published.push({x: this.toString(), y: content[this][0]});
-                published_colors.push('rgba(121,178,50,0.8)');
-                scheduled_colors.push('rgba(192,192,192,0.8)');
-                scheduled.push({x: this.toString(), y: content[this][1]});
-            });
-            var unit = "day";
-            if (published.length > 100)
-            {
-                unit = "month";
-            }
+                function dateToDMY(date) {
+                    var d = date.getUTCDate();
+                    var m = date.getUTCMonth() + 1;
+                    var y = date.getUTCFullYear();
+                    return '' + (d <= 9 ? '0' + d : d) + '.' + (m <= 9 ? '0' + m : m) + '.' + y;
+                }
 
-            var myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    datasets: [{
-                            label: jQuery("#chart_div").data('text-published'),
-                            data: published,
-                            backgroundColor: published_colors
-                        }, {
-                            label: jQuery("#chart_div").data('text-scheduled'),
-                            data: scheduled,
-                            backgroundColor: scheduled_colors
-                        }]
-                },
-                options: {
-                    tooltips: {
-                        callbacks: {
-                            title: function (tooltipItem) {
-                                if (jQuery("#chart_div").data('language') == "de") {
-                                    var date = new Date(tooltipItem[0].xLabel);
-                                    return dateToDMY(date);
-                                } else {
-                                    return tooltipItem[0].xLabel
-                                }
-                            }
+                jQuery(Object.keys(content)).each(function () {
+                    if (published.length > 0) {
+                        var diff = parseInt((new Date(published[published.length - 1].x).getTime() - new Date(this).getTime()) / (24 * 3600 * 1000));
+                        while (diff < -1) {
+                            var date = new Date(published[published.length - 1].x.toString());
+                            var newDate = new Date(date.setTime(date.getTime() + 86400000));
+                            published.push({x: dateToYMD(newDate), y: 0});
+                            published_colors.push('rgba(121,178,50,0.8)');
+                            scheduled_colors.push('rgba(192,192,192,0.8)');
+                            scheduled.push({x: dateToYMD(newDate), y: 0});
+                            diff = parseInt((new Date(published[published.length - 1].x).getTime() - new Date(this).getTime()) / (24 * 3600 * 1000));
                         }
+                    }
+
+                    published.push({x: this.toString(), y: content[this][0]});
+                    published_colors.push('rgba(121,178,50,0.8)');
+                    scheduled_colors.push('rgba(192,192,192,0.8)');
+                    scheduled.push({x: this.toString(), y: content[this][1]});
+                });
+                var unit = "day";
+                if (published.length > 100)
+                {
+                    unit = "month";
+                }
+
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        datasets: [{
+                                label: jQuery("#chart_div").data('text-published'),
+                                data: published,
+                                backgroundColor: published_colors
+                            }, {
+                                label: jQuery("#chart_div").data('text-scheduled'),
+                                data: scheduled,
+                                backgroundColor: scheduled_colors
+                            }]
                     },
-                    scales: {
-                        xAxes: [{
-                                type: "time",
-                                time: {
-                                    unit: unit
+                    options: {
+                        tooltips: {
+                            callbacks: {
+                                title: function (tooltipItem) {
+                                    if (jQuery("#chart_div").data('language') == "de") {
+                                        var date = new Date(tooltipItem[0].xLabel);
+                                        return dateToDMY(date);
+                                    } else {
+                                        return tooltipItem[0].xLabel
+                                    }
                                 }
                             }
-                        ],
-                        yAxes: [{
-                                ticks: {
-                                    beginAtZero: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                    type: "time",
+                                    time: {
+                                        unit: unit
+                                    }
                                 }
-                            }]
+                            ],
+                            yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                        }
                     }
-                }
-            });
+                });
+            }
         }
-
     });
 }
 

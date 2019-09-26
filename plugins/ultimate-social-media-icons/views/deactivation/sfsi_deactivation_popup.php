@@ -10,7 +10,7 @@
         <div class="sfsi-popup-header sfsi-top-header">
             <h2>Oh! You don\'t like our plugin?</h2>
             <div class="sfsi-sad-image">
-                <img src="<?php echo SFSI_PLUGURL; ?>images/sad_image.png">
+                <img src="<?php echo SFSI_PLUGURL; ?>images/sad_image.png" alt="error">
             </div>
         </div>
 
@@ -56,7 +56,7 @@
                         <div class="sfsi-popup-content">
                             <div class="sfsi-text">
                                 <p class="sfsi-please">PLEASE</p>
-                                <p class="sfsi-please-other-text">let us know in the Support Forum what didn't work, <br>so that we can fix it. We‘ll respond quickly! <img src="<?php echo SFSI_PLUGURL; ?>images/smile.png"></p>
+                                <p class="sfsi-please-other-text">let us know in the Support Forum what didn't work, <br>so that we can fix it. We‘ll respond quickly! <img src="<?php echo SFSI_PLUGURL; ?>images/smile.png" alt="error"></p>
                             </div>
                             <div class="sfsi-go-to-support">
                                 <a target="_blank" href="<?php echo SFSI_SUPPORT_FORM; ?>" class="go-to-support-forum">Go to Support Forum ></a>
@@ -77,7 +77,7 @@
                     <div class="sfsi-reason-section hide">
                         <div class="sfsi-popup-content">
                             <div class="sfsi-text">
-                                <p class="sfsi-please-other-text">Thumbs up to that one! <img src="<?php echo SFSI_PLUGURL; ?>images/smile.png"></p>
+                                <p class="sfsi-please-other-text">Thumbs up to that one! <img src="<?php echo SFSI_PLUGURL; ?>images/smile.png" alt="error"></p>
                             </div>
                             <div class="sfsi-go-to-support">
                                 <a href="javascript:void(0)" class="sfsi-deactive-plugin go-to-support-forum">De-activate plugin now</a>

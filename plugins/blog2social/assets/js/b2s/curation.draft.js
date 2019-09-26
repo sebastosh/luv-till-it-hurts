@@ -34,7 +34,8 @@ function b2sSortFormSubmit() {
         'b2sShowByDate': jQuery('#b2sShowByDate').val(),
         'b2sPagination': jQuery('#b2sPagination').val(),
         'b2sShowPagination': jQuery('#b2sShowPagination').length > 0 ? jQuery('#b2sShowPagination').val() : 1,
-        'b2sUserLang': jQuery('#b2sUserLang').val()
+        'b2sUserLang': jQuery('#b2sUserLang').val(),
+        'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
     };
 
     if (jQuery('#b2sPostsPerPage').length > 0) {
@@ -77,12 +78,71 @@ function b2sSortFormSubmit() {
                     }
                 }
             } else {
-                jQuery('.b2s-server-connection-fail').show();
+                if (data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                } else {
+                    jQuery('.b2s-server-connection-fail').show();
+                }
                 return false;
             }
         }
     });
 }
+
+jQuery(document).on('click', '.deleteCcDraftBtn', function () {
+    jQuery('#b2s-delete-confirm-post-id').val(jQuery(this).attr('data-blog-post-id'));
+    jQuery('.b2s-delete-cc-draft-modal').modal('show');
+    jQuery('.b2s-delete-cc-draft-confirm-btn').prop('disabeld', false);
+
+});
+
+jQuery(document).on('click', '.b2s-delete-cc-draft-confirm-btn', function () {
+    jQuery('.b2s-post-remove-fail').hide();
+    jQuery('.b2s-post-remove-success').hide();
+    jQuery('.b2s-delete-cc-draft-confirm-btn').prop('disabeld', true);
+    jQuery('.b2s-server-connection-fail').hide();
+    jQuery.ajax({
+        url: ajaxurl,
+        type: "POST",
+        dataType: "json",
+        cache: false,
+        data: {
+            'action': 'b2s_delete_user_cc_draft_post',
+            'postId': jQuery('#b2s-delete-confirm-post-id').val(),
+            'b2s_security_nonce': jQuery('#b2s_security_nonce').val()
+        },
+        error: function () {
+            jQuery('.b2s-server-connection-fail').show();
+            return false;
+        },
+        success: function (data) {
+            jQuery('.b2s-delete-cc-draft-modal').modal('hide');
+            if (data.result == true) {
+                jQuery('.b2s-list-cc-draft[data-blog-post-id="' + data.postId + '"').remove();
+                /*var count = parseInt(jQuery('.b2s-approve-count[data-post-id="' + data.blogPostId + '"]').html());
+                 var newCount = count - data.postCount;
+                 jQuery('.b2s-approve-count[data-post-id="' + data.blogPostId + '"]').html(newCount);
+                 if (newCount >= 1) {
+                 jQuery.each(data.postId, function (i, id) {
+                 jQuery('.b2s-post-approve-area-li[data-post-id="' + id + '"]').remove();
+                 });
+                 } else {
+                 jQuery('.b2s-post-approve-area-li[data-post-id="' + data.postId[0] + '"]').closest('ul').closest('li').remove();
+                 }*/
+                jQuery('.b2s-post-remove-success').show();
+            } else {
+                if (data.error == 'nonce') {
+                    jQuery('.b2s-nonce-check-fail').show();
+                }
+                jQuery('.b2s-post-remove-fail').show();
+            }
+
+            return true;
+        }
+    });
+});
+
+
 
 jQuery(document).on('click', '#b2s-sort-reset-btn', function () {
     jQuery('#b2sPagination').val("1");

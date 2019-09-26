@@ -728,16 +728,11 @@ p.description {
 }
 
 .tnp-theme-preview img:hover {
-    border: 5px solid #FD5F65;
-    border-radius: 10px;
-    padding: 5px;
-    background-color: #FD5F65;
+    box-shadow: 3px 3px 8px 2px #293848;
 }
 
 .tnp-theme-preview img {
-    border: 5px solid transparent;
     border-radius: 10px;
-    padding: 5px;
 }
 
 
@@ -1484,6 +1479,13 @@ table.widefat {
 
 .tnp-extension-buy {
     color: #F1C40F;
+    padding: 5px 8px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#tnp-body a.tnp-extension-details{
+    color: #999999;
     padding: 5px 8px;
     text-decoration: none;
     cursor: pointer;

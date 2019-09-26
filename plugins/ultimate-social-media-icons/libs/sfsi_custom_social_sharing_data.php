@@ -40,7 +40,7 @@ function sfsi_social_media_metabox( $post ) { ?>
     </style>
 
     <script type="text/javascript">
-        jQuery(document).ready(function(){
+        window.addEventListener('sfsi_functions_loaded',function(){
             jQuery('.sfsi_hidenotice').on('click',function(){
                 var data = {
                     action:"update_sharing_settings",

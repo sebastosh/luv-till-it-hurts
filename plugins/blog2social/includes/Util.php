@@ -71,7 +71,7 @@ class B2S_Util {
             $html = self::b2sFileGetContents($url, true);
             if (!empty($html) && $html !== false) {
                 //Search rist Parameter
-                $data = self::b2sGetAllTags($html, 'all',true);
+                $data = self::b2sGetAllTags($html, 'all', false);
                 if (is_array($data) && !empty($data)) {
                     return $data;
                 }
@@ -158,7 +158,7 @@ class B2S_Util {
         return (isset($matches[1]) && !empty($matches[1])) ? trim(preg_replace('/\s+/', ' ', $matches[1])) : '';
     }
 
-    private static function b2sGetAllTags($html, $type = 'og', $ignoreEncoding=false, $search = 'property') {
+    private static function b2sGetAllTags($html, $type = 'og', $ignoreEncoding = false, $search = 'property') {
         $list = array();
         $doc = new DOMDocument();
         if (function_exists('mb_convert_encoding') && !$ignoreEncoding) {
@@ -179,14 +179,14 @@ class B2S_Util {
         for ($i = 0; $i < $metas->length; $i++) {
             $meta = $metas->item($i);
             if ($type != 'all') {
-                if ($meta->getAttribute($search) == $type . ':title' && !isset($list['title'])) {
+                if (($meta->getAttribute('property') == $type . ':title' || $meta->getAttribute('name') == $type . ':title') && !isset($list['title'])) {
                     $list['title'] = (function_exists('mb_convert_encoding') ? htmlspecialchars($meta->getAttribute('content')) : $meta->getAttribute('content'));
                 }
-                if ($meta->getAttribute($search) == $type . ':description' && !isset($list['description'])) {
+                if (($meta->getAttribute('property') == $type . ':description' || $meta->getAttribute('name') == $type . ':description') && !isset($list['description'])) {
                     $desc = self::cleanContent(strip_shortcodes($meta->getAttribute('content')));
                     $list['description'] = (function_exists('mb_convert_encoding') ? htmlspecialchars($desc) : $desc);
                 }
-                if ($meta->getAttribute($search) == $type . ':image' && !isset($list['image'])) {
+                if (($meta->getAttribute('property') == $type . ':image' || $meta->getAttribute('name') == $type . ':image') && !isset($list['image'])) {
                     $list['image'] = (function_exists('mb_convert_encoding') ? htmlspecialchars($meta->getAttribute('content')) : $meta->getAttribute('content'));
                 }
             } else {
@@ -406,17 +406,27 @@ class B2S_Util {
 
     public static function getExcerpt($text, $count = 400, $max = false, $add = false) {
         //Bug: Converting json + PHP Extension
-        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+        if (function_exists('mb_strlen') && function_exists('mb_substr') && function_exists('mb_stripos')) {
             if (mb_strlen($text, 'UTF-8') < $count) {
                 return trim($text);
             }
             $stops = array('.', ':');
             $min = (int) $count / 2;
+            $cleanTruncateWord = true;
             $max = ($max !== false) ? ($max - $min) : ($min - 1);
+
+            if (mb_strlen($text, 'UTF-8') < $max) {
+                return trim($text);
+            }
+            
             $sub = mb_substr($text, $min, $max, 'UTF-8');
             for ($i = 0; $i < count($stops); $i++) {
                 if (count($subArray = explode($stops[$i], $sub)) > 1) {
+                    $cleanTruncateWord = false;
                     if (mb_substr($subArray[count($subArray) - 1], 0, 1) == ' ') { //empty first charcater in last explode - delete last explode
+                        $subArray[count($subArray) - 1] = ' ';
+                    }
+                    if (mb_stripos($subArray[count($subArray) - 1], $stops[$i]) === false) { //delete last explode if no stops set
                         $subArray[count($subArray) - 1] = ' ';
                     }
                     $sub = implode($stops[$i], $subArray);
@@ -424,6 +434,14 @@ class B2S_Util {
                     break;
                 }
             }
+
+            if ($cleanTruncateWord) {
+                $lastIndex = mb_strripos($sub, ' ');
+                if ($lastIndex !== false) {
+                    $sub = trim(mb_substr($sub, 0, $lastIndex));
+                }
+            }
+
             $text = trim(mb_substr($text, 0, $min, 'UTF-8') . $sub);
             return ($add) ? $text . "..." : $text;
         }

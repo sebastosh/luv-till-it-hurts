@@ -31,8 +31,10 @@ class core_pdf_embedder {
 	}
 	
 	protected function get_translation_array() {
+		$options = $this->get_option_pdfemb();
 		return Array('worker_src' => $this->my_plugin_url().'js/pdfjs/pdf.worker'.($this->useminified() ? '.min' : '').'.js',
-		             'cmap_url' => $this->my_plugin_url().'js/pdfjs/cmaps/',
+		        'cmap_url' => $this->my_plugin_url().'js/pdfjs/cmaps/',
+		        'poweredby'=>$options['poweredby'],
             'objectL10n' => array(
                 'loading' => esc_html__('Loading...', 'pdf-embedder'),
                 'page' => esc_html__('Page', 'pdf-embedder'),
@@ -337,7 +339,13 @@ class core_pdf_embedder {
         <input type="radio" name='<?php echo $this->get_options_name(); ?>[pdfemb_toolbarfixed]' id='pdfemb_toolbarfixed_on' class='radio' value="on" <?php echo $options['pdfemb_toolbarfixed'] == 'on' ? 'checked' : ''; ?> />
         <label for="pdfemb_toolbarfixed_on" class="radio"><?php esc_html_e('Toolbar always visible', 'pdf-embedder'); ?></label>
         </span>
+        <br/>
+        <label for="pdfemb_toolbarfixed" class="textinput"><?php esc_html_e('Display Credit', 'pdf-embedder'); ?></label>
+        <span>
+        <input type='checkbox' name='<?php echo $this->get_options_name(); ?>[poweredby]' id='poweredby' class='checkbox' <?php echo $options['poweredby'] == 'on' ? 'checked' : ''; ?>  />
 
+        <label for="poweredby" class="checkbox plain" style="margin-left: 10px;"><?php esc_html_e('Display "Powered by wp-pdf.com" on PDF Viewer with a link to our site. Spread the love!', 'pdf-embedder'); ?></label>
+		</span>
 		<?php
             $this->pdfemb_mainsection_extra();
         ?>
@@ -420,6 +428,13 @@ class core_pdf_embedder {
         }
 
         $newinput['pdfemb_version'] = $this->PLUGIN_VERSION;
+
+        if (isset($input['poweredby']) && in_array($input['poweredby'], array('on', 'off'))) {
+        	$newinput['poweredby'] = $input['poweredby'];
+        }else{
+        	$newinput['poweredby'] = 'off';
+        }
+        
 		return $newinput;
 	}
 	
@@ -514,6 +529,7 @@ class core_pdf_embedder {
             'pdfemb_height' => 'max',
             'pdfemb_toolbar' => 'bottom',
             'pdfemb_toolbarfixed' => 'off',
+            'poweredby' => 'off',
             'pdfemb_version' => $this->PLUGIN_VERSION
         );
 	}

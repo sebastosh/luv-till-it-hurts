@@ -17,7 +17,7 @@
         public function get_result() {
             global $wpdb;
 
-            $addNotAdminPosts = (B2S_PLUGIN_ADMIN == false) ? $wpdb->prepare(' AND b2s_posts.`blog_user_id` = %d', B2S_PLUGIN_BLOG_USER_ID) : '';
+            $addNotAdminPosts = (B2S_PLUGIN_ADMIN == false) ? $wpdb->prepare(' AND '.$wpdb->prefix.'b2s_posts.`blog_user_id` = %d', B2S_PLUGIN_BLOG_USER_ID) : '';
 
             $sql = "SELECT IFNULL(date1,date2) as _date, IFNULL(count_public,0) as count_public, IFNULL(count_sched,0) as count_sched FROM 
                     (
@@ -25,52 +25,52 @@
                         *
                     FROM
                         (SELECT 
-                            DATE_FORMAT(b2s_posts.publish_date, '%Y-%m-%d') date1,
+                            DATE_FORMAT({$wpdb->prefix}b2s_posts.publish_date, '%Y-%m-%d') date1,
                                 COUNT(*) as count_public
                         FROM
-                            b2s_posts
+                            {$wpdb->prefix}b2s_posts
                         WHERE
-                            b2s_posts.publish_date >= '".$this->get_from()."'
-                                && b2s_posts.hide = 0
+                            {$wpdb->prefix}b2s_posts.publish_date >= '".$this->get_from()."'
+                                && {$wpdb->prefix}b2s_posts.hide = 0
                                 ".$addNotAdminPosts."
-                        GROUP BY DATE_FORMAT(b2s_posts.publish_date, '%Y-%m-%d')) public
+                        GROUP BY DATE_FORMAT({$wpdb->prefix}b2s_posts.publish_date, '%Y-%m-%d')) public
                             LEFT JOIN
                         (SELECT 
-                            DATE_FORMAT(b2s_posts.sched_date, '%Y-%m-%d') date2,
+                            DATE_FORMAT({$wpdb->prefix}b2s_posts.sched_date, '%Y-%m-%d') date2,
                                 COUNT(*) as count_sched
                         FROM
-                            b2s_posts
+                            {$wpdb->prefix}b2s_posts
                         WHERE
-                            b2s_posts.publish_link = ''
-                                && b2s_posts.sched_date >= '".$this->get_from()."'
-                                && b2s_posts.hide = 0
+                            {$wpdb->prefix}b2s_posts.publish_link = ''
+                                && {$wpdb->prefix}b2s_posts.sched_date >= '".$this->get_from()."'
+                                && {$wpdb->prefix}b2s_posts.hide = 0
                                 ".$addNotAdminPosts."
-                        GROUP BY DATE_FORMAT(b2s_posts.sched_date, '%Y-%m-%d')) sched ON sched.date2 = public.date1 
+                        GROUP BY DATE_FORMAT({$wpdb->prefix}b2s_posts.sched_date, '%Y-%m-%d')) sched ON sched.date2 = public.date1 
                     UNION SELECT 
                         *
                     FROM
                         (SELECT 
-                            DATE_FORMAT(b2s_posts.publish_date, '%Y-%m-%d') date1,
+                            DATE_FORMAT({$wpdb->prefix}b2s_posts.publish_date, '%Y-%m-%d') date1,
                                 COUNT(*) as count_public
                         FROM
-                            b2s_posts
+                            {$wpdb->prefix}b2s_posts
                         WHERE
-                            b2s_posts.publish_date >= '".$this->get_from()."'
-                                && b2s_posts.hide = 0
+                            {$wpdb->prefix}b2s_posts.publish_date >= '".$this->get_from()."'
+                                && {$wpdb->prefix}b2s_posts.hide = 0
                                 ".$addNotAdminPosts."
-                        GROUP BY DATE_FORMAT(b2s_posts.publish_date, '%Y-%m-%d')) public
+                        GROUP BY DATE_FORMAT({$wpdb->prefix}b2s_posts.publish_date, '%Y-%m-%d')) public
                             RIGHT JOIN
                         (SELECT 
-                            DATE_FORMAT(b2s_posts.sched_date, '%Y-%m-%d') date2,
+                            DATE_FORMAT({$wpdb->prefix}b2s_posts.sched_date, '%Y-%m-%d') date2,
                                 COUNT(*) as count_sched
                         FROM
-                            b2s_posts
+                            {$wpdb->prefix}b2s_posts
                         WHERE
-                            b2s_posts.publish_link = ''
-                                && b2s_posts.sched_date >= '".$this->get_from()."'
-                                && b2s_posts.hide = 0
+                            {$wpdb->prefix}b2s_posts.publish_link = ''
+                                && {$wpdb->prefix}b2s_posts.sched_date >= '".$this->get_from()."'
+                                && {$wpdb->prefix}b2s_posts.hide = 0
                                 ".$addNotAdminPosts."
-                        GROUP BY DATE_FORMAT(b2s_posts.sched_date, '%Y-%m-%d')) sched ON sched.date2 = public.date1) as data";
+                        GROUP BY DATE_FORMAT({$wpdb->prefix}b2s_posts.sched_date, '%Y-%m-%d')) sched ON sched.date2 = public.date1) as data";
 
             $items = $wpdb->get_results($sql);
 

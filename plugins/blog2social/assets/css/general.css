@@ -7586,3 +7586,15 @@ CSS CheckBOX
 .b2s-feature-img-with-24{
     max-width: 24px !important;
 }
+
+.b2s-padding-bottom-5{
+    padding-bottom: 5px;
+}
+
+.b2s-left-border-success {
+    border-left: 4px solid #79B232;
+}
+
+.b2s-left-border-danger {
+    border-left: 4px solid #a94442;
+}

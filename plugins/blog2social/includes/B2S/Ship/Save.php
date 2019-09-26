@@ -15,14 +15,14 @@ class B2S_Ship_Save {
 
         //special case xing groups  contains network_display_name
         if ($network_id == 8 && $network_type == 2) {
-            $networkDetailsIdSelect = $wpdb->get_col($wpdb->prepare("SELECT postNetworkDetails.id FROM b2s_posts_network_details AS postNetworkDetails WHERE postNetworkDetails.network_auth_id = %s AND postNetworkDetails.network_display_name = %s", $network_auth_id, trim($network_display_name)));
+            $networkDetailsIdSelect = $wpdb->get_col($wpdb->prepare("SELECT postNetworkDetails.id FROM {$wpdb->prefix}b2s_posts_network_details AS postNetworkDetails WHERE postNetworkDetails.network_auth_id = %s AND postNetworkDetails.network_display_name = %s", $network_auth_id, trim($network_display_name)));
         } else {
-            $networkDetailsIdSelect = $wpdb->get_col($wpdb->prepare("SELECT postNetworkDetails.id FROM b2s_posts_network_details AS postNetworkDetails WHERE postNetworkDetails.network_auth_id = %s", $network_auth_id));
+            $networkDetailsIdSelect = $wpdb->get_col($wpdb->prepare("SELECT postNetworkDetails.id FROM {$wpdb->prefix}b2s_posts_network_details AS postNetworkDetails WHERE postNetworkDetails.network_auth_id = %s", $network_auth_id));
         }
         if (isset($networkDetailsIdSelect[0])) {
             return (int) $networkDetailsIdSelect[0];
         } else {
-            $wpdb->insert('b2s_posts_network_details', array(
+            $wpdb->insert($wpdb->prefix.'b2s_posts_network_details', array(
                 'network_id' => (int) $network_id,
                 'network_type' => (int) $network_type,
                 'network_auth_id' => (int) $network_auth_id,
@@ -33,7 +33,7 @@ class B2S_Ship_Save {
 
     private function lookupNetworkDetailsId($network_auth_id) {
         global $wpdb;
-        $networkDetailsIdSelect = $wpdb->get_col($wpdb->prepare("SELECT postNetworkDetails.id FROM b2s_posts_network_details AS postNetworkDetails WHERE postNetworkDetails.network_auth_id = %s", $network_auth_id));
+        $networkDetailsIdSelect = $wpdb->get_col($wpdb->prepare("SELECT postNetworkDetails.id FROM {$wpdb->prefix}b2s_posts_network_details AS postNetworkDetails WHERE postNetworkDetails.network_auth_id = %s", $network_auth_id));
         if (isset($networkDetailsIdSelect[0])) {
             return (int) $networkDetailsIdSelect[0];
         }
@@ -61,7 +61,7 @@ class B2S_Ship_Save {
             'post_for_approve' => $shareApprove,
             'network_details_id' => $networkDetailsId
         );
-        $wpdb->insert('b2s_posts', $postData, array('%d', '%d', '%d', '%s', '%d', '%d', '%d'));
+        $wpdb->insert($wpdb->prefix.'b2s_posts', $postData, array('%d', '%d', '%d', '%s', '%d', '%d', '%d'));
         B2S_Rating::trigger();
 
         //approve == 0  else postDataApprove
@@ -135,7 +135,7 @@ class B2S_Ship_Save {
                     if (isset($post->internal_post_id) && (int) $post->internal_post_id == (int) $v['internal_post_id']) {
                         $data = array('publish_link' => $post->publishUrl, 'publish_error_code' => isset($post->error_code) ? $post->error_code : '');
                         $where = array('id' => $post->internal_post_id);
-                        $wpdb->update('b2s_posts', $data, $where, array('%s', '%s'), array('%d'));
+                        $wpdb->update($wpdb->prefix.'b2s_posts', $data, $where, array('%s', '%s'), array('%d'));
                         $errorCode = isset($post->error_code) ? $post->error_code : '';
 
                         //since V4.8.0 relay posts
@@ -181,7 +181,7 @@ class B2S_Ship_Save {
                         $sched_date = date('Y-m-d H:i:s', strtotime("+" . $relayData['delay'][$key] . " minutes", strtotime($schedData['sched_date'])));
                         $sched_date_utc = date('Y-m-d H:i:s', strtotime("+" . $relayData['delay'][$key] . " minutes", strtotime($schedData['sched_date_utc'])));
 
-                        $wpdb->insert('b2s_posts', array(
+                        $wpdb->insert($wpdb->prefix.'b2s_posts', array(
                             'post_id' => $schedData['post_id'],
                             'blog_user_id' => $schedData['blog_user_id'],
                             'user_timezone' => $schedData['user_timezone'],
@@ -245,14 +245,14 @@ class B2S_Ship_Save {
                     }
                     //Update - calendar edit function
                     if (isset($data['sched_details_id'])) {
-                        $wpdb->update('b2s_posts_sched_details', array(
+                        $wpdb->update($wpdb->prefix.'b2s_posts_sched_details', array(
                             'sched_data' => serialize($serializeData),
                             'image_url' => $data['image_url']
                                 ), array("id" => $data['sched_details_id']), array('%s', '%s', '%d'));
                         $schedDetailsId = $data['sched_details_id'];
                         //new entry insert
                     } else {
-                        $wpdb->insert('b2s_posts_sched_details', array('sched_data' => serialize($serializeData), 'image_url' => $data['image_url']), array('%s', '%s'));
+                        $wpdb->insert($wpdb->prefix.'b2s_posts_sched_details', array('sched_data' => serialize($serializeData), 'image_url' => $data['image_url']), array('%s', '%s'));
                         $schedDetailsId = $wpdb->insert_id;
                     }
 
@@ -270,7 +270,7 @@ class B2S_Ship_Save {
                 $dayOfWeeks = array(1 => 'mo', 2 => 'di', 3 => 'mi', 4 => 'do', 5 => 'fr', 6 => 'sa', 7 => 'so');
 
                 //new entry insert
-                $wpdb->insert('b2s_posts_sched_details', array('sched_data' => serialize($serializeData), 'image_url' => $data['image_url']), array('%s', '%s'));
+                $wpdb->insert($wpdb->prefix.'b2s_posts_sched_details', array('sched_data' => serialize($serializeData), 'image_url' => $data['image_url']), array('%s', '%s'));
                 $schedDetailsId = $wpdb->insert_id;
 
                 foreach ($schedData['interval_select'] as $cycle => $mode) {
@@ -340,7 +340,7 @@ class B2S_Ship_Save {
 
         foreach ($shipdays as $k => $schedDate) {
             if (isset($data['b2s_id']) && $data['b2s_id'] > 0) {
-                $wpdb->update('b2s_posts', array(
+                $wpdb->update($wpdb->prefix.'b2s_posts', array(
                     'post_id' => $data['post_id'],
                     'last_edit_blog_user_id' => $data['last_edit_blog_user_id'],
                     'user_timezone' => $schedData['user_timezone'],
@@ -354,7 +354,7 @@ class B2S_Ship_Save {
                     'hook_action' => (($shareApprove == 0) ? 5 : 0)
                         ), array("id" => $data['b2s_id']), array('%d', '%d', '%s', '%s', '%d', '%d', '%s', '%s', '%d', '%d', '%d'));
             } else {
-                $wpdb->insert('b2s_posts', array(
+                $wpdb->insert($wpdb->prefix.'b2s_posts', array(
                     'post_id' => $data['post_id'],
                     'blog_user_id' => $data['blog_user_id'],
                     'user_timezone' => $schedData['user_timezone'],
@@ -388,25 +388,25 @@ class B2S_Ship_Save {
         $data['token'] = B2S_PLUGIN_TOKEN;
         if ($info) {
             if ($data['network_id'] == 1) {
-                $html .='<br><div class="alert alert-warning"><b>' . __('For sharing your posts on personal Facebook Profiles you can now  use Facebook Instant Sharing', 'blog2social') . '</b> (<a target="_blank" href="' . B2S_Tools::getSupportLink('network_tos_faq_news_072018') . '">' . __('Read why', 'blog2social') . '</a>).';
+                $html .='<br><div class="alert alert-warning"><b>' . esc_html__('For sharing your posts on personal Facebook Profiles you can now  use Facebook Instant Sharing', 'blog2social') . '</b> (<a target="_blank" href="' . esc_url(B2S_Tools::getSupportLink('network_tos_faq_news_072018')) . '">' . esc_html__('Read why', 'blog2social') . '</a>).';
                 $html .='<br><br>';
-                $html .='<b>' . __('This is how it works:', 'blog2social') . '</b><br>';
-                $html .= __('-To share your post immediately, click the "Share" button next to your selected Facebook profile below.', 'blog2social') . '<br>';
-                $html .= __('-For scheduled posts, Blog2Social will save your post and move it to the "Scheduled Posts" tab on your "Posts & Sharing" navigation bar. On your scheduled date and time, your post will move to the "Instant Sharing" tab and you can click on "Share" to post it to your Facebook Profile instantly.', 'blog2social');
+                $html .='<b>' . esc_html__('This is how it works:', 'blog2social') . '</b><br>';
+                $html .= esc_html__('-To share your post immediately, click the "Share" button next to your selected Facebook profile below.', 'blog2social') . '<br>';
+                $html .= esc_html__('-For scheduled posts, Blog2Social will save your post and move it to the "Scheduled Posts" tab on your "Posts & Sharing" navigation bar. On your scheduled date and time, your post will move to the "Instant Sharing" tab and you can click on "Share" to post it to your Facebook Profile instantly.', 'blog2social');
                 $html .='</div>';
             }
             if ($data['network_id'] == 10) {
-                $html .='<br><div class="alert alert-warning"><b>' . __('For sharing your posts on Google+ you can now use Google+ Instant Sharing', 'blog2social') . '</b></a>).';
+                $html .='<br><div class="alert alert-warning"><b>' . esc_html__('For sharing your posts on Google+ you can now use Google+ Instant Sharing', 'blog2social') . '</b></a>).';
                 $html .='<br><br>';
-                $html .='<b>' . __('This is how it works:', 'blog2social') . '</b><br>';
-                $html .= __('-To share your post immediately, click the "Share" button next to your selected Google+ account below.', 'blog2social') . '<br>';
-                $html .= __('-For scheduled posts, Blog2Social will save your post and move it to the "Scheduled Posts" tab on your "Posts & Sharing" navigation bar. On your scheduled date and time, your post will move to the "Instant Sharing" tab and you can click on "Share" to post it to your account instantly.', 'blog2social') . '<br>';
-                $html .= '<b>' . __('Please note: You post has to be marked as public to be posted in a group.', 'blog2social') . '</b>';
+                $html .='<b>' . esc_html__('This is how it works:', 'blog2social') . '</b><br>';
+                $html .= esc_html__('-To share your post immediately, click the "Share" button next to your selected Google+ account below.', 'blog2social') . '<br>';
+                $html .= esc_html__('-For scheduled posts, Blog2Social will save your post and move it to the "Scheduled Posts" tab on your "Posts & Sharing" navigation bar. On your scheduled date and time, your post will move to the "Instant Sharing" tab and you can click on "Share" to post it to your account instantly.', 'blog2social') . '<br>';
+                $html .= '<b>' . esc_html__('Please note: You post has to be marked as public to be posted in a group.', 'blog2social') . '</b>';
                 $html .='</div>';
             }
         }
-        $approveLink = '<a href="#" class="btn btn-primary" onclick="wopApprove(\'' . $data['network_auth_id'] . '\',\'' . (($data['network_id'] == 10) ? $data['internal_post_id'] : 0) . '\',\'' . B2S_PLUGIN_API_ENDPOINT . 'instant/share.php?data=' . B2S_Util::urlsafe_base64_encode(json_encode($data)) . '\', \'Blog2Social\'); return false;" target="_blank"><i class="glyphicon glyphicon-share"></i> ' . __('share', 'blog2social') . '</a>';
-        $html .= '<span class="text-warning">' . $approveLink . ' (' . __('Please share your post now', 'blog2social') . ')</span><br>';
+        $approveLink = '<a href="#" class="btn btn-primary" onclick="wopApprove(\'' . esc_attr($data['network_auth_id']) . '\',\'' . esc_attr((($data['network_id'] == 10) ? $data['internal_post_id'] : 0)) . '\',\'' . B2S_PLUGIN_API_ENDPOINT . 'instant/share.php?data=' . B2S_Util::urlsafe_base64_encode(json_encode($data)) . '\', \'Blog2Social\'); return false;" target="_blank"><i class="glyphicon glyphicon-share"></i> ' . esc_html__('share', 'blog2social') . '</a>';
+        $html .= '<span class="text-warning">' . $approveLink . ' (' . esc_html__('Please share your post now', 'blog2social') . ')</span><br>';
         return $html;
     }
 
@@ -414,8 +414,8 @@ class B2S_Ship_Save {
         $html = "";
         if (empty($error)) {
             if ($directPost) {
-                $html = '<br><span class="text-success"><i class="glyphicon glyphicon-ok-circle"></i> ' . __('published', 'blog2social');
-                $html .=!empty($link) ? ': <a href="' . $link . '" target="_blank">' . __('view social media post', 'blog2social') . '</a>' : '';
+                $html = '<br><span class="text-success"><i class="glyphicon glyphicon-ok-circle"></i> ' . esc_html__('published', 'blog2social');
+                $html .=!empty($link) ? ': <a href="' . esc_url($link) . '" target="_blank">' . esc_html__('view social media post', 'blog2social') . '</a>' : '';
                 $html .='</span>';
             }
             if (is_array($schedDate) && !empty($schedDate)) {
@@ -424,8 +424,8 @@ class B2S_Ship_Save {
                 sort($schedDate);
                 foreach ($schedDate as $k => $v) {
                     $schedDateTime = date_i18n($dateFormat . ' ' . $timeFormat, strtotime($v['date']));
-                    $isRelay = (isset($v['relay'])) ? " - " . __('Retweet', 'blog2social') : '';
-                    $html .= '<br><span class="text-success"><i class="glyphicon glyphicon-time"></i> ' . __('scheduled on', 'blog2social') . ': ' . $schedDateTime . $isRelay . '</span>';
+                    $isRelay = (isset($v['relay'])) ? " - " . esc_html__('Retweet', 'blog2social') : '';
+                    $html .= '<br><span class="text-success"><i class="glyphicon glyphicon-time"></i> ' . esc_html__('scheduled on', 'blog2social') . ': ' . esc_html($schedDateTime) . $isRelay . '</span>';
                 }
             }
         } else {
@@ -435,7 +435,7 @@ class B2S_Ship_Save {
 //special case: reddit RATE_LIMIT
             if ($network_id == 15 && $error == 'RATE_LIMIT') {
                 $link = (strtolower(substr(B2S_LANGUAGE, 0, 2)) == 'de') ? 'https://www.blog2social.com/de/faq/content/9/115/de/reddit-du-hast-das-veroeffentlichungs_limit-mit-deinem-account-kurzzeitig-erreicht.html' : 'https://www.blog2social.com/en/faq/content/9/115/en/reddit-you-have-temporarily-reached-the-publication-limit-with-your-account.html';
-                $add = ' ' . __('Please see', 'blog2social') . ' <a target="_blank" href="' . $link . '">' . __('FAQ', 'blog2social') . '</a>';
+                $add = ' ' . esc_html__('Please see', 'blog2social') . ' <a target="_blank" href="' . esc_url($link) . '">' . esc_html__('FAQ', 'blog2social') . '</a>';
             }
 
             $html .= '<br><span class="text-danger"><i class="glyphicon glyphicon-remove-circle glyphicon-danger"></i> ' . $errorText[$error] . $add . '</span>';
