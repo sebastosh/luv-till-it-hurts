@@ -32,7 +32,7 @@
 	</div><!-- .drawer -->
 
 	<div class="top-navigation">
-<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="http://luvhurts.co/wp-content/uploads/2018/10/luvwebhead.png" class="Desktop"></a>
+<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="http://luvhurts.co/wp-content/uploads/2019/09/luvhead-07.png" class="Desktop"></a>
 <a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="http://luvhurts.co/wp-content/uploads/2018/10/luvwebcone-red.png" class="Ipad"></a>
 <a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="http://luvhurts.co/wp-content/uploads/2018/10/LUV_logo.png" class="Mobile"></a>
 
