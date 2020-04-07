@@ -160,7 +160,7 @@
     line-height: 1.428571429;
     border-radius: 15px;
 }
-.fb-url-image, .xing-url-image, .linkedin-url-image, .tw-url-image, .b2s-image-border {
+.fb-url-image, .xing-url-image, .linkedin-url-image, .reddit-url-image, .tw-url-image, .b2s-image-border {
     margin-right: 10px;
     margin-bottom: 20px;
     border: 1px dashed #bdbfc2;
@@ -170,14 +170,13 @@
 textarea.form-control {
     height: auto;
 }
-.fb-textarea-input, .tw-textarea-input, .xing-textarea-input, .linkedin-textarea-input {
+.fb-textarea-input, .tw-textarea-input, .xing-textarea-input, .reddit-textarea-input, .linkedin-textarea-input, .b2s-post-item-details-item-message-input {
     font-size: 14px;
     font-weight: normal;
     line-height: 1.125;
     width: 100%;
     border: medium none;
     border-radius: 0;
-    margin-top: 10px;
     margin-bottom: 10px;
     font-family: helvetica,arial,sans-serif;
 }
@@ -212,7 +211,7 @@ textarea.form-control {
 .b2s-image-item-thumb {
     height: 150px;
 }
-.b2s-image-change-all-network,.b2s-upload-image-free-version,.b2s-image-change-this-network{
+.b2s-image-change-all-network,.b2s-upload-image-free-version,.b2s-image-change-this-network, .b2s-image-change-meta-network{
     margin-right: 5px !important;
 }
 .b2s-image-remove-btn {
@@ -309,4 +308,62 @@ textarea.form-control {
     margin-left: auto;
     margin-right: auto;
     max-height: 100%;
+}
+
+.b2s-post-item-details-item-group-select {
+    max-width: 100% !important;
+}
+
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+.b2s-post-item-details-item-message-area {
+    display: inline-block;
+    position: relative;
+    min-width: 100%;
+}
+
+.emoji-picker__content .active {
+    background-color: #fff;
+}
+
+.emoji-picker__content {
+    height: 21.5rem;
+}
+
+.emoji-picker__preview {
+    display: none;
+}
+
+.emoji-picker {
+    height: auto;
+    z-index: 1060;
+}
+
+.emoji-picker__tab.active {
+    color: #79b333;
+    border-bottom: 3px solid #79b333;
+}
+
+.b2sFavoriteStar {
+    font-size: 22px;
+    margin-top: 6px;
+    color: #ffb900;
+    cursor: pointer;
+}
+
+.b2sFavoriteStarLoading {
+    animation: 1.5s ease-in-out 0s normal none infinite running sk-pulseScaleOut;
 }

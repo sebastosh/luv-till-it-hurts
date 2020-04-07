@@ -303,3 +303,13 @@ textarea.form-control {
     }
 }
 
+.b2sFavoriteStar {
+    font-size: 22px;
+    margin-top: 6px;
+    color: #ffb900;
+    cursor: pointer;
+}
+
+.b2sFavoriteStarLoading {
+    animation: 1.5s ease-in-out 0s normal none infinite running sk-pulseScaleOut;
+}

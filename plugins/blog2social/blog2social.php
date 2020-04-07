@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Plugin Name:Blog2Social: Social Media Auto Post & Scheduler
  * Plugin URI: https://www.blog2social.com
@@ -7,12 +6,12 @@
  * Author: Blog2Social, Adenion
  * Text Domain: blog2social
  * Domain Path: /languages
- * Version: 5.8.0
+ * Version: 6.2.0
  * Author URI: https://www.blog2social.com
  * License: GPL2+
  */
 
-define('B2S_PLUGIN_VERSION', '580');
+define('B2S_PLUGIN_VERSION', '620');
 define('B2S_PLUGIN_LANGUAGE', serialize(array('de_DE', 'en_US')));
 define('B2S_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('B2S_PLUGIN_URL', plugin_dir_url(__FILE__));

@@ -127,3 +127,26 @@ ul.chosen-choices {
     font-size: 14px !important;
     font-weight: 500 !important;
 }
+
+.b2s-user-network-shortener-connect {
+    margin-left: 5px;
+}
+
+#b2s-auto-post-profil-dropdown-twitter option:disabled {
+    color: #ff4f68;
+}
+
+.b2s-w-100 {
+    width: 100%;
+    padding: 0px;
+}
+
+.b2s-auto-post-header {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/*prevent themes to overwrite line-height, causing the words to shift to the top*/
+.toggle-off, .toggle-on {
+    line-height: 1.4 !important;
+}

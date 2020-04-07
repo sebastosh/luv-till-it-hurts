@@ -1,11 +1,11 @@
 ===Blog2Social: Social Media Auto Post & Scheduler===
 Contributors: Blog2Social, pr-gateway
 Requires PHP: 5.5.3
-Tags: auto post, auto publish, social media scheduling, social media calendar, social media automation, social media share, auto-publish, scheduling, social media post, social url share, social network share, share tweet, share links, share this, sharethis, social tools, admin, api, auto share to, autopost, auto-Posting, auto-schedule, auto-schedule social media posts, automatic social sharing plugin, blog marketing, blog2social, blogger, buffer, crossposting, cross-promotion, cross-promoting, bloglovin, bloglovin auto post, facebook, facebook auto post, facebook pages, google auto post, google plus, google plus pages, instagram, instagram auto post, jetpack, jetpack sharing, linkedin, linkedin auto post, medium, medium auto post, multiposting, path, pinterest, re-post, scheduling, scheduling plugin, social media, social media auto publish, social media automation, social media button, social media manager, social media plugin, social media post, social media publishing, social media share, social media scheduling tool, social media sharing, social media tool, social network auto publish, social network icon, social network widget, socialmedia, timing, torial, torial auto post, tumblr, twitter, twitter auto post, xing, xing auto post, xing groups, xing gruppen, xing personal profiles, xing company profiles, xing business pages, xing pages, xing seiten, auto post scheduler, repost, social media management, facebook fan page auto post, facebook profile auto post, social auto post, social autoposting, flickr, flickr auto posting, linkedin, linkedin auto posting, linkedin profile, facebook group, facebook gruppen, reddit, reddit auto posting, reddit auto post, social media calendar, editorial calendar, calendar plugin, Social Media Automatisierung, Social Media Management, Kalender, Planungs Kalender, Social Media Kalender, Content Marketing
+Tags: auto post, auto publish, social media scheduling, social media calendar, social media automation, social media share, auto-publish, scheduling, social media post, social url share, social network share, share tweet, share links, share this, sharethis, social tools, admin, api, auto share to, autopost, auto-Posting, auto-schedule, auto-schedule social media posts, automatic social sharing plugin, blog marketing, blog2social, blogger, buffer, crossposting, cross-promotion, cross-promoting, bloglovin, bloglovin auto post, facebook, facebook auto post, facebook pages, google auto post, instagram, instagram auto post, jetpack, jetpack sharing, linkedin, linkedin auto post, medium, medium auto post, multiposting, pinterest, re-post, scheduling plugin, social media, social media auto publish, social media button, social media manager, social media plugin, social media publishing, social media scheduling tool, social media sharing, social media tool, social network auto publish, social network icon, social network widget, socialmedia, timing, torial, torial auto post, tumblr, twitter, twitter auto post, xing, xing auto post, xing groups, xing gruppen, xing personal profiles, xing company profiles, xing business pages, xing pages, xing seiten, auto post scheduler, repost, social media management, facebook fan page auto post, facebook profile auto post, social auto post, social autoposting, flickr, flickr auto posting, linkedin, linkedin auto posting, linkedin profile, facebook group, facebook gruppen, reddit, reddit auto posting, reddit auto post, social media calendar, editorial calendar, calendar plugin, Social Media Automatisierung, Social Media Management, Kalender, Planungs Kalender, Social Media Kalender, Content Marketing, Revive, Revive posts, Revive old posts, old posts, Reshare, Re-Share, automatically re-post, automatically reshare, auto repost, auto republish, recycle posts, bulk schedule, Google My Business, Google posts, imgur, vk, vkontakte, Vkontakte.ru, vk.com
 Donate link: https://paypal.me/adenion
-Requires at least: 4.2.2
-Tested up to: 5.2.3
-Stable tag: 5.8.0
+Requires at least: 4.7.0
+Tested up to: 5.3
+Stable tag: 6.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,14 +13,16 @@ Autopost, schedule and share blog posts and contents on social media, pages & gr
 
 == Description ==
 **Social Media Auto-Posting and Scheduling Plugin for WordPress Sites and Blogs.** 
-Autopost, cross-promote, schedule and automatically share your blog posts to social networks such as **Facebook, Twitter, Google My Business, LinkedIn, XING, Instagram, Pinterest, Flickr, Reddit, VK.com, Medium, Tumblr, Torial, Diigo and Bloglovin.**
+Autopost, cross-promote, schedule and automatically share your blog posts to social networks such as **Facebook, Twitter, Google My Business, LinkedIn, XING, Instagram, Pinterest, Imgur, Flickr, Reddit, VK.com, Medium, Tumblr, Torial, Diigo and Bloglovin.**
 Blog2Social automatically creates social media posts for your content and auto-posts at the best times for each network. Save time and pain of manually sharing and promoting your site on social media.
 
 _Compatible with WooCommerce, Gutenberg Editor, Hummingbird & Bitly._
 
-* Version 5.8: Wordpress Multisite compatible
+* Version 6.2: Re-Share and Re-Schedule posts automatically, Sniply
 
-**Blog2Social Free is free.** Download Blog2Social today to make your social media marketing for your WordPress site or blog easier than ever. [See what's included in the free version](https://wordpress.org/plugins/blog2social/#faq "FAQ")  Or, benefit from all advanced features for sharing and scheduling your content on social media by upgrading to **Blog2Social Premium.** [Start your free 30-day-Premium-trial](https://www.blog2social.com/en/plugin/wordpress/premium-trial/ "Test Blog2Social Premium for free") 
+Download Blog2Social today to make your social media marketing for your WordPress site or blog easier than ever. Blog2Social is a freemium plugin, with a free comprehensive basic version and premium plans offering more advanced features. To ensure compliance with the high quality standards of the new networks’ API rules and community guidelines, some functions of the auto-poster are premium features and not part of the free version. 
+The Blog2Social free version offers you a wide range of features. ([See what’s included in the free version](https://wordpress.org/plugins/blog2social/#faq "Blog2Social Free Features")). 
+To benefit from all the advanced features for automatic sharing and scheduling your content on social media you can [start your free 30-day trial for Blog2SocialPremium Pro- today and upgrade any time.](https://www.blog2social.com/en/plugin/wordpress/premium-trial/ "Free Blog2Social Premium Trial")
 
 = Supported Networks = for cross-posting and auto posting
 * **Facebook** - Post to your profile, page (Free), and in groups (Premium) 
@@ -30,6 +32,7 @@ _Compatible with WooCommerce, Gutenberg Editor, Hummingbird & Bitly._
 * **XING** - Post to your profile (Free), page (Premium), and in groups (Premium) 
 * **Instagram** - Post to your Instagram profile (Free)
 * **Pinterest** - Post to all your different Pinboards (Free)
+* **Imgur** - Post to your Imgur profile (Free)
 * **Flickr** - Post to your Flickr profile (Free)
 * **Reddit** - Post to your subreddits (Free)
 * **VK.com** - post to your profile (Free), page (Premium) or in groups (Premium) 
@@ -43,8 +46,8 @@ _Compatible with WooCommerce, Gutenberg Editor, Hummingbird & Bitly._
 
 BLOG2SOCIAL FREE
 
-* Share your posts and pages on 14 different networks: Twitter, Facebook (profile and page), LinkedIn (profile), XING (profile), Instagram, Pinterest, Reddit, Torial, Medium, Tumblr, Flickr, Diigo, Bloglovin, and VK at once.
-* Customize your social media posts with unique personal comments, hashtags, handles, emojis, and select an image of your choice. 
+* Share your posts and pages on 14 different networks: Twitter, Facebook (profile and page), LinkedIn (profile), XING (profile), Instagram, Pinterest, Imgur, Reddit, Torial, Medium, Tumblr, Flickr, Diigo, Bloglovin, and VK at once.
+* Customize your social media posts with unique personal comments, hashtags, handles, emojis, and select an image or animated GIF of your choice. 
 * You can even edit the complete HTML markup for re-publishing your post on Tumblr, Torial, and Medium. 
 * Manage all users posts and pages and share them on your channels.
 * Re-post old posts.
@@ -59,16 +62,16 @@ All these features are included in Blog2Social free. If you want to take your so
 Try Blog2Social Premium with [free 30-day-trial](https://www.blog2social.com/en/plugin/wordpress/premium-trial/ "Try Blog2Social Premium for free") (without any obligations, no automatic subscription). 
 
 
-7 REASONS FOR CHOOSING BLOG2SOCIAL PREMIUM
+10 REASONS FOR CHOOSING BLOG2SOCIAL PREMIUM
 
 **#1 Easy Social Media Scheduling** –  Auto-Post and Auto-Schedule your posts with a pre-defined best time schedule for each social network or define your own best times.
 
-Blog2Social provides you with a **ready-to-use Best Time Manager** for the best times to post on each social network. If you know which times work best for you, then you can **define and save your own time settings.** Schedule your social media posts for **immediate sharing or choose a one-time or recurring schedule.**
+Blog2Social provides you with a **ready-to-use Best Time Manager** for the best times to post on each social network. If you know which times work best for you, then you can **define and save your own time settings.** Schedule your social media posts for **immediate sharing or choose a one-time or recurring schedule. Save evergreen content as a favorite** to easily find and re-share your most valuable content.
 
 
 **#2 Cross-Posting and Cross-Promotion with Customized Social Media Posts** – Create unique social media posts for each social network and community.
 
-Blog2Social automatically turns your posts into an adapted format for each social platform. You can optionally customize and tailor your social media posts with individual **comments, #hashtags, @handles, and emojis. Automatically generate Hashtags** from your WP tags. **Select or add individual images** and choose between different **post formats (link post / image post)** to create more variations for your social media posts. Customize post templates to save your individual layout setting as default and share your social media posts faster with individually tailored posts on each social network.
+Blog2Social automatically turns your posts into an adapted format for each social platform. You can optionally customize and tailor your social media posts with individual **comments, #hashtags, @handles, and emojis. Automatically generate Hashtags** from your WP tags. **Select or add individual images and animated GIFs** and choose between different **post formats (link post / image post)** to create more variations for your social media posts. Customize post templates to save your individual layout setting as default and share your social media posts faster with individually tailored posts on each social network.
 
 
 **#3 Social Media Calendar** – Organize your social media marketing
@@ -86,14 +89,29 @@ Activate the autoposter to **automatically share your new and updated posts** on
 Share and schedule links and posts from any source to **automatically fill your social media feeds with a consistent content mix** of your own content and third-party content. Import content via RSS or share any URL-Link, or use the [free Blog2Social Extension for Firefox and Chrome](https://www.blog2social.com/en/webapp/extension/ "Blog2Social Browser Extension") to save links while browsing and share or schedule them whenever you want.
 
 
-**#6 Social-Media-Ready Blog Posts** –  Blog2Social optimizes your social meta tags 
+**#6 Create Social Media Posts any source**  –  share updates, images, and links from one central platform and schedule all your social media posts in one social media calendar.
+
+Save valuable time by managing your complete **social media content right from your WordPress dashboard.**
+
+
+**#7 Social-Media-Ready Blog Posts** –  Blog2Social optimizes your social meta tags 
 
 Blog2Social automatically adds Open Graph and Twitter Card tags to your blog posts to **optimize the shareability of your blog post on social networks.** Edit these tags to your liking to adjust how your link preview looks on social media networks.
 
 
-**#7 There is much more to discover** – Try Blog2Social to check out all the features
+**#8 Tracking with URL parameters** – Monitor and measure your marketing success in Google Analytics
 
-Use the **integrated Bitly shortener** to track the performance of your links. **Re-share** old posts or post & schedule **Retweets for Twitter.** Discover many more features:
+Add **UTM parameters** to URLs to enable **tracking of your social media campaigns via Google Analytics**.  You can also add **other URL parameters**, for example, for Adobe Analytics or IBM Cognos Analytics.
+
+
+**#9 Re-share and re-schedule old posts automatically** - Revive your posts
+
+Keep your social media feed updated automatically with awesome content and save valuable time by reviving your evergreen content regularly. **Automate your resharing** process with Blog2Social, so you can use your time to create new content and interact with your community. 
+
+
+**#10 There is much more to discover** – Try Blog2Social to check out all the features
+
+Use the **Bitly, Rebrandly or Sniply shortener** to track the performance of your links. Schedule **Retweets for Twitter.** Discover many more features:
 **Download Blog2Social and [start your free 30-day-Premium-trial](https://www.blog2social.com/en/plugin/wordpress/premium-trial/ "Start your free Blog2Social Premium Trial")** 
 
 
@@ -115,11 +133,11 @@ The Blog2Social Plugin is available in the following language versions
 * Thanks to [Juanma](https://wpnovatos.com/ "Juanma") for translating this plugin into Spanish
 
 == Installation ==
-1. Go to the Admin Panel of your Wordpress dashboard
+1. Go to the Admin Panel of your WordPress dashboard
 
-2. Select "Plugin" -> "Add New" in the left hand side menu
+2. Select “Plugin” -> “Add New” in the left hand side menu
 
-3. Enter "Blog2Social" in the "Search Plugins" text field.
+3. Enter "Blog2Social" in the "Search Plugins" text field
 
 4. Click "Install Now" on the Blog2Social banner
 
@@ -129,12 +147,18 @@ The Blog2Social Plugin is available in the following language versions
 
 7. "Blog2Social" appears in the left hand side menu
 
+**How to get started with Blog2Social?**
+Blog2Social is easy to use. [The step-by-step guide](https://www.blog2social.com/en/blog/smart-social-media-automation-step-by-step-guide-blog2social/ "Blog2Social Guide") will lead you step-by-step through the installation of Blog2Social and everything you need to know to get started. 
+
+**Unlock the full potential of Social Media Automation and start your free 30-day Premium trial**
+To take your social media marketing to the next level with more advanced sharing and scheduling options for auto-posting and cross-promoting your content [you can upgrade to Premium any time.](https://www.blog2social.com/en/pricing/ "Upgrade to Blog2Social Premium")
+[Check out Blog2Social Premium Pro with all awesome features](https://www.blog2social.com/en/plugin/wordpress/premium-trial/ "Blog2Social Free Premium Trial") for scheduling and sharing (e.g. auto-posting, best-time scheduling, social media calendar) 30-days for free. The trial is free of charge, without any obligations, no automatic subscription. All basic features of the Free Version are free forever.
 
 == Frequently Asked Questions ==
 
 = Is Blog2Social free? =
 
-Yes, Blog2Social is completely free to cross-post your blog posts on your social media profiles. For more advanced features and options you can upgrade to Blog2Social Premium whenever needed.
+Blog2Social is a freemium plugin with a free comprehensive basic version and premium plans offering more advanced features. With Blog2Social free you can cross-post your website content and blog posts on your social media profiles. You can post to all or selected social media networks at once or you can individually tailor your social media posts before posting. [See what’s included in the free version.](https://wordpress.org/plugins/blog2social/#faq "Blog2Social Free Features") For more advanced features and options you can [test Blog2Social Premium for free and without any obligations](https://www.blog2social.com/en/plugin/wordpress/premium-trial/ "Blog2Social Free Premium Trial") and upgrade whenever needed.
 
 = What can I do with the free version? =
 
@@ -163,14 +187,15 @@ You don’t need to cancel anything. There is no automatic subscription. The tri
 
 = What are the benefits of a Premium subscription plan? =
 
-Blog2Social premium takes your social media marketing to the next level. Benefit from more features for a smarter and faster social media scheduling and automation such as:
+Blog2Social premium takes your social media marketing to the next level. Benefit from more features for smarter and faster social media scheduling and automation such as:
 
 * Schedule, share and re-share your posts automatically with the Best Time Manager, select recurring intervals and set your own scheduling schemes.
 * Auto-Posting: Set your social media marketing on auto-pilot and share your posts fully automated.
 * Tailor and optimize your social media post: Select individual post formats (link or image post) and images for each post by using any image from your library.
 * Customize post templates to save your individual layout setting as default and share your social media posts faster with individually tailored posts on each social network.
-* Connect more accounts per network, add more users 
-* Business networks: Get more options for LinkedIn, XING, VK, and Google My Business 
+* Connect more accounts per network, add more users. 
+* Business networks: Get more options for LinkedIn, XING, VK, and Google My Business. 
+* Add URL parameters to track your marketing efforts. 
 * Get priority support per email and by phone.
 * ...and many more Premium features: [See all the Premium features on our pricing page](https://www.blog2social.com/en/pricing/ "All Blog2Social Premium features") 
 
@@ -193,6 +218,20 @@ To get started with the basics of Blog2Social and maybe find some useful tips an
 7. Keep track of your shared posts and scheduling plan with the Social Media Calendar.
 
 == Changelog ==
+= 6.2.0 = 
+Usability Optimization, Snip.ly integration, Re-poster
+= 6.1.2 = 
+Usability Optimization
+= 6.1.1 = 
+Usability Optimization
+= 6.1.0 = 
+Usability Optimization, Rebrandly integration, url parameter settings
+= 6.0.0 = 
+New Image Posts, Imgur, Animated Gifs and Emojis
+= 5.9.0 = 
+Usability Optimization & Gif support
+= 5.8.1 = 
+Usability Optimization
 = 5.8.0 = 
 Wordpress Multisite compatible
 = 5.7.2 = 
@@ -235,52 +274,22 @@ Usability Optimization
 Usability Optimization
 = 5.0.0 =
 Content Curation with links, WooCommerce compatibility, gutenberg editor compatibility
-= 4.9.2 =
-Usability Optimization
-= 4.9.1 =
-Usability Optimization, adapting to the facebook sharing process
-= 4.9.0 =
-Usability Optimization, shortener bitly, new network google my business
-= 4.8.3 =
-Bugfix: compatible with custom backend templates and modal scripts
-= 4.8.2 =
-Bugfix: twitter scheduling prozess
-= 4.8.1 =
-Bugfix: facebook individualize image and content in scheduling prozess
-= 4.8.0 =
-Usability Optimization, twitter retweet, more individualize image and content by scheduling 
-= 4.7.0 =
-Usability Optimization
-= 4.6.0 =
-Usability Optimization, facebook member groups, new network vkontakte, more flexible scheduling
-= 4.5.1 =
-Usability Optimization, varnish caching compatible
-= 4.5.0 =
-Usability Optimization, new calendar features, more easier and flexible schedueling
-= 4.4.0 =
-Usability Optimization, auto post imported content, Instagram image post format
-= 4.3.3 =
-Bugfix: Calendar date time function
-= 4.3.2 =
-Bugfix: Loading process
-= 4.3.1 =
-Bugfix: Social meta tags
-= 4.3.0 =
-Add Social Meta tags settings for linkpost. Scheduling calendar.
-= 4.2.2 =
-Bugfix: image upload
-= 4.2.1 =
-General Usabilitiy and Performance Optimization.
-= 4.2.0 =
-General Usabilitiy and Performance Optimization.
-= 4.1.1 =
-Usabilitiy and Performance Optimization. Bugfix: Heartbeat
-= 4.1.0 =
-Usabilitiy and Performance Optimization. Select link format or image format individual per posts
-= 4.0.0 =
-Usabilitiy and Performance Optimization. NEW: Select individual images per post. Select link format or image format for your posts. Select your own time zone for scheduling posts. Emoji support.
 
 == Upgrade Notice ==
+= 6.2.0 = 
+Usability Optimization, Snip.ly integration, Re-poster
+= 6.1.2 = 
+Usability Optimization
+= 6.1.1 = 
+Usability Optimization
+= 6.1.0 = 
+Usability Optimization, Rebrandly integration, url parameter settings
+= 6.0.0 = 
+New Image Posts, Imgur, Animated Gifs and Emojis
+= 5.9.0 = 
+Usability Optimization & Gif support
+= 5.8.1 = 
+Usability Optimization
 = 5.8.0 = 
 Wordpress Multisite compatible
 = 5.7.2 = 
@@ -323,47 +332,3 @@ Usability Optimization
 Usability Optimization
 = 5.0.0 =
 Content Curation with links, WooCommerce compatibility, gutenberg editor compatibility
-= 4.9.2 =
-Usability Optimization
-= 4.9.1 =
-Usability Optimization, adapting to the facebook sharing process
-= 4.9.0 =
-Usability Optimization, shortener bitly, new network google my business
-= 4.8.3 =
-Bugfix: compatible with custom backend templates and modal scripts
-= 4.8.2 =
-Bugfix: twitter scheduling prozess
-= 4.8.1 =
-Bugfix: facebook individualize image and content in scheduling prozess
-= 4.8.0 =
-Usability Optimization, twitter retweet, more individualize image and content by scheduling
-= 4.7.0 =
-Usability Optimization
-= 4.6.0 =
-Usability Optimization, facebook member groups, new network vkontakte, more flexible schedueling
-= 4.5.1 =
-Usability Optimization, varnish caching compatible
-= 4.5.0 =
-Usability Optimization, new calendar features, more easier and flexible schedueling
-= 4.4.0 =
-Usability Optimization, auto post imported content, Instagram image post format
-= 4.3.3 =
-Bugfix: Calendar date time function
-= 4.3.2 =
-Bugfix: Loading process
-= 4.3.1 =
-Bugfix: Social meta tags
-= 4.3.0 =
-Add Social Meta tags settings for linkpost. Scheduling calendar.
-= 4.2.2 =
-Bugfix: image upload
-= 4.2.1 =
-General Usabilitiy and Performance Optimization.
-= 4.2.0 =
-General Usabilitiy and Performance Optimization.
-= 4.1.1 =
-Usabilitiy and Performance Optimization. Bugfix: Heartbeat
-= 4.1.0 =
-Usabilitiy and Performance Optimization. Select link format or image format individual per posts
-= 4.0.0 =
-Usabilitiy and Performance Optimization. NEW: Select individual images per post. Select link format or image format for your posts. Select your own time zone for scheduling posts. Emoji support.

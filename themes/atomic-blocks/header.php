@@ -32,19 +32,17 @@
 	</div><!-- .drawer -->
 
 	<div class="top-navigation">
-<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="http://luvhurts.co/wp-content/uploads/2019/09/luvhead-07.png" class="Desktop"></a>
-<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="http://luvhurts.co/wp-content/uploads/2018/10/luvwebcone-red.png" class="Ipad"></a>
-<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="http://luvhurts.co/wp-content/uploads/2018/10/LUV_logo.png" class="Mobile"></a>
-
-
-
+	<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="<?php echo esc_url( home_url( '/wp-content/themes/atomic-blocks/images/luvwebhead.png' ) ); ?>" class="Desktop"></a>
+<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="<?php echo esc_url( home_url( '/wp-content/themes/atomic-blocks/images/luvwebcone-red.png' ) ); ?>" class="Ipad"></a>
+<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="<?php echo esc_url( home_url( '/wp-content/themes/atomic-blocks/images/LUV_logo.png' ) ); ?>" class="Mobile"></a>
 		<?php
 			// Get the mobile menu
 			get_template_part( 'template-parts/content-menu-drawer' );
 		?>
 
 		<div class="container">
-
+			<div class="site-identity clear">
+	
 				<div class="top-navigation-right">
 					<!-- Main navigation -->
 					<nav id="site-navigation" class="main-navigation">
@@ -54,11 +52,12 @@
 						) );?>
 					</nav><!-- .main-navigation -->
 				</div><!-- .top-navigation-right -->
+			</div><!-- .site-identity-->
 		</div><!-- .container -->
 	</div><!-- .top-navigation -->
 
 	<!-- Get the archive page titles -->
-	<?php if( is_search() || is_404() ) { ?>
+	<?php if( is_archive() || is_search() || is_404() ) { ?>
 		<div class="container text-container">
 			<div class="header-text">
 				<?php atomic_blocks_page_titles(); ?>

@@ -2988,7 +2988,7 @@ select[multiple].input-lg {
 }
 .btn {
     display: inline-block;
-    padding: 6px 12px;
+    padding: 6px 8px;
     margin-bottom: 0;
     font-size: 14px;
     font-weight: normal;
@@ -3425,7 +3425,7 @@ fieldset[disabled] .btn-link:focus {
 }
 .btn-sm,
 .btn-group-sm > .btn {
-    padding: 5px 10px;
+    padding: 5px 6px;
     font-size: 12px;
     line-height: 1.5;
     border-radius: 3px;
@@ -4804,9 +4804,9 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 }
 .label {
     display: inline;
-    padding: .2em .6em .3em;
+    padding: .2em .3em .2em;
     font-size: 75%;
-    font-weight: bold;
+    font-weight: 600;
     line-height: 1;
     color: #fff;
     text-align: center;
@@ -6961,6 +6961,7 @@ p {
 .b2s-select,.b2s-input,.b2s-select-area{
     height:  30px !important;
     margin-bottom: 8px !important;
+    padding: 0 19px 0 1px !important;
 }
 
 .b2s-btn-logo{
@@ -7143,6 +7144,10 @@ h4{
 
 .error{
     border: 1px solid #FF0000 !important;
+}
+
+.warning{
+    border: 1px solid #ffc107 !important;
 }
 
 input[type="checkbox"].error, select.error{
@@ -7597,4 +7602,40 @@ CSS CheckBOX
 
 .b2s-left-border-danger {
     border-left: 4px solid #a94442;
+}
+
+.b2s-free-link {
+    font-size: 13px;
+}
+
+.b2s-post-item-details-item-message-emoji-btn:active {
+    box-shadow: none !important;
+    opacity: 0.5;
+}
+
+.b2s-post-item-details-item-message-emoji-btn {
+    position: absolute;
+    background-color: transparent;
+    font-size: 2rem !important;
+    color: #79b333;
+    max-width: 0px;
+    max-height: 0px;
+    bottom: 50px;
+    right: 40px;
+}
+
+.margin-bottom-0 {
+    margin-bottom: 0px !important;
+}
+
+.b2s-sort-pagination-area {
+    display: none;
+}
+
+.b2s-post-per-page {
+    margin: 20px 0px;
+}
+
+.fc-other-month{
+    opacity: 1 !important;
 }

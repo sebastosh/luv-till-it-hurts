@@ -1,10 +1,10 @@
 === Atomic Blocks ===
 Contributors: arrayhq
 Donate link: https://atomicblocks.com/
-Tags: one-column, featured-images, theme-options, custom-background, custom-colors, custom-menu, editor-style, translation-ready, footer-widgets, full-width-template, blog
+Tags: one-column, featured-images, theme-options, custom-background, custom-colors, custom-menu, editor-style, translation-ready, footer-widgets, full-width-template, blog, gutenberg
 Requires at least: 4.0
-Tested up to: 4.9.4
-Stable tag: 1.2.2
+Tested up to: 5.2.2
+Stable tag: 1.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,26 @@ License: CC0 1.0 Universal (CC0 1.0)
 Source: https://pixabay.com/en/girl-person-walking-footbridge-918706/
 
 == Change Log ==
+
+= 1.2.6 - 10/16/19 =
+* Improve alignment styles.
+* Improve block editor styles for default themes.
+* Fix editor width setting in Customizer to match block editor width.
+* Remove specific heading colors in favor of body styles.
+* Remove forced image width.
+
+= 1.2.5 - 6/26/19 =
+* Minor style improvements for AB plugin section and layouts.
+
+= 1.2.4 - 1/14/19 =
+* Rework editor styles to match core.
+* Fix footer text wrap.
+* Fix Disable Google Font error.
+* Remove unnecessary masonry and imagesLoaded.
+* Fix font family in lists.
+
+= 1.2.3 - 10/5/18 =
+* Fix mobile responsiveness for columns.
 
 = 1.2.2 - 9/25/18 =
 * Fix wide and full width alignment styles.

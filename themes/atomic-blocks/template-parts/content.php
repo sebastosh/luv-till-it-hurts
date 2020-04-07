@@ -10,8 +10,7 @@
 	<div class="post-content">
 
 		<header class="entry-header">
-						<?php atomic_blocks_post_byline(); ?>
-			<?php if( is_single() ) { ?>
+			<?php if( is_single() ) { ?>	
 				<h1 class="entry-title">
 					<?php the_title(); ?>
 				</h1>
@@ -20,14 +19,14 @@
 					<a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a>
 				</h2>
 			<?php } ?>
-
-
+			
+			<?php atomic_blocks_post_byline(); ?>
 		</header>
-
+		
 		<?php if ( has_post_thumbnail() ) { ?>
 			<div class="featured-image">
 				<?php if ( is_single() ) { ?>
-					<?php the_post_thumbnail( 'atomic-blocks-featured-image' ); echo get_post(get_post_thumbnail_id())->post_excerpt; ?>
+					<?php the_post_thumbnail( 'atomic-blocks-featured-image' ); ?>
 				<?php } else { ?>
 					<a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_post_thumbnail( 'atomic-blocks-featured-image' ); ?></a>
 				<?php } ?>

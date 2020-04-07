@@ -211,8 +211,8 @@ function atomic_blocks_post_byline() { ?>
 		<a class="entry-byline-author" href="<?php echo esc_url( get_author_posts_url( $author_id ) ); ?>">
 			<?php echo esc_html( get_the_author_meta( 'display_name', $author_id ) ); ?>
 		</a>
-		<span class="entry-byline-on"><?php esc_html_e( '-', 'atomic-blocks' ); ?></span>
-		<span class="entry-byline-date"><?php echo get_the_date('M Y'); ?></span>
+		<span class="entry-byline-on"><?php esc_html_e( 'on', 'atomic-blocks' ); ?></span>
+		<span class="entry-byline-date"><?php echo get_the_date(); ?></span>
 	</p>
 <?php } endif;
 

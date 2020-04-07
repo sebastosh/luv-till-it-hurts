@@ -47,10 +47,22 @@ function atomic_blocks_setup() {
 	/*
 	 * Add editor styles
 	 */
-	//add_theme_support( 'editor-styles' );
+	add_theme_support( 'editor-styles' );
+
+	/*
+	 * Enqueue editor styles
+	 */
+	add_editor_style( 'style-editor.css' );
 
 	/**
+	 * Custom Background support
+	 */
+	$defaults = array(
+		'default-color' => 'ffffff'
+	);
+	add_theme_support( 'custom-background', $defaults );
 
+	/**
 	 * Add wide image support
 	 */
 	add_theme_support( 'align-wide' );
@@ -147,16 +159,6 @@ function atomic_blocks_widgets_init() {
 		'before_title'  => '<h2 class="widget-title">',
 		'after_title'   => '</h2>',
 	) );
-
-	register_sidebar( array(
-		'name'          => esc_html__( 'Sidebar Column', 'atomic-blocks' ),
-		'id'            => 'page-sidebar',
-		'description'   => esc_html__( 'Widgets added here will appear in the right column of a page.', 'atomic-blocks' ),
-		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</aside>',
-		'before_title'  => '<h2 class="widget-title">',
-		'after_title'   => '</h2>',
-	) );
 }
 add_action( 'widgets_init', 'atomic_blocks_widgets_init' );
 
@@ -200,12 +202,16 @@ function atomic_blocks_fonts_url() {
 		}
 	}
 
-	$query_args = array(
-		'family' => urlencode( implode( '|', $font_families ) ),
-		'subset' => urlencode( 'latin,latin-ext' ),
-	);
+	if ( !empty ( $font_families ) ) {
 
-	$fonts_url = add_query_arg( $query_args, "//fonts.googleapis.com/css" );
+		$query_args = array(
+			'family' => urlencode( implode( '|', $font_families ) ),
+			'subset' => urlencode( 'latin,latin-ext' ),
+		);
+
+		$fonts_url = add_query_arg( $query_args, "//fonts.googleapis.com/css?&display=swap" );
+
+	}
 
 	return $fonts_url;
 }
@@ -238,11 +244,6 @@ function atomic_blocks_scripts() {
 	 * Load fitvids javascript
 	 */
 	wp_enqueue_script( 'fitvids', get_template_directory_uri() . '/js/jquery.fitvids.js', array(), '1.1', true );
-
-	/**
-	 * Masonry
-	 */
-	wp_enqueue_script( 'masonry' );
 
 	/**
 	 * Localizes the atomic-blocks-js file
@@ -300,7 +301,7 @@ add_action( 'enqueue_block_editor_assets', 'atomic_blocks_shared_styles' );
  * Load block editor styles
  */
 function atomic_blocks_block_editor_styles() {
-	wp_enqueue_style( 'atomic-blocks-block-editor-styles', get_template_directory_uri() . '/block-editor.css');
+	wp_enqueue_style( 'atomic-blocks-block-editor-styles', get_template_directory_uri() . '/style-editor-extra.css');
 }
 add_action( 'enqueue_block_editor_assets', 'atomic_blocks_block_editor_styles' );
 

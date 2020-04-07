@@ -4,7 +4,7 @@ Theme URI: https://arraythemes.com/themes/atomic-blocks-wordpress-theme/
 Author: Atomic Blocks
 Author URI: https://atomicblocks.com/
 Description: A beautifully-simple yet powerful WordPress theme that integrates perfectly with the new Gutenberg editor and the Atomic Blocks plugin. Start building amazing websites with the new WordPress editor today! Atomic Blocks comes with theme options to customize your font style, body and title font sizes, content width and more! Install the Atomic Blocks plugin (atomicblocks.com) to add even more page-building blocks such as testimonials, sharing icons, notices, call to actions, buttons and more. Theme Demo: https://preview.arraythemes.com/atomicblocks
-Version: 1.2.2
+Version: 1.2.6
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: atomic-blocks
@@ -15,7 +15,7 @@ Tags: one-column, featured-images, theme-options, custom-background, custom-colo
 */
 
 /* Import Atomic Blocks Sass Variables (inc/sass/variables.scss) */
-@import 'variables'; 
+@import 'variables';
 
 /* --------------------------------------------------------------
 1.0 - Reset
@@ -108,7 +108,6 @@ body, button {
 
 h1, h2, h3, h4, h5, h6 {
 	clear: both;
-	color: $black;
 	font-family: $title;
 	font-weight: 700;
 	line-height: 1.2;
@@ -397,7 +396,7 @@ input[type="submit"]:active,
 .button:focus,
 .comment-navigation a:focus,
 a.added_to_cart:active,
-a.added_to_cart:focus, {
+a.added_to_cart:focus {
 	color: #fff;
 	box-shadow: inset 0 0 80px rgba(0,0,0, .05);
 }
@@ -1641,8 +1640,8 @@ a:hover, a:focus, a:active {
 }
 
 .drawer-wrap .searchform {
-	margin-top: 25px; 
-	
+	margin-top: 25px;
+
 	.search-input {
 		border: none;
 	}
@@ -4193,6 +4192,10 @@ body.admin-bar .is-sticky .site-header {
 	}
 }
 
+#page .more-link + .page-links {
+	margin-top: 20px;
+}
+
 .featured-image,
 .featured-video {
 	margin-bottom: 5%;
@@ -4598,6 +4601,7 @@ body.admin-bar .is-sticky .site-header {
 
 .footer-tagline {
 	display: inline-block;
+	width: 40%;
 
 	@include viewport(tablet) {
 		float: none;
@@ -5244,24 +5248,21 @@ div[id^='contact-form'] {
 			margin-left: -8px;
 			margin-right: -8px;
 			width: inherit;
-		}	
+		}
 	}
-	
+
 	img {
-		width: 100%;
 		display: block;
 	}
 }
 
 .alignwide {
     max-width: none;
-    
     @include viewport(desktop) {
         width: 75vw;
         margin-left: calc( 50% - 75vw / 2 );
     }
 
-    
 }
 
 .alignfull {

@@ -9,16 +9,15 @@
 get_header();
 ?>
 
-<section id="archive" class="content-area">
+<section id="primary" class="content-area">
 	<main id="main" class="site-main">
-		<div id="archive-wrap">
-
+		<div id="post-wrap">
 			<?php
 				if ( have_posts() ) :
 
 				while ( have_posts() ) : the_post();
 
-					get_template_part( 'template-parts/content-archive' );
+					get_template_part( 'template-parts/content' );
 
 				endwhile;
 
