@@ -62,6 +62,7 @@ jQuery.fn.perform_block_edit = function () {
             jQuery("#tnpc-block-options-form").load(ajaxurl, {
                 action: "tnpc_options",
                 id: container.data("id"),
+                context_type: tnp_context_type,
                 options: options
             }, function () {
                 start_options = jQuery("#tnpc-block-options-form").serialize();
@@ -246,19 +247,25 @@ function start_composer() {
     });
 
     // live preview from block options *** EXPERIMENTAL ***
-    jQuery('#tnpc-block-options-form').change(function () {
+    jQuery('#tnpc-block-options-form').change(function (event) {
         var data = jQuery("#tnpc-block-options-form").serialize();
         jQuery.post(ajaxurl, data, function (response) {
             target.html(response);
+            if (event.target.dataset.afterRendering === 'reload') {
+                container.find(".tnpc-row-edit-block").click();
+            }
         }).fail(function () {
             alert("Block rendering failed");
         });
+            
+    
 
     });
 
     jQuery(".tnpc-row").add_delete();
     jQuery(".tnpc-row").add_block_edit();
     jQuery(".tnpc-row").add_block_clone();
+
 
     tnpc_mobile_preview();
 
@@ -292,7 +299,7 @@ function tnpc_save(form) {
 
     let css = jQuery.trim(form.elements["options[css]"].value);
 
-    let export_content = '<!DOCTYPE html>\n<html>\n<head>\n<title>{subject}</title>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<meta http-equiv="X-UA-Compatible" content="IE=edge">\n';
+    let export_content = '<!DOCTYPE html>\n<html>\n<head>\n<title>{email_subject}</title>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<meta http-equiv="X-UA-Compatible" content="IE=edge">\n';
     export_content += '<style type="text/css">' + css + '</style>';
     export_content += '</head>\n<body style="margin: 0; padding: 0;">\n';
     export_content += preload_export_html;

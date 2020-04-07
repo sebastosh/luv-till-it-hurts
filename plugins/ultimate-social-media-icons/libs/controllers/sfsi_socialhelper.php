@@ -71,7 +71,7 @@ class sfsi_SocialHelper
 	/* get youtube subscribers  */
 	function sfsi_get_youtube($user)
 	{
-		if($user == 'SpecificFeeds')
+		if($user == 'follow.it')
 		{
 			$sfsi_section4_options =  unserialize(get_option('sfsi_section4_options',false));
 			$user = (
@@ -250,18 +250,12 @@ class sfsi_SocialHelper
 		return $fb_like_html;exit;
 	}
 	
-	/*subscribe like*/
-	function sfsi_Subscribelike($permalink, $show_count)
-	{
-	
-	}
-	
 	/*twitter like*/
-	function sfsi_twitterlike($permalink, $show_count)
-	{
-		$twitter_text = '';
-		return sfsi_twitterShare($permalink,$twitter_text);
-	}
+	// function sfsi_twitterlike($permalink, $show_count)
+	// {
+	// 	$twitter_text = '';
+	// 	return sfsi_twitterShare($permalink,$twitter_text);
+	// }
 	
 	/* create on page facebook share option */
 	public function sfsiFB_Share($permalink)
@@ -270,35 +264,78 @@ class sfsi_SocialHelper
 		$fb_share_html .= 'type="button"';
 		$fb_share_html .= '></fb:share-button>';*/
 		$fb_share_html = '';
-		$fb_share_html .= '<div class="fb-share-button" data-href="'.$permalink.'" data-layout="button"></div>';
-		return $fb_share_html;
+		// $fb_share_html .= '<div class="fb-share-button" data-href="'.$permalink.'" data-layout="button"></div>';
+		// return $fb_share_html;
+		$shareurl = "https://www.facebook.com/sharer/sharer.php?u=";
+	  $shareurl = $shareurl . urlencode(urldecode($permalink));
+
+	  $fb_share_html = "<a " . sfsi_checkNewWindow() . " href='" . $shareurl . "' style='display:inline-block;'  > <img class='sfsi_wicon'  data-pin-nopin='true' width='auto' height='auto' alt='fb-share-icon' title='Facebook Share' src='" . SFSI_PLUGURL . "images/visit_icons/fbshare_bck.png" . "'  /></a>";
+	  return $fb_share_html;
 	}
+
+	
+
 	/* create on page twitter follow option */ 
 	public function sfsi_twitterFollow($tw_username)
 	{
-		$twitter_html = '<a href="https://twitter.com/'.trim($tw_username).'" class="twitter-follow-button"  data-show-count="false" data-show-screen-name="false">Follow </a>';
+		$twitter_html = '<a target="_blank" href="https://twitter.com/intent/user?screen_name='.trim($tw_username).'">
+			<img nopin="nopin" width="auto" src="'. SFSI_PLUGURL .'images/visit_icons/en_US_Follow.svg" class="sfsi_wicon" alt="Follow Me" title="Follow Me" style="opacity: 1;" />
+			</a>';
+
+		// $twitter_html = '<a href="https://twitter.com/'.trim($tw_username).'" class="twitter-follow-button"  data-show-count="false" data-show-screen-name="false">Follow </a>';
 		return $twitter_html;
 	} 
 	
 	/* create on page twitter share icon */
 	public function sfsi_twitterShare($permalink,$tweettext)
 	{
-		$twitter_html = '<a rel="nofollow" href="http://twitter.com/share" data-count="none" class="sr-twitter-button twitter-share-button" lang="en" data-url="'.$permalink.'" data-text="'.stripslashes($tweettext).'" ></a>';
+		$tweet_icon = SFSI_PLUGURL . 'images/visit_icons/en_US_Tweet.svg';
+
+		$twitter_html = "<div class='sf_twiter' style='display: inline-block;vertical-align: middle;width: auto;'>
+						<a " . sfsi_checkNewWindow() . " href='https://twitter.com/intent/tweet?text=" . urlencode($tweettext).' '.$permalink. "'style='display:inline-block' >
+							<img nopin=nopin width='auto' class='sfsi_wicon' src='" . $tweet_icon . "' alt='Tweet' title='Tweet' >
+						</a>
+					</div>";
 		return $twitter_html;
 	} 
 	
 	/* create on page twitter share icon with count */
-	public function sfsi_twitterSharewithcount($permalink,$tweettext, $show_count)
+	public function sfsi_twitterSharewithcount($permalink,$tweettext, $show_count,$rectangular_icon=false)
 	{
-		if($show_count)
-		{
-			$twitter_html = '<a href="http://twitter.com/share" class="sr-twitter-button twitter-share-button" lang="en" data-counturl="'.$permalink.'" data-url="'.$permalink.'" data-text="'.$tweettext.'" ></a>';
+		$sfsi_section4	= unserialize(get_option('sfsi_section4_options', false));
+		$tweet_icon = SFSI_PLUGURL . 'images/visit_icons/en_US_Tweet.svg';
+		$socialObj = new sfsi_SocialHelper();
+		$count_html ="";
+		if ($show_count ) {
+			/* get twitter counts */
+			if ($sfsi_section4['sfsi_twitter_countsFrom'] == "source") {
+				$option2	= unserialize(get_option('sfsi_section2_options', false));
+
+				$twitter_user = $option2['sfsi_twitter_followUserName'];
+				$tw_settings = array(
+					'tw_consumer_key' => $sfsi_section4['tw_consumer_key'],
+					'tw_consumer_secret' => $sfsi_section4['tw_consumer_secret'],
+					'tw_oauth_access_token' => $sfsi_section4['tw_oauth_access_token'],
+					'tw_oauth_access_token_secret' => $sfsi_section4['tw_oauth_access_token_secret']
+				);
+
+				$followers = $socialObj->sfsi_get_tweets($twitter_user, $tw_settings);
+				$counts = $socialObj->format_num($followers);
+			} else {
+				$counts = $socialObj->format_num($sfsi_section4['sfsi_twitter_manualCounts']);
+				
+			}
+			if($counts>0){
+				$count_html = '<span class="bot_no">'.$counts.'</span>';
+			}
 		}
-		else
-		{
-			$twitter_html = '<a href="http://twitter.com/share" data-count="none" class="sr-twitter-button twitter-share-button" lang="en" data-url="'.$permalink.'" data-text="'.$tweettext.'" ></a>';
-		}
-	   return $twitter_html;
+		$twitter_html = "<div class='sf_twiter ".($rectangular_icon?'sf_icon':'')."' style='display: inline-block;vertical-align: middle;width: auto;margin-left: 7px;'>
+						<a " . sfsi_checkNewWindow() . " href='https://twitter.com/intent/tweet?text=" . urlencode($tweettext) . ' ' . $permalink . "'style='display:inline-block' >
+							<img nopin=nopin width='auto' class='sfsi_wicon' src='" . $tweet_icon . "' alt='Tweet' title='Tweet' >
+						</a>".$count_html."
+					</div>";
+		// $twitter_html = '<a href="http://twitter.com/share" data-count="none" class="sr-twitter-button twitter-share-button" lang="en" data-url="'.$permalink.'" data-text="'.$tweettext.'" ></a>';
+		return $twitter_html;
 	}
  
 	/* create on page youtube subscribe icon */       
@@ -322,10 +359,23 @@ class sfsi_SocialHelper
 	
 	/* create on page pinit button icon */      
 	public function sfsi_PinIt($url='')
-	{       
-		$pin_it_html = '<a data-pin-do="buttonPin" data-pin-save="true" href="https://www.pinterest.com/pin/create/button/?url=&media=&description="></a>';
-		return $pin_it_html;
+	{   
+		if(""==$url){
+			$url = trailingslashit(get_permalink());
+		}
+
+		$description = get_the_title();
+
+		// $pinit_url = 'https://www.pinterest.com/pin/create/button/?url='.$url.'&media='.$media.'&description='.$description;
+		// $pinit_url = 'https://www.pinterest.com/pin/create/button/?url='.$url.'&media='..'&description='.;
+
+		$pinit_html = "<a href='#'  onclick='sfsi_pinterest_modal_images(event)' style='display:inline-block;'  > <img class='sfsi_wicon'  data-pin-nopin='true' width='auto' height='auto' alt='fb-share-icon' title='Pin Share' src='" . SFSI_PLUGURL . "images/share_icons/Pinterest_Save/en_US_save.svg" . "'  /></a>";
+		return $pinit_html;
+		// $pin_it_html = '<a data-pin-do="buttonPin" data-pin-save="true" href="https://www.pinterest.com/pin/create/button/?url=&media=&description="></a>';
+		// return $pin_it_html;
 	}
+	
+
 	
 	/* get instragram followers */
 	public function sfsi_get_instagramFollowers($user_name)
@@ -408,11 +458,12 @@ class sfsi_SocialHelper
 	/* create linkedIn  share button */
 	public function sfsi_LinkedInShare($url='')
 	{
-	  $url=(isset($url))? $url :  home_url();
-	  return  $ifollow='<script type="IN/Share" data-url="'.$url.'"></script>';
+	  $url=(isset($url) && ''!==$url)? $url :  home_url();
+	  return '<a ' . sfsi_checkNewWindow() . ' href="https://www.linkedin.com/shareArticle?url='.urlencode($url).'"><img class="sfsi_wicon" nopin="nopin" alt="Share" title="Share" src="'.SFSI_PLUGURL.'images/visit_icons/lnkdin_share_bck.png"></a>';
+	  // return  $ifollow='<script type="IN/Share" data-url="'.$url.'"></script>';
 	}
 	
-	/* get no of subscribers from specificfeeds for current blog */
+	/* get no of subscribers from follow.it for current blog */
 	public function SFSI_getFeedSubscriber($feedid)
 	{
 		$sfsi_instagram_sf_count_option = get_option('sfsi_instagram_sf_count',false);
@@ -423,7 +474,7 @@ class sfsi_SocialHelper
 		}
 		
 		/*if date is empty (for decrease request count)*/
-		if(empty($sfsi_instagram_sf_count["date_sf"]))
+		if(isset($sfsi_instagram_sf_count["date_sf"]) && empty($sfsi_instagram_sf_count["date_sf"]))
 		{
 			$sfsi_instagram_sf_count["date_sf"] = strtotime(date("Y-m-d"));
 			$counts = $this->SFSI_getFeedSubscriberCount($feedid);
@@ -465,7 +516,7 @@ class sfsi_SocialHelper
 		return $counts;
 	}
 	
-	/* get no of subscribers from specificfeeds for current blog count */
+	/* get no of subscribers from follow.it for current blog count */
 	public function  SFSI_getFeedSubscriberCount($feedid)
 	{
 		
@@ -473,6 +524,7 @@ class sfsi_SocialHelper
 			'feed_id' => $feedid,
 			'v' => 'newplugincount'
 		);
+	
 		$args = array(
 		    'body' => $postto_array,
 		    'blocking' => true,
@@ -482,9 +534,9 @@ class sfsi_SocialHelper
 		    'sslverify' => false
 		);
 		try{
-			$resp = wp_remote_post( 'https://www.specificfeeds.com/wordpress/wpCountSubscriber', $args );
+			$resp = wp_remote_post( 'https://api.follow.it/wordpress/wpCountSubscriber', $args );
 		}catch(\Exception $e){
-			var_dump($e);
+			// var_dump($e);
 		}
 		$httpcode = wp_remote_retrieve_response_code($resp);
 		
@@ -519,4 +571,3 @@ class sfsi_SocialHelper
 	
 }
 /* end of class */
-?>

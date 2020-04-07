@@ -198,7 +198,7 @@ function metaslider_optimize_url($url, $text, $html = null, $class = '') {
     if (!empty($html)) {
 	    return sprintf('<a class="%1$s" href="%2$s">%3$s</a>', esc_attr($class), esc_attr($url), $html);
     } else {
-	    return sprintf('<a class="%1$s" href="%2$s">%3$s</a>', esc_attr($class), esc_attr($url), htmlspecialchars($text));
+	    return sprintf('<a class="text-blue-dark underline %1$s" href="%2$s">%3$s</a>', esc_attr($class), esc_attr($url), htmlspecialchars($text));
     }
 }
 

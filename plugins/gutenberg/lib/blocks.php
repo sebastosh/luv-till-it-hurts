@@ -1,271 +1,230 @@
 <?php
 /**
- * Functions related to editor blocks for the Gutenberg editor plugin.
+ * Block and style registration functions.
  *
  * @package gutenberg
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
-}
-
-if ( ! function_exists( 'register_block_type' ) ) {
-	/**
-	 * Registers a block type.
-	 *
-	 * @since 0.1.0
-	 * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
-	 *
-	 * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
-	 *                                   complete WP_Block_Type instance. In case a WP_Block_Type
-	 *                                   is provided, the $args parameter will be ignored.
-	 * @param array                $args {
-	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
-	 *     ones described below are supported by default. Default empty array.
-	 *
-	 *     @type callable $render_callback Callback used to render blocks of this block type.
-	 * }
-	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
-	 */
-	function register_block_type( $name, $args = array() ) {
-		return WP_Block_Type_Registry::get_instance()->register( $name, $args );
+/**
+ * Substitutes the implementation of a core-registered block type, if exists,
+ * with the built result from the plugin.
+ */
+function gutenberg_reregister_core_block_types() {
+	// Blocks directory may not exist if working from a fresh clone.
+	$blocks_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
+	if ( ! file_exists( $blocks_dir ) ) {
+		return;
 	}
-}
 
-if ( ! function_exists( 'unregister_block_type' ) ) {
-	/**
-	 * Unregisters a block type.
-	 *
-	 * @since 0.1.0
-	 * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
-	 *
-	 * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
-	 *                                   complete WP_Block_Type instance.
-	 * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
-	 */
-	function unregister_block_type( $name ) {
-		return WP_Block_Type_Registry::get_instance()->unregister( $name );
-	}
-}
+	$block_names = array(
+		'archives.php'            => 'core/archives',
+		'block.php'               => 'core/block',
+		'calendar.php'            => 'core/calendar',
+		'categories.php'          => 'core/categories',
+		'latest-comments.php'     => 'core/latest-comments',
+		'latest-posts.php'        => 'core/latest-posts',
+		'legacy-widget.php'       => 'core/legacy-widget',
+		'navigation.php'          => 'core/navigation',
+		'rss.php'                 => 'core/rss',
+		'shortcode.php'           => 'core/shortcode',
+		'search.php'              => 'core/search',
+		'social-link.php'         => 'core/social-link',
+		'tag-cloud.php'           => 'core/tag-cloud',
+		'site-title.php'          => 'core/site-title',
+		'template-part.php'       => 'core/template-part',
+		'post-title.php'          => 'core/post-title',
+		'post-content.php'        => 'core/post-content',
+		'post-author.php'         => 'core/post-author',
+		'post-comments.php'       => 'core/post-comments',
+		'post-comments-count.php' => 'core/post-comments-count',
+		'post-comments-form.php'  => 'core/post-comments-form',
+		'post-date.php'           => 'core/post-date',
+		'post-excerpt.php'        => 'core/post-excerpt',
+		'post-featured-image.php' => 'core/post-featured-image',
+		'post-tags.php'           => 'core/post-tags',
+	);
 
-if ( ! function_exists( 'gutenberg_parse_blocks' ) ) {
-	/**
-	 * Parses blocks out of a content string.
-	 *
-	 * @since 0.5.0
-	 *
-	 * @param  string $content Post content.
-	 * @return array  Array of parsed block objects.
-	 */
-	function gutenberg_parse_blocks( $content ) {
-		/**
-		 * Filter to allow plugins to replace the server-side block parser
-		 *
-		 * @since 3.8.0
-		 *
-		 * @param string $parser_class Name of block parser class
-		 */
-		$parser_class = apply_filters( 'block_parser_class', 'WP_Block_Parser' );
-		// Load default block parser for server-side parsing if the default parser class is being used.
-		if ( 'WP_Block_Parser' === $parser_class ) {
-			require_once dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
+	$registry = WP_Block_Type_Registry::get_instance();
+
+	foreach ( $block_names as $file => $block_names ) {
+		if ( ! file_exists( $blocks_dir . $file ) ) {
+			return;
 		}
-		$parser = new $parser_class();
-		return $parser->parse( $content );
-	}
-}
 
-if ( ! function_exists( 'get_dynamic_block_names' ) ) {
-	/**
-	 * Returns an array of the names of all registered dynamic block types.
-	 *
-	 * @return array Array of dynamic block names.
-	 */
-	function get_dynamic_block_names() {
-		$dynamic_block_names = array();
-
-		$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
-		foreach ( $block_types as $block_type ) {
-			if ( $block_type->is_dynamic() ) {
-				$dynamic_block_names[] = $block_type->name;
+		if ( is_string( $block_names ) ) {
+			if ( $registry->is_registered( $block_names ) ) {
+				$registry->unregister( $block_names );
+			}
+		} elseif ( is_array( $block_names ) ) {
+			foreach ( $block_names as $block_name ) {
+				if ( $registry->is_registered( $block_name ) ) {
+					$registry->unregister( $block_name );
+				}
 			}
 		}
 
-		return $dynamic_block_names;
+		require $blocks_dir . $file;
 	}
 }
-
-if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
-	/**
-	 * Retrieve the dynamic blocks regular expression for searching.
-	 *
-	 * @since 3.6.0
-	 *
-	 * @return string
-	 */
-	function get_dynamic_blocks_regex() {
-		$dynamic_block_names   = get_dynamic_block_names();
-		$dynamic_block_pattern = (
-			'/<!--\s+wp:(' .
-			str_replace(
-				'/',
-				'\/',                 // Escape namespace, not handled by preg_quote.
-				str_replace(
-					'core/',
-					'(?:core/)?', // Allow implicit core namespace, but don't capture.
-					implode(
-						'|',                   // Join block names into capture group alternation.
-						array_map(
-							'preg_quote',    // Escape block name for regular expression.
-							$dynamic_block_names
-						)
-					)
-				)
-			) .
-			')(\s+(\{.*?\}))?\s+(\/)?-->/'
-		);
-
-		return $dynamic_block_pattern;
-	}
-}
+add_action( 'init', 'gutenberg_reregister_core_block_types' );
 
 /**
- * Renders a single block into a HTML string.
+ * Complements the implementation of block type `core/social-icon`, whether it
+ * be provided by core or the plugin, with derived block types for each
+ * "service" (WordPress, Twitter, etc.) supported by Social Links.
  *
- * @since 1.9.0
- * @since 4.4.0 renders full nested tree of blocks before reassembling into HTML string
- * @global WP_Post $post The post to edit.
+ * This ensures backwards compatibility for any users running the Gutenberg
+ * plugin who have used Social Links prior to their conversion to block
+ * variations.
  *
- * @param  array $block A single parsed block object.
- * @return string String of rendered HTML.
+ * This shim is INTENTIONALLY left out of core, as Social Links haven't yet
+ * landed there.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/19887
  */
-function gutenberg_render_block( $block ) {
-	global $post;
+function gutenberg_register_legacy_social_link_blocks() {
+	$services = array(
+		'amazon',
+		'bandcamp',
+		'behance',
+		'chain',
+		'codepen',
+		'deviantart',
+		'dribbble',
+		'dropbox',
+		'etsy',
+		'facebook',
+		'feed',
+		'fivehundredpx',
+		'flickr',
+		'foursquare',
+		'goodreads',
+		'google',
+		'github',
+		'instagram',
+		'lastfm',
+		'linkedin',
+		'mail',
+		'mastodon',
+		'meetup',
+		'medium',
+		'pinterest',
+		'pocket',
+		'reddit',
+		'skype',
+		'snapchat',
+		'soundcloud',
+		'spotify',
+		'tumblr',
+		'twitch',
+		'twitter',
+		'vimeo',
+		'vk',
+		'wordpress',
+		'yelp',
+		'youtube',
+	);
 
-	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
-	$inner_content = '';
-	$index         = 0;
-
-	foreach ( $block['innerContent'] as $chunk ) {
-		$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
+	foreach ( $services as $service ) {
+		register_block_type(
+			'core/social-link-' . $service,
+			array(
+				'category'        => 'widgets',
+				'attributes'      => array(
+					'url'     => array(
+						'type' => 'string',
+					),
+					'service' => array(
+						'type'    => 'string',
+						'default' => $service,
+					),
+					'label'   => array(
+						'type' => 'string',
+					),
+				),
+				'render_callback' => 'gutenberg_render_block_core_social_link',
+			)
+		);
 	}
+}
+add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 
-	if ( $is_dynamic ) {
-		$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
-		$global_post = $post;
-		$output      = $block_type->render( $attributes, $inner_content );
-		$post        = $global_post;
-
-		return $output;
+if ( ! function_exists( 'register_block_style' ) ) {
+	/**
+	 * Registers a new block style.
+	 *
+	 * @param string $block_name       Block type name including namespace.
+	 * @param array  $style_properties Array containing the properties of the style name, label, style (name of the stylesheet to be enqueued), inline_style (string containing the CSS to be added).
+	 *
+	 * @return boolean True if the block style was registered with success and false otherwise.
+	 */
+	function register_block_style( $block_name, $style_properties ) {
+		return WP_Block_Styles_Registry::get_instance()->register( $block_name, $style_properties );
 	}
-
-	return $inner_content;
 }
 
-if ( ! function_exists( 'do_blocks' ) ) {
+if ( ! function_exists( 'unregister_block_style' ) ) {
 	/**
-	 * Parses dynamic blocks out of `post_content` and re-renders them.
+	 * Unregisters a block style.
 	 *
-	 * @since 0.1.0
-	 * @since 4.4.0 performs full parse on input post content
+	 * @param string $block_name       Block type name including namespace.
+	 * @param array  $block_style_name Block style name.
 	 *
-	 * @param  string $content Post content.
-	 * @return string          Updated post content.
+	 * @return boolean True if the block style was unregistered with success and false otherwise.
 	 */
-	function do_blocks( $content ) {
-		// If there are blocks in this content, we shouldn't run wpautop() on it later.
-		$priority = has_filter( 'the_content', 'wpautop' );
-		if ( false !== $priority && doing_filter( 'the_content' ) && has_blocks( $content ) ) {
-			remove_filter( 'the_content', 'wpautop', $priority );
-			add_filter( 'the_content', '_restore_wpautop_hook', $priority + 1 );
+	function unregister_block_style( $block_name, $block_style_name ) {
+		return WP_Block_Styles_Registry::get_instance()->unregister( $block_name, $block_style_name );
+	}
+}
+
+if ( ! has_action( 'enqueue_block_assets', 'enqueue_block_styles_assets' ) ) {
+	/**
+	 * Function responsible for enqueuing the styles required for block styles functionality on the editor and on the frontend.
+	 */
+	function gutenberg_enqueue_block_styles_assets() {
+		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+
+		foreach ( $block_styles as $styles ) {
+			foreach ( $styles as $style_properties ) {
+				if ( isset( $style_properties['style_handle'] ) ) {
+					wp_enqueue_style( $style_properties['style_handle'] );
+				}
+				if ( isset( $style_properties['inline_style'] ) ) {
+					wp_add_inline_style( 'wp-block-library', $style_properties['inline_style'] );
+				}
+			}
 		}
+	}
+	add_action( 'enqueue_block_assets', 'gutenberg_enqueue_block_styles_assets', 30 );
+}
+if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_assets' ) ) {
+	/**
+	 * Function responsible for enqueuing the assets required for block styles functionality on the editor.
+	 */
+	function gutenberg_enqueue_editor_block_styles_assets() {
+		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
 
-		$blocks = gutenberg_parse_blocks( $content );
-		$output = '';
-
-		foreach ( $blocks as $block ) {
-			$output .= gutenberg_render_block( $block );
+		$register_script_lines = array( '( function() {' );
+		foreach ( $block_styles as $block_name => $styles ) {
+			foreach ( $styles as $style_properties ) {
+				$register_script_lines[] = sprintf(
+					'	wp.blocks.registerBlockStyle( \'%s\', %s );',
+					$block_name,
+					wp_json_encode(
+						array(
+							'name'  => $style_properties['name'],
+							'label' => $style_properties['label'],
+						)
+					)
+				);
+			}
 		}
+		$register_script_lines[] = '} )();';
+		$inline_script           = implode( "\n", $register_script_lines );
 
-		return $output;
+		wp_register_script( 'wp-block-styles', false, array( 'wp-blocks' ), true, true );
+		wp_add_inline_script( 'wp-block-styles', $inline_script );
+		wp_enqueue_script( 'wp-block-styles' );
 	}
-
-	add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
-}
-
-if ( ! function_exists( '_restore_wpautop_hook' ) ) {
-	/**
-	 * If do_blocks() needs to remove wpautop() from the `the_content` filter,
-	 * this re-adds it afterwards, for subsequent `the_content` usage.
-	 *
-	 * @access private
-	 *
-	 * @since 4.6.0
-	 *
-	 * @param string $content The post content running through this filter.
-	 * @return string The unmodified content.
-	 */
-	function _restore_wpautop_hook( $content ) {
-		$current_priority = has_filter( 'the_content', '_restore_wpautop_hook' );
-
-		add_filter( 'the_content', 'wpautop', $current_priority - 1 );
-		remove_filter( 'the_content', '_restore_wpautop_hook', $current_priority );
-
-		return $content;
-	}
-}
-
-if ( ! function_exists( 'strip_dynamic_blocks' ) ) {
-	/**
-	 * Remove all dynamic blocks from the given content.
-	 *
-	 * @since 3.6.0
-	 *
-	 * @param string $content Content of the current post.
-	 * @return string
-	 */
-	function strip_dynamic_blocks( $content ) {
-		return preg_replace( get_dynamic_blocks_regex(), '', $content );
-	}
-}
-
-if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
-	/**
-	 * Adds the content filter to strip dynamic blocks from excerpts.
-	 *
-	 * It's a bit hacky for now, but once this gets merged into core the function
-	 * can just be called in `wp_trim_excerpt()`.
-	 *
-	 * @since 3.6.0
-	 *
-	 * @param string $text Excerpt.
-	 * @return string
-	 */
-	function strip_dynamic_blocks_add_filter( $text ) {
-		add_filter( 'the_content', 'strip_dynamic_blocks', 6 );
-
-		return $text;
-	}
-	add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before wp_trim_excerpt().
-}
-
-if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
-	/**
-	 * Removes the content filter to strip dynamic blocks from excerpts.
-	 *
-	 * It's a bit hacky for now, but once this gets merged into core the function
-	 * can just be called in `wp_trim_excerpt()`.
-	 *
-	 * @since 3.6.0
-	 *
-	 * @param string $text Excerpt.
-	 * @return string
-	 */
-	function strip_dynamic_blocks_remove_filter( $text ) {
-		remove_filter( 'the_content', 'strip_dynamic_blocks', 6 );
-
-		return $text;
-	}
-	add_filter( 'wp_trim_excerpt', 'strip_dynamic_blocks_remove_filter', 0 ); // Before all other.
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_editor_block_styles_assets' );
 }

@@ -6,7 +6,7 @@ Description: Easy to use and 100% FREE social media plugin which adds social med
 
 Author: UltimatelySocial
 Author URI: http://ultimatelysocial.com
-Version: 2.4.2
+Version: 2.5.4
 License: GPLv2 or later
 */
 require_once 'analyst/main.php';
@@ -40,16 +40,14 @@ define('SFSI_ALLICONS', serialize(array("rss", "email", "facebook", "twitter", "
 function sfsi_get_current_page_url()
 
 {
-
     global $post, $wp;
-    if (!empty($wp)) {
-
+    if (!empty($wp->request)) {
         return home_url(add_query_arg(array(), $wp->request));
-    } elseif (!empty($post)) {
-
+    } elseif (is_home()) {
+        return site_url();
+    } elseif (!empty($post->ID)) {
         return get_permalink($post->ID);
     } else {
-
         return site_url();
     }
 }
@@ -88,12 +86,11 @@ register_deactivation_hook(__FILE__, 'sfsi_deactivate_plugin');
 
 register_uninstall_hook(__FILE__, 'sfsi_Unistall_plugin');
 
-if (!get_option('sfsi_pluginVersion') || get_option('sfsi_pluginVersion') < 2.42) {
+if (!get_option('sfsi_pluginVersion') || get_option('sfsi_pluginVersion') < 2.54) {
 
     add_action("init", "sfsi_update_plugin");
 }
 /* redirect setting page hook */
-
 add_action('admin_init', 'sfsi_plugin_redirect');
 
 function sfsi_plugin_redirect()
@@ -149,13 +146,13 @@ function DISPLAY_ULTIMATE_SOCIAL_ICONS($args = null, $content = null)
 
     if ($title) $return .= $before_title . $title . $after_title;
 
-    $return .= '<div class="sfsi_widget">';
+    $return .= '<div class="sfsi_widget sfsi_shortcode_container">';
 
     $return .= '<div id="sfsi_wDiv"></div>';
 
     /* Link the main icons function */
 
-    $return .= sfsi_check_visiblity(0);
+    $return .= sfsi_check_visiblity(0, true);
 
     $return .= '<div style="clear: both;"></div>';
 
@@ -207,11 +204,9 @@ function ultimatefbmetatags()
     $verification_code = get_option('sfsi_verificatiom_code');
 
     if (!empty($feed_id) && !empty($verification_code) && $verification_code != "no") {
-
-        echo '<meta name="specificfeeds-verification-code-' . $feed_id . '" content="' . $verification_code . '"/>';
+        echo '<meta name="follow.it-verification-code-' . $feed_id . '" content="' . $verification_code . '"/>';
     }
     if ($metarequest == 'yes' && !empty($post_id)) {
-
         $post = get_post($post_id);
 
         $attachment_id = get_post_thumbnail_id($post_id);
@@ -304,7 +299,7 @@ function sfsi_getverification_code()
 
 {
     $feed_id = sanitize_text_field(get_option('sfsi_feed_id'));
-    $url = $http_url = 'https://www.specificfeeds.com/wordpress/getVerifiedCode_plugin';
+    $url = $http_url = 'https://api.follow.it/wordpress/getVerifiedCode_plugin';
 
     $args = array(
         'timeout' => 30,
@@ -372,291 +367,337 @@ function addStyleFunction()
 
     $sfsi_feediid = sanitize_text_field(get_option('sfsi_feed_id'));
 
-    $url = "https://www.specificfeeds.com/widgets/subscribeWidget/";
+    $url = "https://api.follow.it/subscription-form/";
 
     echo $return = '';
 
     ?>
+    <script>
+        window.addEventListener('sfsi_functions_loaded', function() {
+            if (typeof sfsi_plugin_version == 'function') {
+                sfsi_plugin_version(<?php echo get_option("sfsi_pluginVersion"); ?>);
+            }
+        });
 
-<script>
-    window.addEventListener('sfsi_functions_loaded', function() {
-        if (typeof sfsi_plugin_version == 'function') {
-            sfsi_plugin_version(<?php echo get_option("sfsi_pluginVersion"); ?>);
-        }
-    });
+        function sfsi_processfurther(ref) {
 
-    function sfsi_processfurther(ref) {
+            var feed_id = '<?php echo $sfsi_feediid ?>';
+            var feedtype = 8;
 
-        var feed_id = '<?php echo $sfsi_feediid ?>';
-        var feedtype = 8;
+            var email = jQuery(ref).find('input[name="email"]').val();
 
-        var email = jQuery(ref).find('input[name="data[Widget][email]"]').val();
+            var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-        var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if ((email != "Enter your email") && (filter.test(email))) {
+                if (feed_id != "") {
 
-        if ((email != "Enter your email") && (filter.test(email))) {
-            if (feed_id != "") {
+                    if (feedtype == "8") {
 
-                if (feedtype == "8") {
+                        var url = "<?php echo $url; ?>" + feed_id + "/" + feedtype;
 
-                    var url = "<?php echo $url; ?>" + feed_id + "/" + feedtype;
+                        window.open('', "popupwindow", "scrollbars=yes,width=1080,height=760");
 
-                    window.open('', "popupwindow", "scrollbars=yes,width=1080,height=760");
+                        ref.action = url;
 
-                    ref.action = url;
+                        ref.target = "popupwindow";
 
-                    ref.target = "popupwindow";
+                        return true;
 
-                    return true;
+                    } else {
+
+                        return false
+
+                    }
 
                 } else {
 
-                    return false
+                    alert("Please enter email address");
 
+                    jQuery(ref).find('input[name="email"]').focus();
+
+                    return false;
                 }
             }
-        } else {
+        }
+    </script>
+    <style type="text/css" aria-selected="true">
+        .sfsi_subscribe_Popinner {
+            <?php if (sanitize_text_field($option8['sfsi_form_adjustment']) == 'yes') : ?>width: 100% !important;
 
-            alert("Please enter email address");
+            height: auto !important;
 
-            jQuery(ref).find('input[name="data[Widget][email]"]').focus();
+            <?php else : ?>width: <?php echo intval($option8['sfsi_form_width']) ?>px !important;
 
-            return false;
+            height: <?php echo intval($option8['sfsi_form_height']) ?>px !important;
+
+            <?php endif;
+                ?><?php if (sanitize_text_field($option8['sfsi_form_border']) == 'yes') : ?>border: <?php echo intval($option8['sfsi_form_border_thickness']) . "px solid " . sfsi_sanitize_hex_color($option8['sfsi_form_border_color']);
+                                                                                                            ?> !important;
+
+            <?php endif;
+                ?>padding: 18px 0px !important;
+
+            background-color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_background']) ?> !important;
 
         }
 
-    }
-</script>
+        .sfsi_subscribe_Popinner form {
 
-<style type="text/css" aria-selected="true">
-    .sfsi_subscribe_Popinner {
+            margin: 0 20px !important;
 
-        <?php if (sanitize_text_field($option8['sfsi_form_adjustment']) == 'yes') : ?>width: 100% !important;
+        }
 
-        height: auto !important;
+        .sfsi_subscribe_Popinner h5 {
 
-        <?php else : ?>width: <?php echo intval($option8['sfsi_form_width']) ?>px !important;
+            font-family: <?php echo sanitize_text_field($option8['sfsi_form_heading_font']) ?> !important;
 
-        height: <?php echo intval($option8['sfsi_form_height']) ?>px !important;
+            <?php if (sanitize_text_field($option8['sfsi_form_heading_fontstyle']) != 'bold') {
+                    ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_heading_fontstyle']) ?> !important;
 
-        <?php endif;
-            ?><?php if (sanitize_text_field($option8['sfsi_form_border']) == 'yes') : ?>border: <?php echo intval($option8['sfsi_form_border_thickness']) . "px solid " . sfsi_sanitize_hex_color($option8['sfsi_form_border_color']);
-                                                                                            ?> !important;
+            <?php
+                } else {
+                    ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_heading_fontstyle']) ?> !important;
 
-        <?php endif;
-            ?>padding: 18px 0px !important;
+            <?php
+                }
 
-        background-color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_background']) ?> !important;
+                ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_heading_fontcolor']) ?> !important;
 
-    }
+            font-size: <?php echo intval($option8['sfsi_form_heading_fontsize']) . "px" ?> !important;
 
-    .sfsi_subscribe_Popinner form {
+            text-align: <?php echo sanitize_text_field($option8['sfsi_form_heading_fontalign']) ?> !important;
 
-        margin: 0 20px !important;
+            margin: 0 0 10px !important;
 
-    }
+            padding: 0 !important;
 
-    .sfsi_subscribe_Popinner h5 {
+        }
 
-        font-family: <?php echo sanitize_text_field($option8['sfsi_form_heading_font']) ?> !important;
+        .sfsi_subscription_form_field {
 
-        <?php if (sanitize_text_field($option8['sfsi_form_heading_fontstyle']) != 'bold') {
-                ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_heading_fontstyle']) ?> !important;
+            margin: 5px 0 !important;
 
-        <?php
-            } else {
-                ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_heading_fontstyle']) ?> !important;
+            width: 100% !important;
 
-        <?php
-            }
+            display: inline-flex;
 
-            ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_heading_fontcolor']) ?> !important;
+            display: -webkit-inline-flex;
 
-        font-size: <?php echo intval($option8['sfsi_form_heading_fontsize']) . "px" ?> !important;
+        }
 
-        text-align: <?php echo sanitize_text_field($option8['sfsi_form_heading_fontalign']) ?> !important;
+        .sfsi_subscription_form_field input {
 
-        margin: 0 0 10px !important;
+            width: 100% !important;
 
-        padding: 0 !important;
+            padding: 10px 0px !important;
 
-    }
+        }
 
-    .sfsi_subscription_form_field {
+        .sfsi_subscribe_Popinner input[type=email] {
 
-        margin: 5px 0 !important;
-
-        width: 100% !important;
-
-        display: inline-flex;
-
-        display: -webkit-inline-flex;
-
-    }
-
-    .sfsi_subscription_form_field input {
-
-        width: 100% !important;
-
-        padding: 10px 0px !important;
-
-    }
-
-    .sfsi_subscribe_Popinner input[type=email] {
-
-        font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
-                            ?> !important;
-
-        <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
-                ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            } else {
-                ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            }
-
-            ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
-                    ?> !important;
-
-        font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
-
-        text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
-                        ?> !important;
-
-    }
-
-    .sfsi_subscribe_Popinner input[type=email]::-webkit-input-placeholder {
-
-        font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
-                            ?> !important;
-
-        <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
-                ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            } else {
-                ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            }
-
-            ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
-                    ?> !important;
-
-        font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
-
-        text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
-                        ?> !important;
-
-    }
-
-    .sfsi_subscribe_Popinner input[type=email]:-moz-placeholder {
-        /* Firefox 18- */
-
-        font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
-                            ?> !important;
-
-        <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
-                ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            } else {
-                ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            }
-
-            ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
-                    ?> !important;
-
-        font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
-
-        text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
-                        ?> !important;
-
-    }
-
-    .sfsi_subscribe_Popinner input[type=email]::-moz-placeholder {
-        /* Firefox 19+ */
-
-        font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
-                            ?> !important;
-
-        <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
-                ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            } else {
-                ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            }
-
-            ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
-                    ?> !important;
-
-        font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
-
-        text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
-                        ?> !important;
-
-    }
-
-    .sfsi_subscribe_Popinner input[type=email]:-ms-input-placeholder {
-
-        font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
-                            ?> !important;
-
-        <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
-                ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            } else {
-                ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
-
-        <?php
-            }
-
-            ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
-                    ?> !important;
-
-        font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
-
-        text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
-                        ?> !important;
-
-    }
-
-    .sfsi_subscribe_Popinner input[type=submit] {
-
-        font-family: <?php echo sanitize_text_field($option8['sfsi_form_button_font']);
-                            ?> !important;
-
-        <?php if (sanitize_text_field($option8['sfsi_form_button_fontstyle']) != 'bold') {
-                ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_button_fontstyle']) ?> !important;
-
-        <?php
-            } else {
-                ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_button_fontstyle']) ?> !important;
-
-        <?php
-            }
-
-            ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_button_fontcolor']);
-                    ?> !important;
-
-        font-size: <?php echo intval($option8['sfsi_form_button_fontsize']) . "px" ?> !important;
-
-        text-align: <?php echo sanitize_text_field($option8['sfsi_form_button_fontalign']);
-                        ?> !important;
-
-        background-color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_button_background']);
+            font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
                                 ?> !important;
 
-    }
-</style>
+            <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
+                    ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                } else {
+                    ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                }
+
+                ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
+                                ?> !important;
+
+            font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
+
+            text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
+                            ?> !important;
+
+        }
+
+        .sfsi_subscribe_Popinner input[type=email]::-webkit-input-placeholder {
+
+            font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
+                                ?> !important;
+
+            <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
+                    ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                } else {
+                    ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                }
+
+                ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
+                                ?> !important;
+
+            font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
+
+            text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
+                            ?> !important;
+
+        }
+
+        .sfsi_subscribe_Popinner input[type=email]:-moz-placeholder {
+            /* Firefox 18- */
+
+            font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
+                                ?> !important;
+
+            <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
+                    ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                } else {
+                    ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                }
+
+                ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
+                                ?> !important;
+
+            font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
+
+            text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
+                            ?> !important;
+
+        }
+
+        .sfsi_subscribe_Popinner input[type=email]::-moz-placeholder {
+            /* Firefox 19+ */
+
+            font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
+                                ?> !important;
+
+            <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
+                    ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                } else {
+                    ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                }
+
+                ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
+                                ?> !important;
+
+            font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
+
+            text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
+                            ?> !important;
+
+        }
+
+        .sfsi_subscribe_Popinner input[type=email]:-ms-input-placeholder {
+
+            font-family: <?php echo sanitize_text_field($option8['sfsi_form_field_font']);
+                                ?> !important;
+
+            <?php if (sanitize_text_field($option8['sfsi_form_field_fontstyle']) != 'bold') {
+                    ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                } else {
+                    ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_field_fontstyle']) ?> !important;
+
+            <?php
+                }
+
+                ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_field_fontcolor']);
+                                ?> !important;
+
+            font-size: <?php echo intval($option8['sfsi_form_field_fontsize']) . "px" ?> !important;
+
+            text-align: <?php echo sanitize_text_field($option8['sfsi_form_field_fontalign']);
+                            ?> !important;
+
+        }
+
+        .sfsi_subscribe_Popinner input[type=submit] {
+
+            font-family: <?php echo sanitize_text_field($option8['sfsi_form_button_font']);
+                                ?> !important;
+
+            <?php if (sanitize_text_field($option8['sfsi_form_button_fontstyle']) != 'bold') {
+                    ?>font-style: <?php echo sanitize_text_field($option8['sfsi_form_button_fontstyle']) ?> !important;
+
+            <?php
+                } else {
+                    ?>font-weight: <?php echo sanitize_text_field($option8['sfsi_form_button_fontstyle']) ?> !important;
+
+            <?php
+                }
+
+                ?>color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_button_fontcolor']);
+                                ?> !important;
+
+            font-size: <?php echo intval($option8['sfsi_form_button_fontsize']) . "px" ?> !important;
+
+            text-align: <?php echo sanitize_text_field($option8['sfsi_form_button_fontalign']);
+                            ?> !important;
+
+            background-color: <?php echo sfsi_sanitize_hex_color($option8['sfsi_form_button_background']);
+                                    ?> !important;
+
+        }
+
+        <?php
+            $option5            =  unserialize(get_option('sfsi_section5_options', false));
+
+            if ($option5['sfsi_icons_Alignment_via_shortcode'] == 'left') {
+                ?>.sfsi_shortcode_container {
+            float: left;
+        }
+
+        .sfsi_shortcode_container .norm_row .sfsi_wDiv {
+            position: relative !important;
+        }
+
+        .sfsi_shortcode_container .sfsi_holders {
+            display: none;
+        }
+
+        <?php
+            } elseif ($option5['sfsi_icons_Alignment_via_shortcode'] == 'right') {
+                ?>.sfsi_shortcode_container {
+            float: right;
+        }
+
+        .sfsi_shortcode_container .norm_row .sfsi_wDiv {
+            position: relative !important;
+        }
+
+        .sfsi_shortcode_container .sfsi_holders {
+            display: none;
+        }
+
+        <?php
+            } elseif ($option5['sfsi_icons_Alignment_via_shortcode'] == 'center') {
+                ?>.sfsi_shortcode_container {
+            /* float: right; */
+        }
+
+        .sfsi_shortcode_container .norm_row.sfsi_wDiv {
+            position: relative !important;
+            float: none;
+            margin: 0 auto;
+        }
+
+        .sfsi_shortcode_container .sfsi_holders {
+            display: none;
+        }
+
+        <?php
+            }
+            ?>
+    </style>
 
 <?php
 
@@ -700,7 +741,7 @@ function sfsi_admin_notice()
     // 	
     ?>
 
-<!-- 	// 	<style type="text/css">
+    <!-- 	// 	<style type="text/css">
 
 	// 		form.sfsi_languageNoticeDismiss{
 
@@ -751,249 +792,250 @@ function sfsi_admin_notice()
 
 	// 	</div> -->
 
-<?php
+    <?php
 
-    // }
-    /**
+        // }
+        /**
 
-     * Premium Notification
+         * Premium Notification
 
-     */
+         */
 
-    $sfsi_themecheck = new sfsi_ThemeCheck();
+        $sfsi_themecheck = new sfsi_ThemeCheck();
 
-    $domain     = $sfsi_themecheck->sfsi_plus_getdomain(site_url());
+        $domain     = $sfsi_themecheck->sfsi_plus_getdomain(site_url());
 
-    $siteMatch     = false;
-    if (!empty($domain)) {
+        $siteMatch     = false;
+        if (!empty($domain)) {
 
-        $regexp = "/^([a-d A-D])/im";
+            $regexp = "/^([a-d A-D])/im";
 
-        if (preg_match($regexp, $domain)) {
+            if (preg_match($regexp, $domain)) {
 
-            $siteMatch = true;
-        } else {
+                $siteMatch = true;
+            } else {
 
-            $siteMatch = false;
+                $siteMatch = false;
+            }
         }
-    }
-    if (get_option("show_premium_notification") == "yes") {
-
-        ?>
-
-<style type="text/css">
-    div.sfsi_show_premium_notification {
-
-        float: none;
-
-        display: block;
-
-        margin-left: 15px;
-
-        margin-top: 15px;
-
-        padding: 8px;
-
-        background-color: #38B54A;
-
-        color: #fff;
-
-        font-size: 18px;
-
-    }
-
-    .sfsi_show_premium_notification a {
-
-        color: #fff;
-
-    }
-
-    form.sfsi_premiumNoticeDismiss {
-
-        display: inline-block;
-
-        margin: 5px 0 0;
-
-        vertical-align: middle;
-
-    }
-
-    .sfsi_premiumNoticeDismiss input[type='submit'] {
-
-        background-color: transparent;
-
-        border: medium none;
-
-        color: #fff;
-
-        margin: 0;
-
-        padding: 0;
-
-        cursor: pointer;
-
-    }
-</style>
-
-<div class="updated sfsi_show_premium_notification" style="<?php echo isset($style) ? $style : ''; ?>">
-
-    <div style="margin: 9px 0; ">
-
-        BIG NEWS: There is now a <b><a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=notification_banner&utm_medium=banner" target="_blank">Premium Ultimate Social Media Plugin</a></b> available with many more cool features: <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=notification_banner&utm_medium=banner" target="_blank">Check it out</a>
-
-    </div>
-
-    <div style="text-align:right;margin-top:-40px;">
-
-        <form method="post" class="sfsi_premiumNoticeDismiss" style="padding-bottom:8px;">
-
-            <input type="hidden" name="sfsi-dismiss-premiumNotice" value="true">
-
-            <input type="submit" name="dismiss" value="Dismiss" />
-
-        </form>
-
-    </div>
-
-</div>
-
-<?php
-
-    }
-    if (is_ssl()) {
-        if (get_option("show_premium_cumulative_count_notification") == "yes") {
+        $screen = get_current_screen();
+        if (get_option("show_premium_notification") == "yes" && ($screen->id != "toplevel_page_sfsi-options"))  {
 
             ?>
 
-<style type="text/css">
-    div.sfsi_show_premium_cumulative_count_notification {
+        <style type="text/css">
+            div.sfsi_show_premium_notification {
 
-        color: #fff;
+                float: none;
 
-        margin-left: 37px;
+                display: block;
 
-        margin-top: 15px;
+                margin-left: 15px;
 
-        padding: 8px;
+                margin-top: 15px;
 
-        background-color: #38B54A;
+                padding: 8px;
 
-        color: #fff;
+                background-color: #38B54A;
 
-        font-size: 18px;
+                color: #fff;
 
-    }
+                font-size: 18px;
 
-    .sfsi_show_premium_cumulative_count_notification a {
+            }
 
-        color: #fff;
-    }
+            .sfsi_show_premium_notification a {
 
-    form.sfsi_premiumCumulativeCountNoticeDismiss {
+                color: #fff;
 
-        display: inline-block;
+            }
 
-        margin: 5px 0 0;
+            form.sfsi_premiumNoticeDismiss {
 
-        vertical-align: middle;
+                display: inline-block;
 
-    }
+                margin: 5px 0 0;
 
-    .sfsi_premiumCumulativeCountNoticeDismiss input[type='submit'] {
+                vertical-align: middle;
 
-        background-color: transparent;
+            }
 
-        border: medium none;
+            .sfsi_premiumNoticeDismiss input[type='submit'] {
 
-        color: #fff;
+                background-color: transparent;
 
-        margin: 0;
+                border: medium none;
 
-        padding: 0;
+                color: #fff;
 
-        cursor: pointer;
+                margin: 0;
 
-    }
-</style>
+                padding: 0;
 
-<div class="updated sfsi_show_premium_cumulative_count_notification">
+                cursor: pointer;
 
-    <div style="margin: 9px 0;">
+            }
+        </style>
 
-        <b>Recently switched to https?</b> If you don’t want to lose the Facebook share & like counts <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=https_share_counts&utm_medium=banner" target="_blank">have a look at our Premium Plugin</a>, we found a fix for that: <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=https_share_counts&utm_medium=banner" target="_blank">Check it out</a>
+        <div class="updated sfsi_show_premium_notification" style="<?php echo isset($style) ? $style : ''; ?>">
 
-    </div>
+            <div style="margin: 9px 0; ">
 
-    <div style="text-align: right;margin-top:-30px">
+                BIG NEWS: There is now a <b><a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=notification_banner&utm_medium=banner" target="_blank">Premium Ultimate Social Media Plugin</a></b> available with many more cool features: <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=notification_banner&utm_medium=banner" target="_blank">Check it out</a>
 
-        <form method="post" class="sfsi_premiumCumulativeCountNoticeDismiss" style="padding:10px">
+            </div>
 
-            <input type="hidden" name="sfsi-dismiss-premiumCumulativeCountNoticeDismiss" value="true">
+            <div style="text-align:right;margin-top:-40px;">
 
-            <input type="submit" name="dismiss" value="Dismiss" />
+                <form method="post" class="sfsi_premiumNoticeDismiss" style="padding-bottom:8px;">
 
-        </form>
+                    <input type="hidden" name="sfsi-dismiss-premiumNotice" value="true">
 
-    </div>
+                    <input type="submit" name="dismiss" value="Dismiss" />
 
-    <div style=”clear:both”></div>
+                </form>
 
-</div>
+            </div>
 
-<?php
+        </div>
 
-        }
-    }
-    /* show mobile notification */
+        <?php
 
-    if (get_option("show_mobile_notification") == "yes") {
+            }
+            if (is_ssl() && false) {
+                if (get_option("show_premium_cumulative_count_notification") == "yes") {
 
-        $sfsi_install_date = strtotime(get_option('sfsi_installDate'));
+                    ?>
 
-        $sfsi_future_date = strtotime('14 days', $sfsi_install_date);
+            <style type="text/css">
+                div.sfsi_show_premium_cumulative_count_notification {
 
-        $sfsi_past_date = strtotime("now");
+                    color: #fff;
 
-        if ($sfsi_past_date >= $sfsi_future_date) {
+                    margin-left: 37px;
 
-            ?>
+                    margin-top: 15px;
 
-<style type="text/css">
-    .sfsi_show_mobile_notification a {
+                    padding: 8px;
 
-        color: #fff;
+                    background-color: #38B54A;
 
-    }
+                    color: #fff;
 
-    form.sfsi_mobileNoticeDismiss {
+                    font-size: 18px;
 
-        display: inline-block;
+                }
 
-        margin: 5px 0 0;
+                .sfsi_show_premium_cumulative_count_notification a {
 
-        vertical-align: middle;
+                    color: #fff;
+                }
 
-    }
+                form.sfsi_premiumCumulativeCountNoticeDismiss {
 
-    .sfsi_mobileNoticeDismiss input[type='submit'] {
+                    display: inline-block;
 
-        background-color: transparent;
+                    margin: 5px 0 0;
 
-        border: medium none;
+                    vertical-align: middle;
 
-        color: #fff;
+                }
 
-        margin: 0;
+                .sfsi_premiumCumulativeCountNoticeDismiss input[type='submit'] {
 
-        padding: 0;
+                    background-color: transparent;
 
-        cursor: pointer;
+                    border: medium none;
 
-    }
-</style>
+                    color: #fff;
 
-<!-- <div class="updated sfsi_show_mobile_notification" style="<?php //echo $style; 
-                                                                            ?>background-color: #38B54A; color: #fff; font-size: 18px;">
+                    margin: 0;
+
+                    padding: 0;
+
+                    cursor: pointer;
+
+                }
+            </style>
+
+            <div class="updated sfsi_show_premium_cumulative_count_notification">
+
+                <div style="margin: 9px 0;">
+
+                    <b>Recently switched to https?</b> If you don’t want to lose the Facebook share & like counts <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=https_share_counts&utm_medium=banner" target="_blank">have a look at our Premium Plugin</a>, we found a fix for that: <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=https_share_counts&utm_medium=banner" target="_blank">Check it out</a>
+
+                </div>
+
+                <div style="text-align: right;margin-top:-30px">
+
+                    <form method="post" class="sfsi_premiumCumulativeCountNoticeDismiss" style="padding:10px">
+
+                        <input type="hidden" name="sfsi-dismiss-premiumCumulativeCountNoticeDismiss" value="true">
+
+                        <input type="submit" name="dismiss" value="Dismiss" />
+
+                    </form>
+
+                </div>
+
+                <div style=”clear:both”></div>
+
+            </div>
+
+        <?php
+
+                }
+            }
+            /* show mobile notification */
+
+            if (get_option("show_mobile_notification") == "yes") {
+
+                $sfsi_install_date = strtotime(get_option('sfsi_installDate'));
+
+                $sfsi_future_date = strtotime('14 days', $sfsi_install_date);
+
+                $sfsi_past_date = strtotime("now");
+
+                if ($sfsi_past_date >= $sfsi_future_date) {
+
+                    ?>
+
+            <style type="text/css">
+                .sfsi_show_mobile_notification a {
+
+                    color: #fff;
+
+                }
+
+                form.sfsi_mobileNoticeDismiss {
+
+                    display: inline-block;
+
+                    margin: 5px 0 0;
+
+                    vertical-align: middle;
+
+                }
+
+                .sfsi_mobileNoticeDismiss input[type='submit'] {
+
+                    background-color: transparent;
+
+                    border: medium none;
+
+                    color: #fff;
+
+                    margin: 0;
+
+                    padding: 0;
+
+                    cursor: pointer;
+
+                }
+            </style>
+
+            <!-- <div class="updated sfsi_show_mobile_notification" style="<?php //echo $style; 
+                                                                                        ?>background-color: #38B54A; color: #fff; font-size: 18px;">
 
 				<div class="alignleft" style="margin: 9px 0;line-height: 24px;width: 95%;">
 
@@ -1015,497 +1057,496 @@ function sfsi_admin_notice()
 
 			</div> -->
 
-<?php
+        <?php
 
+                }
+            }
+
+            /* end show mobile notification */
+
+            /* start phpversion error notification*/
+
+            $phpVersion = phpVersion();
+
+            if ($phpVersion <= '5.4') {
+
+                if (get_option("sfsi_serverphpVersionnotification") == "yes") {
+                    ?>
+
+
+
+            <style type="text/css">
+                .sfsi_show_phperror_notification {
+
+                    color: #fff;
+
+                    text-decoration: underline;
+
+                }
+
+                form.sfsi_phperrorNoticeDismiss {
+
+                    display: inline-block;
+
+                    margin: 5px 0 0;
+
+                    vertical-align: middle;
+
+                }
+
+                .sfsi_phperrorNoticeDismiss input[type='submit'] {
+
+                    background-color: transparent;
+
+                    border: medium none;
+
+                    color: #fff;
+
+                    margin: 0;
+
+                    padding: 0;
+
+                    cursor: pointer;
+
+                }
+
+                .sfsi_show_phperror_notification p {
+                    line-height: 22px;
+                }
+
+                p.sfsi_show_notifictaionpragraph {
+                    padding: 0 !important;
+                    font-size: 18px;
+                }
+            </style>
+            <div class="updated sfsi_show_phperror_notification" style="<?php echo (isset($style) ? $style : ''); ?>background-color: #D22B2F; color: #fff; font-size: 18px; border-left-color: #D22B2F;">
+
+                <div style="margin: 9px 0;">
+                    <p class="sfsi_show_notifictaionpragraph">
+
+                        We noticed you are running your site on a PHP version older than 5.4. Please upgrade to a more recent
+                        version. This is not only important for running the Ultimate Social Media Plugin, but also for security
+                        reasons in general.
+
+                        <br>
+
+                        If you do not know how to do the upgrade, please ask your server team or hosting company to do it for you.'
+
+                    </p>
+                </div>
+
+                <div style="text-align:right;margin-top:-30px">
+
+                    <form method="post" class="sfsi_phperrorNoticeDismiss" style="padding-bottom:10px">
+
+                        <input type="hidden" name="sfsi-dismiss-phperrorNotice" value="true">
+
+                        <input type="submit" name="dismiss" value="Dismiss" />
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+
+        <?php
+
+                }
+            }
+            sfsi_get_language_detection_notice();
+            sfsi_language_notice();
+
+
+
+            sfsi_addThis_removal_notice();
+            sfsi_error_reporting_notice();
         }
-    }
+        function sfsi_get_language_detection_notice()
+        {
+            $currLang = get_locale();
 
-    /* end show mobile notification */
+            $text     = '';
+            switch ($currLang) {
+                    // Arabic
 
-    /* start phpversion error notification*/
+                    // case 'ar':
 
-    $phpVersion = phpVersion();
 
-    if ($phpVersion <= '5.4') {
 
-        if (get_option("sfsi_serverphpVersionnotification") == "yes") {
-            ?>
+                    //     $text = "";
 
+                    //     break;
+                    // Chinese - simplified
 
+                case 'zh-Hans':
 
-<style type="text/css">
-    .sfsi_show_phperror_notification {
 
-        color: #fff;
 
-        text-decoration: underline;
+                    $text = "似乎你的WordPress仪表盘使用的是法语。你知道 终极社交媒体插件 也支持法语吗？ <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'><b>请点击此处</b></a>";
 
-    }
+                    break;
+                    // Chinese - traditional
 
-    form.sfsi_phperrorNoticeDismiss {
+                    // case 'zh-Hant':
 
-        display: inline-block;
 
-        margin: 5px 0 0;
 
-        vertical-align: middle;
+                    //     $text = "";
 
-    }
+                    //     break;
+                    // Dutch, Dutch (Belgium)
 
-    .sfsi_phperrorNoticeDismiss input[type='submit'] {
+                    // case 'nl_NL': case 'nl_BE':                
 
-        background-color: transparent;
+                    //     $text = "";
 
-        border: medium none;
+                    //     break;
+                    // French (Belgium), French (France)
 
-        color: #fff;
+                case 'fr_BE':
+                case 'fr_FR':
 
-        margin: 0;
 
-        padding: 0;
 
-        cursor: pointer;
+                    $text = "Il semblerait que votre tableau de bord Wordpress soit en Français. Saviez-vous que l'extension Ultimate  Social Media est aussi disponible en Français? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Cliquez ici</a>";
 
-    }
+                    break;
+                    // German, German (Switzerland)
 
-    .sfsi_show_phperror_notification p {
-        line-height: 22px;
-    }
+                case 'de':
+                case 'de_CH':
+                    $text = "Dein Wordpress-Dashboard scheint auf deutsch zu sein. Wusstest Du dass das Ultimate Social Media Plugin auch auf deutsch verfügbar ist? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Klicke hier</a>";
 
-    p.sfsi_show_notifictaionpragraph {
-        padding: 0 !important;
-        font-size: 18px;
-    }
-</style>
-<div class="updated sfsi_show_phperror_notification" style="<?php echo (isset($style) ? $style : ''); ?>background-color: #D22B2F; color: #fff; font-size: 18px; border-left-color: #D22B2F;">
+                    break;
+                    // Greek
 
-    <div style="margin: 9px 0;">
-        <p class="sfsi_show_notifictaionpragraph">
+                    // case 'el':
 
-            We noticed you are running your site on a PHP version older than 5.4. Please upgrade to a more recent
-            version. This is not only important for running the Ultimate Social Media Plugin, but also for security
-            reasons in general.
 
-            <br>
 
-            If you do not know how to do the upgrade, please ask your server team or hosting company to do it for you.'
+                    //     $text = "";
 
-        </p>
-    </div>
+                    //     break;
+                    // Hebrew
 
-    <div style="text-align:right;margin-top:-30px">
+                case 'he_IL':
+                    $text = "נדמה שלוח הבקרה שלך הוא בעברית. האם ידעת שהתוסף זמין גם בשפה העברית? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>לחץ כאן</a>";
 
-        <form method="post" class="sfsi_phperrorNoticeDismiss" style="padding-bottom:10px">
+                    break;
+                    // Hindi
 
-            <input type="hidden" name="sfsi-dismiss-phperrorNotice" value="true">
+                    // case 'hi_IN':
 
-            <input type="submit" name="dismiss" value="Dismiss" />
 
-        </form>
 
-    </div>
+                    //     $text = ""; 
 
-</div>
+                    //     break;
+                    // Indonesian
 
+                    // case 'id':
 
 
-<?php
 
-        }
-    }
-    sfsi_get_language_detection_notice();
-    sfsi_language_notice();
+                    //     $text = "";
+                    //     break;
+                    // Italian
 
+                case 'it_IT':
 
 
-    sfsi_addThis_removal_notice();
-    sfsi_error_reporting_notice();
-}
-function sfsi_get_language_detection_notice()
-{
-    $currLang = get_locale();
 
-    $text     = '';
-    switch ($currLang) {
-            // Arabic
+                    $text = "Semberebbe che la tua bacheca di WordPress sia in Italiano.Lo sapevi che il plugin Ultimate Social Media è anche dispoinibile in Italiano? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Fai click qui</a>";
 
-            // case 'ar':
 
 
+                    break;
+                    // Japanese
 
-            //     $text = "";
+                    // case 'ja':
 
-            //     break;
-            // Chinese - simplified
 
-        case 'zh-Hans':
 
+                    //     $text = "";
+                    //     break;                       
+                    // Korean
 
+                    // case 'ko_KR ':
+                    //     $text = ""; 
+                    //     break;                       
+                    // Persian, Persian (Afghanistan)
 
-            $text = "似乎你的WordPress仪表盘使用的是法语。你知道 终极社交媒体插件 也支持法语吗？ <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'><b>请点击此处</b></a>";
+                    // case 'fa_IR':case 'fa_AF':
 
-            break;
-            // Chinese - traditional
 
-            // case 'zh-Hant':
 
+                    //     $text = "";
 
 
-            //     $text = "";
 
-            //     break;
-            // Dutch, Dutch (Belgium)
+                    //     break;                       
+                    // Polish
+                    // case 'pl_PL':
 
-            // case 'nl_NL': case 'nl_BE':                
+                    //     $text = "";
 
-            //     $text = "";
+                    //     break;
+                    //Portuguese (Brazil), Portuguese (Portugal)
+                case 'pt_BR':
+                case 'pt_PT':
+                    $text = "Parece que seu painel Wordpress está em português. Você sabia que o plugin Ultimate Social Media também está disponível em português? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Clique aqui</a>";
+                    break;
+                    // Russian, Russian (Ukraine)
 
-            //     break;
-            // French (Belgium), French (France)
+                case 'ru_RU':
+                case 'ru_UA':
+                    $text = "Ты говоришь по-русски? Если у вас есть вопросы о плагине Ultimate Social Media, задайте свой вопрос в форуме поддержки, мы постараемся ответить на русский: <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Нажмите здесь</a>";
 
-        case 'fr_BE':
-        case 'fr_FR':
 
 
+                    break;
 
-            $text = "Il semblerait que votre tableau de bord Wordpress soit en Français. Saviez-vous que l'extension Ultimate  Social Media est aussi disponible en Français? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Cliquez ici</a>";
 
-            break;
-            // German, German (Switzerland)
 
-        case 'de':
-        case 'de_CH':
-            $text = "Dein Wordpress-Dashboard scheint auf deutsch zu sein. Wusstest Du dass das Ultimate Social Media Plugin auch auf deutsch verfügbar ist? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Klicke hier</a>";
-
-            break;
-            // Greek
-
-            // case 'el':
-
-
-
-            //     $text = "";
-
-            //     break;
-            // Hebrew
-
-        case 'he_IL':
-            $text = "נדמה שלוח הבקרה שלך הוא בעברית. האם ידעת שהתוסף זמין גם בשפה העברית? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>לחץ כאן</a>";
-
-            break;
-            // Hindi
-
-            // case 'hi_IN':
-
-
-
-            //     $text = ""; 
-
-            //     break;
-            // Indonesian
-
-            // case 'id':
-
-
-
-            //     $text = "";
-            //     break;
-            // Italian
-
-        case 'it_IT':
-
-
-
-            $text = "Semberebbe che la tua bacheca di WordPress sia in Italiano.Lo sapevi che il plugin Ultimate Social Media è anche dispoinibile in Italiano? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Fai click qui</a>";
-
-
-
-            break;
-            // Japanese
-
-            // case 'ja':
-
-
-
-            //     $text = "";
-            //     break;                       
-            // Korean
-
-            // case 'ko_KR ':
-            //     $text = ""; 
-            //     break;                       
-            // Persian, Persian (Afghanistan)
-
-            // case 'fa_IR':case 'fa_AF':
-
-
-
-            //     $text = "";
-
-
-
-            //     break;                       
-            // Polish
-            // case 'pl_PL':
-
-            //     $text = "";
-
-            //     break;
-            //Portuguese (Brazil), Portuguese (Portugal)
-        case 'pt_BR':
-        case 'pt_PT':
-            $text = "Parece que seu painel Wordpress está em português. Você sabia que o plugin Ultimate Social Media também está disponível em português? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Clique aqui</a>";
-            break;
-            // Russian, Russian (Ukraine)
-
-        case 'ru_RU':
-        case 'ru_UA':
-            $text = "Ты говоришь по-русски? Если у вас есть вопросы о плагине Ultimate Social Media, задайте свой вопрос в форуме поддержки, мы постараемся ответить на русский: <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Нажмите здесь</a>";
-
-
-
-            break;
-
-
-
-            /* Spanish (Argentina), Spanish (Chile), Spanish (Colombia), Spanish (Mexico),
+                    /* Spanish (Argentina), Spanish (Chile), Spanish (Colombia), Spanish (Mexico),
 
             Spanish (Peru), Spanish (Puerto Rico), Spanish (Spain), Spanish (Venezuela) */
-        case 'es_AR':
-        case 'es_CL':
-        case 'es_CO':
-        case 'es_MX':
-        case 'es_PE':
-        case 'es_PR':
+                case 'es_AR':
+                case 'es_CL':
+                case 'es_CO':
+                case 'es_MX':
+                case 'es_PE':
+                case 'es_PR':
 
-        case 'es_ES':
-        case 'es_VE':
-            $text = "Al parecer, tu dashboard en Wordpress está en Francés/ ¿Sabías que el complemento Ultimate Social Media está también disponible en Francés? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Haz clic aquí</a>";
+                case 'es_ES':
+                case 'es_VE':
+                    $text = "Al parecer, tu dashboard en Wordpress está en Francés/ ¿Sabías que el complemento Ultimate Social Media está también disponible en Francés? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Haz clic aquí</a>";
 
-            break;
-            //  Swedish
-            // case 'sv_SE':
+                    break;
+                    //  Swedish
+                    // case 'sv_SE':
 
 
+                    //     $text = "<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klicka här</a>";
 
-            //     $text = "<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klicka här</a>";
+                    //     break;                       
+                    //  Turkish
+                case 'tr_TR':
 
-            //     break;                       
-            //  Turkish
-        case 'tr_TR':
+                    $text = "Wordpress gösterge panelinizin dili Türkçe olarak görünüyor. Ultimate Social Media eklentisinin Türkçe için de mevcut olduğunu biliyor musunuz? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Buraya tıklayın</a>";
 
-            $text = "Wordpress gösterge panelinizin dili Türkçe olarak görünüyor. Ultimate Social Media eklentisinin Türkçe için de mevcut olduğunu biliyor musunuz? <a target='_blank' href='https://wordpress.org/plugins/ultimate-social-media-plus/'>Buraya tıklayın</a>";
+                    break;
+                    //  Ukrainian
+                    // case 'uk':
 
-            break;
-            //  Ukrainian
-            // case 'uk':
+                    //     $text = "<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>натисніть тут</a>";
 
-            //     $text = "<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>натисніть тут</a>";
+                    //     break;                       
+                    //  Vietnamese
+                case 'vi':
 
-            //     break;                       
-            //  Vietnamese
-        case 'vi':
+                    $text = 'Có vẻ như bảng điều khiển Wordpress của bạn đang hiển thị "tiếng Việt". Bạn có biết rằng Ultimate Social Media plugin cũng hỗ trợ tiếng Việt? <a target="_blank" href="https://wordpress.org/plugins/ultimate-social-media-plus/">Hãy nhấn vào đây</a>';
 
-            $text = 'Có vẻ như bảng điều khiển Wordpress của bạn đang hiển thị "tiếng Việt". Bạn có biết rằng Ultimate Social Media plugin cũng hỗ trợ tiếng Việt? <a target="_blank" href="https://wordpress.org/plugins/ultimate-social-media-plus/">Hãy nhấn vào đây</a>';
+                    break;
+            }
+            $style = "overflow: hidden;padding:8px;margin:15px 15px 15px 0px !important";
+            if (
+                !empty($text) && isset($_GET['page'])
 
-            break;
-    }
-    $style = "overflow: hidden;padding:8px;margin:15px 15px 15px 0px !important";
-    if (
-        !empty($text) && isset($_GET['page'])
+                && ("sfsi-options" == $_GET['page']) && ("yes" == get_option("sfsi_languageNotice"))
+            ) {
 
-        && ("sfsi-options" == $_GET['page']) && ("yes" == get_option("sfsi_languageNotice"))
-    ) {
+                ?>
+            <style type="text/css">
+                form.sfsi_languageNoticeDismiss {
+                    display: inline-block;
+                    margin: 5px 0 0;
+                    vertical-align: middle;
+                }
 
-        ?>
-<style type="text/css">
-    form.sfsi_languageNoticeDismiss {
-        display: inline-block;
-        margin: 5px 0 0;
-        vertical-align: middle;
-    }
+                .sfsi_languageNoticeDismiss input[type='submit'] {
+                    background-color: transparent;
+                    border: medium none;
+                    margin: 0 5px 0 0px;
+                    padding: 0;
+                    cursor: pointer;
+                    font-size: 22px;
+                }
+            </style>
 
-    .sfsi_languageNoticeDismiss input[type='submit'] {
-        background-color: transparent;
-        border: medium none;
-        margin: 0 5px 0 0px;
-        padding: 0;
-        cursor: pointer;
-        font-size: 22px;
-    }
-</style>
+            <div class="notice notice-info" style="<?php echo isset($style) ? $style : ''; ?>">
 
-<div class="notice notice-info" style="<?php echo isset($style) ? $style : ''; ?>">
+                <div style="margin: 9px 0;">
 
-    <div style="margin: 9px 0;">
+                    <?php echo $text; ?>
 
-        <?php echo $text; ?>
+                </div>
 
-    </div>
+                <div style="text-align: right;margin-top:-30px">
 
-    <div style="text-align: right;margin-top:-30px">
+                    <form method="post" class="sfsi_languageNoticeDismiss" style="padding-bottom:10px">
 
-        <form method="post" class="sfsi_languageNoticeDismiss" style="padding-bottom:10px">
+                        <input type="hidden" name="sfsi-dismiss-languageNotice" value="true">
 
-            <input type="hidden" name="sfsi-dismiss-languageNotice" value="true">
+                        <input type="submit" name="dismiss" value="&times;" />
 
-            <input type="submit" name="dismiss" value="&times;" />
+                    </form>
 
-        </form>
+                </div>
 
-    </div>
+            </div>
+        <?php }
+        }
+        add_action('admin_init', 'sfsi_dismiss_admin_notice');
 
-</div>
-<?php }
-}
-add_action('admin_init', 'sfsi_dismiss_admin_notice');
+        function sfsi_dismiss_admin_notice()
 
-function sfsi_dismiss_admin_notice()
+        {
 
-{
+            if (isset($_REQUEST['sfsi-dismiss-notice']) && $_REQUEST['sfsi-dismiss-notice'] == 'true') {
 
-    if (isset($_REQUEST['sfsi-dismiss-notice']) && $_REQUEST['sfsi-dismiss-notice'] == 'true') {
+                update_option('show_notification_plugin', "no");
 
-        update_option('show_notification_plugin', "no");
+                //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options");die;
 
-        //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options");die;
+            }
+            if (isset($_REQUEST['sfsi-dismiss-languageNotice']) && $_REQUEST['sfsi-dismiss-languageNotice'] == 'true') {
 
-    }
-    if (isset($_REQUEST['sfsi-dismiss-languageNotice']) && $_REQUEST['sfsi-dismiss-languageNotice'] == 'true') {
+                update_option('sfsi_languageNotice', "no");
 
-        update_option('sfsi_languageNotice', "no");
+                //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options"); die;
 
-        //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options"); die;
+            }
+            if (isset($_REQUEST['sfsi-dismiss-premiumNotice']) && $_REQUEST['sfsi-dismiss-premiumNotice'] == 'true') {
 
-    }
-    if (isset($_REQUEST['sfsi-dismiss-premiumNotice']) && $_REQUEST['sfsi-dismiss-premiumNotice'] == 'true') {
+                update_option('show_premium_notification', "no");
 
-        update_option('show_premium_notification', "no");
+                //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options");die;
 
-        //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options");die;
+            }
+            if (isset($_REQUEST['sfsi-dismiss-mobileNotice']) && $_REQUEST['sfsi-dismiss-mobileNotice'] == 'true') {
 
-    }
-    if (isset($_REQUEST['sfsi-dismiss-mobileNotice']) && $_REQUEST['sfsi-dismiss-mobileNotice'] == 'true') {
+                update_option('show_mobile_notification', "no");
 
-        update_option('show_mobile_notification', "no");
+                //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options");die;
 
-        //header("Location: ".site_url()."/wp-admin/admin.php?page=sfsi-options");die;
+            }
 
-    }
+            if (isset($_REQUEST['sfsi-dismiss-phperrorNotice']) && $_REQUEST['sfsi-dismiss-phperrorNotice'] == 'true') {
 
-    if (isset($_REQUEST['sfsi-dismiss-phperrorNotice']) && $_REQUEST['sfsi-dismiss-phperrorNotice'] == 'true') {
+                update_option('sfsi_serverphpVersionnotification', "no");
+            }
 
-        update_option('sfsi_serverphpVersionnotification', "no");
-    }
+            if (isset($_REQUEST['sfsi-dismiss-premiumCumulativeCountNoticeDismiss']) && $_REQUEST['sfsi-dismiss-premiumCumulativeCountNoticeDismiss'] == 'true') {
 
-    if (isset($_REQUEST['sfsi-dismiss-premiumCumulativeCountNoticeDismiss']) && $_REQUEST['sfsi-dismiss-premiumCumulativeCountNoticeDismiss'] == 'true') {
+                update_option('show_premium_cumulative_count_notification', "no");
+            }
+        }
+        function sfsi_get_bloginfo($url)
 
-        update_option('show_premium_cumulative_count_notification', "no");
-    }
-}
-function sfsi_get_bloginfo($url)
+        {
 
-{
+            $web_url = get_bloginfo($url);
+            //Block to use feedburner url
 
-    $web_url = get_bloginfo($url);
-    //Block to use feedburner url
+            if (preg_match("/(feedburner)/im", $web_url, $match)) {
 
-    if (preg_match("/(feedburner)/im", $web_url, $match)) {
+                $web_url = site_url() . "/feed";
+            }
 
-        $web_url = site_url() . "/feed";
-    }
+            return $web_url;
+        }
 
-    return $web_url;
-}
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), "sfsi_actionLinks", -10);
 
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), "sfsi_actionLinks", -10);
+        function sfsi_actionLinks($links)
 
-function sfsi_actionLinks($links)
+        {
 
-{
+            unset($links['edit']);
 
-    unset($links['edit']);
+            $links['a'] = '<a target="_blank" href="https://goo.gl/auxJ9C#no-topic-0" id="sfsi_deactivateButton" style="color:#FF0000;"><b>Need help?</b></a>';
 
-    $links['a'] = '<a target="_blank" href="https://goo.gl/auxJ9C#no-topic-0" id="sfsi_deactivateButton" style="color:#FF0000;"><b>Need help?</b></a>';
-
-    //$links[] = '<a target="_blank" href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_manage_plugin_page&utm_campaign=check_out_pro_version&utm_medium=banner" id="sfsi_deactivateButton" style="color:#38B54A;"><b>Check out pro version</b></a>';
-    /*if(isset($links["edit"]) && !empty($links["edit"])){
+            //$links[] = '<a target="_blank" href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_manage_plugin_page&utm_campaign=check_out_pro_version&utm_medium=banner" id="sfsi_deactivateButton" style="color:#38B54A;"><b>Check out pro version</b></a>';
+            /*if(isset($links["edit"]) && !empty($links["edit"])){
 
 		$links[] = @$links["edit"];		
 
 	}*/
-    //$slug = plugin_basename(dirname(__FILE__));
+            //$slug = plugin_basename(dirname(__FILE__));
 
-    //$links[$slug] = @$links["deactivate"].'<i class="sfsi-deactivate-slug"></i>';
-    $links['e'] = '<a href="' . admin_url("/admin.php?page=sfsi-options") . '">Settings</a>';
-    ksort($links);
-    //unset($links["deactivate"]);
+            //$links[$slug] = @$links["deactivate"].'<i class="sfsi-deactivate-slug"></i>';
+            $links['e'] = '<a href="' . admin_url("/admin.php?page=sfsi-options") . '">Settings</a>';
+            ksort($links);
+            //unset($links["deactivate"]);
 
-    return $links;
-}
-global $pagenow;
-if ('plugins.php' === $pagenow) {
-    add_action('admin_footer', '_sfsi_add_deactivation_feedback_dialog_box');
-    function _sfsi_add_deactivation_feedback_dialog_box()
-    {
-        include_once(SFSI_DOCROOT . '/views/deactivation/sfsi_deactivation_popup.php'); ?>
-<script type="text/javascript">
-    window.addEventListener('sfsi_functions_loaded',function($) {
-        var _deactivationLink = $('.sfsi-deactivate-slug').prev();
-        $('.sfsi-deactivation-reason-link').find('a').attr('href', _deactivationLink.attr('href'));
-        _deactivationLink.on('click', function(e) {
+            return $links;
+        }
+        global $pagenow;
+        if ('plugins.php' === $pagenow) {
+            add_action('admin_footer', '_sfsi_add_deactivation_feedback_dialog_box');
+            function _sfsi_add_deactivation_feedback_dialog_box()
+            {
+                include_once(SFSI_DOCROOT . '/views/deactivation/sfsi_deactivation_popup.php'); ?>
+            <script type="text/javascript">
+                window.addEventListener('sfsi_functions_loaded', function($) {
+                    var _deactivationLink = $('.sfsi-deactivate-slug').prev();
+                    $('.sfsi-deactivation-reason-link').find('a').attr('href', _deactivationLink.attr('href'));
+                    _deactivationLink.on('click', function(e) {
 
-            e.preventDefault();
+                        e.preventDefault();
 
-            $('[data-popup="popup-1"]').fadeIn(350);
+                        $('[data-popup="popup-1"]').fadeIn(350);
 
-        });
-        //----- CLOSE
+                    });
+                    //----- CLOSE
 
-        $('[data-popup-close]').on('click', function(e) {
+                    $('[data-popup-close]').on('click', function(e) {
 
-            e.preventDefault();
+                        e.preventDefault();
 
-            var targeted_popup_class = jQuery(this).attr('data-popup-close');
+                        var targeted_popup_class = jQuery(this).attr('data-popup-close');
 
-            $('[data-popup="' + targeted_popup_class + '"]').fadeOut(350);
+                        $('[data-popup="' + targeted_popup_class + '"]').fadeOut(350);
 
-        });
-        //----- OPEN
+                    });
+                    //----- OPEN
 
-        $('[data-popup-open]').on('click', function(e) {
+                    $('[data-popup-open]').on('click', function(e) {
 
-            e.preventDefault();
+                        e.preventDefault();
 
-            var targeted_popup_class = jQuery(this).attr('data-popup-open');
+                        var targeted_popup_class = jQuery(this).attr('data-popup-open');
 
-            $('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
+                        $('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
 
-        });
-        $('.sfsi-deactivate-radio').on('click', function(e) {
-            $('.sfsi-deactivate-radio').attr('checked', false);
+                    });
+                    $('.sfsi-deactivate-radio').on('click', function(e) {
+                        $('.sfsi-deactivate-radio').attr('checked', false);
 
-            $(this).attr('checked', true);
-            var val = $(this).val();
-            $('.sfsi-reason-section').removeClass('show').addClass('hide');
+                        $(this).attr('checked', true);
+                        var val = $(this).val();
+                        $('.sfsi-reason-section').removeClass('show').addClass('hide');
 
-            $(this).parent().find('.sfsi-reason-section').addClass('show').removeClass('hide');
+                        $(this).parent().find('.sfsi-reason-section').addClass('show').removeClass('hide');
 
-        });
-        $('.sfsi-deactivate-radio-text').on('click', function(e) {
+                    });
+                    $('.sfsi-deactivate-radio-text').on('click', function(e) {
 
-            $(this).prev().trigger('click');
+                        $(this).prev().trigger('click');
 
-        });
-    });
-</script>
+                    });
+                });
+            </script>
 
-<?php
+            <?php
 
-    }
-}
-/* redirect setting page hook */
-/*add_action('admin_init', 'sfsi_plugin_redirect');
+                }
+            }
+            /* redirect setting page hook */
+            /*add_action('admin_init', 'sfsi_plugin_redirect');
 
 function sfsi_plugin_redirect()
 
@@ -1525,385 +1566,383 @@ function sfsi_plugin_redirect()
 
 */
 
-function _is_curl_installed(){
-	if(in_array('curl', get_loaded_extensions())) {
+            function _is_curl_installed()
+            {
+                if (in_array('curl', get_loaded_extensions())) {
 
-	    return true;
+                    return true;
+                } else {
 
-	}
+                    return false;
+                }
+            }
+            // ********************************* Link to support forum for different languages STARTS *******************************//
+            function sfsi_get_language_notice_text()
+            {
+                $currLang = get_locale();
 
-	else{
+                $text     = '';
+                switch ($currLang) {
+                        // Arabic
 
-	    return false;
-    }
-}
-// ********************************* Link to support forum for different languages STARTS *******************************//
-function sfsi_get_language_notice_text()
-{
-    $currLang = get_locale();
+                    case 'ar':
 
-    $text     = '';
-    switch ($currLang) {
-            // Arabic
 
-        case 'ar':
 
+                        $text = "hal tatakalam alearabia? 'iidha kanat ladayk 'asyilat hawl almukawan al'iidafii l Ultimate Social Media , aitruh sualik fi muntadaa aldaem , sanuhawil alrada biallughat alearabiat: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'><b>'unqur huna</b></a>";
 
+                        break;
+                        // Chinese - simplified
 
-            $text = "hal tatakalam alearabia? 'iidha kanat ladayk 'asyilat hawl almukawan al'iidafii l Ultimate Social Media , aitruh sualik fi muntadaa aldaem , sanuhawil alrada biallughat alearabiat: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'><b>'unqur huna</b></a>";
+                    case 'zh-Hans':
 
-            break;
-            // Chinese - simplified
 
-        case 'zh-Hans':
 
+                        $text = "你会说中文吗？如果您有关于Ultimate Social Media插件的问题，请在支持论坛中提出您的问题，我们将尝试用中文回复：<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'><b>点击此处</b></a>";
 
+                        break;
+                        // Chinese - traditional
 
-            $text = "你会说中文吗？如果您有关于Ultimate Social Media插件的问题，请在支持论坛中提出您的问题，我们将尝试用中文回复：<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'><b>点击此处</b></a>";
+                    case 'zh-Hant':
 
-            break;
-            // Chinese - traditional
 
-        case 'zh-Hant':
 
+                        $text = "你會說中文嗎？如果您有關於Ultimate Social Media插件的問題，請在支持論壇中提出您的問題，我們將嘗試用中文回复：<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'><b>點擊此處</b></a>";
 
+                        break;
+                        // Dutch, Dutch (Belgium)
 
-            $text = "你會說中文嗎？如果您有關於Ultimate Social Media插件的問題，請在支持論壇中提出您的問題，我們將嘗試用中文回复：<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'><b>點擊此處</b></a>";
+                    case 'nl_NL':
+                    case 'nl_BE':
 
-            break;
-            // Dutch, Dutch (Belgium)
+                        $text = "Jij spreekt Nederlands? Als je vragen hebt over de Ultimate Social Media-plug-in, stel je vraag in het ondersteuningsforum, we zullen proberen in het Nederlands te antwoorden: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>klik hier</a>";
 
-        case 'nl_NL':
-        case 'nl_BE':
+                        break;
+                        // French (Belgium), French (France)
 
-            $text = "Jij spreekt Nederlands? Als je vragen hebt over de Ultimate Social Media-plug-in, stel je vraag in het ondersteuningsforum, we zullen proberen in het Nederlands te antwoorden: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>klik hier</a>";
+                    case 'fr_BE':
+                    case 'fr_FR':
 
-            break;
-            // French (Belgium), French (France)
 
-        case 'fr_BE':
-        case 'fr_FR':
 
+                        $text = "Vous parlez français? Si vous avez des questions sur le plugin Ultimate Social Media, posez votre question sur le forum de support, nous essaierons de répondre en français: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Cliquez ici</a>";
 
+                        break;
+                        // German, German (Switzerland)
 
-            $text = "Vous parlez français? Si vous avez des questions sur le plugin Ultimate Social Media, posez votre question sur le forum de support, nous essaierons de répondre en français: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Cliquez ici</a>";
+                    case 'de':
+                    case 'de_CH':
+                        $text = "Du sprichst Deutsch? Wenn Du Fragen zum Ultimate Social Media-Plugins hast, einfach im Support Forum fragen. Wir antworten auch auf Deutsch! <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klicke hier</a>";
 
-            break;
-            // German, German (Switzerland)
+                        break;
+                        // Greek
 
-        case 'de':
-        case 'de_CH':
-            $text = "Du sprichst Deutsch? Wenn Du Fragen zum Ultimate Social Media-Plugins hast, einfach im Support Forum fragen. Wir antworten auch auf Deutsch! <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klicke hier</a>";
+                    case 'el':
 
-            break;
-            // Greek
 
-        case 'el':
 
+                        $text = "Μιλάτε Ελληνικά? Αν έχετε ερωτήσεις σχετικά με το plugin Ultimate Social Media, ρωτήστε την ερώτησή σας στο φόρουμ υποστήριξης, θα προσπαθήσουμε να απαντήσουμε στα ελληνικά: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Κάντε κλικ εδώ</a>";
 
+                        break;
+                        // Hebrew
 
-            $text = "Μιλάτε Ελληνικά? Αν έχετε ερωτήσεις σχετικά με το plugin Ultimate Social Media, ρωτήστε την ερώτησή σας στο φόρουμ υποστήριξης, θα προσπαθήσουμε να απαντήσουμε στα ελληνικά: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Κάντε κλικ εδώ</a>";
+                    case 'he_IL':
 
-            break;
-            // Hebrew
 
-        case 'he_IL':
 
+                        $text = "אתה מדבר עברית? אם יש לך שאלות על תוסף המדיה החברתית האולטימטיבית, שאל את השאלה שלך בפורום התמיכה, ננסה לענות בעברית: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>לחץ כאן</a>";
 
+                        break;
+                        // Hindi
 
-            $text = "אתה מדבר עברית? אם יש לך שאלות על תוסף המדיה החברתית האולטימטיבית, שאל את השאלה שלך בפורום התמיכה, ננסה לענות בעברית: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>לחץ כאן</a>";
+                    case 'hi_IN':
 
-            break;
-            // Hindi
 
-        case 'hi_IN':
 
+                        $text = "आप हिंदी बोलते हो? यदि आपके पास अल्टीमेट सोशल मीडिया प्लगइन के बारे में कोई प्रश्न है, तो समर्थन फोरम में अपना प्रश्न पूछें, हम हिंदी में जवाब देने का प्रयास करेंगे: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>यहां क्लिक करें</a>";
 
+                        break;
+                        // Indonesian
 
-            $text = "आप हिंदी बोलते हो? यदि आपके पास अल्टीमेट सोशल मीडिया प्लगइन के बारे में कोई प्रश्न है, तो समर्थन फोरम में अपना प्रश्न पूछें, हम हिंदी में जवाब देने का प्रयास करेंगे: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>यहां क्लिक करें</a>";
+                    case 'id':
 
-            break;
-            // Indonesian
 
-        case 'id':
 
+                        $text = "Anda berbicara bahasa Indonesia? Jika Anda memiliki pertanyaan tentang plugin Ultimate Social Media, ajukan pertanyaan Anda di Forum Dukungan, kami akan mencoba menjawab dalam Bahasa Indonesia: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klik di sini</a>";
+                        break;
+                        // Italian
 
+                    case 'it_IT':
 
-            $text = "Anda berbicara bahasa Indonesia? Jika Anda memiliki pertanyaan tentang plugin Ultimate Social Media, ajukan pertanyaan Anda di Forum Dukungan, kami akan mencoba menjawab dalam Bahasa Indonesia: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klik di sini</a>";
-            break;
-            // Italian
 
-        case 'it_IT':
 
+                        $text = "Tu parli italiano? Se hai domande sul plugin Ultimate Social Media, fai la tua domanda nel Forum di supporto, cercheremo di rispondere in italiano: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>clicca qui</a>";
 
 
-            $text = "Tu parli italiano? Se hai domande sul plugin Ultimate Social Media, fai la tua domanda nel Forum di supporto, cercheremo di rispondere in italiano: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>clicca qui</a>";
 
+                        break;
+                        // Japanese
 
+                    case 'ja':
 
-            break;
-            // Japanese
 
-        case 'ja':
 
+                        $text = "あなたは日本語を話しますか？アルティメットソーシャルメディアのプラグインに関する質問がある場合は、サポートフォーラムで質問してください。日本語で対応しようと思っています：<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>ここをクリック</a>";
+                        break;
+                        // Korean
 
+                    case 'ko_KR ':
+                        $text = "한국어를 할 줄 아세요? 궁극적 인 소셜 미디어 플러그인에 대해 궁금한 점이 있으면 지원 포럼에서 질문하십시오. 한국어로 답변하려고합니다 : <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>여기를 클릭하십시오.</a>";
+                        break;
+                        // Persian, Persian (Afghanistan)
 
-            $text = "あなたは日本語を話しますか？アルティメットソーシャルメディアのプラグインに関する質問がある場合は、サポートフォーラムで質問してください。日本語で対応しようと思っています：<a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>ここをクリック</a>";
-            break;
-            // Korean
+                    case 'fa_IR':
+                    case 'fa_AF':
 
-        case 'ko_KR ':
-            $text = "한국어를 할 줄 아세요? 궁극적 인 소셜 미디어 플러그인에 대해 궁금한 점이 있으면 지원 포럼에서 질문하십시오. 한국어로 답변하려고합니다 : <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>여기를 클릭하십시오.</a>";
-            break;
-            // Persian, Persian (Afghanistan)
 
-        case 'fa_IR':
-        case 'fa_AF':
 
+                        $text = "شما فارسی صحبت می کنید؟ اگر سوالی در مورد پلاگین رسانه Ultimate Social دارید، سوال خود را در انجمن پشتیبانی بپرسید، سعی خواهیم کرد به فارسی پاسخ دهید: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>اینجا را کلیک کنید</a>";
 
 
-            $text = "شما فارسی صحبت می کنید؟ اگر سوالی در مورد پلاگین رسانه Ultimate Social دارید، سوال خود را در انجمن پشتیبانی بپرسید، سعی خواهیم کرد به فارسی پاسخ دهید: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>اینجا را کلیک کنید</a>";
 
+                        break;
+                        // Polish
+                    case 'pl_PL':
 
+                        $text = "Mówisz po polsku? Jeśli masz pytania dotyczące wtyczki Ultimate Social Media, zadaj pytanie na Forum pomocy technicznej, postaramy się odpowiedzieć po polsku: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Kliknij tutaj</a>";
 
-            break;
-            // Polish
-        case 'pl_PL':
+                        break;
+                        //Portuguese (Brazil), Portuguese (Portugal)
+                    case 'pt_BR':
+                    case 'pt_PT':
+                        $text = "Você fala português? Se você tiver dúvidas sobre o plug-in Ultimate Social Media, faça sua pergunta no Fórum de suporte, tentaremos responder em português: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Clique aqui</a>";
+                        break;
+                        // Russian, Russian (Ukraine)
 
-            $text = "Mówisz po polsku? Jeśli masz pytania dotyczące wtyczki Ultimate Social Media, zadaj pytanie na Forum pomocy technicznej, postaramy się odpowiedzieć po polsku: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Kliknij tutaj</a>";
+                    case 'ru_RU':
+                    case 'ru_UA':
+                        $text = "Ты говоришь по-русски? Если у вас есть вопросы о плагине Ultimate Social Media, задайте свой вопрос в форуме поддержки, мы постараемся ответить на русский: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Нажмите здесь</a>";
 
-            break;
-            //Portuguese (Brazil), Portuguese (Portugal)
-        case 'pt_BR':
-        case 'pt_PT':
-            $text = "Você fala português? Se você tiver dúvidas sobre o plug-in Ultimate Social Media, faça sua pergunta no Fórum de suporte, tentaremos responder em português: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Clique aqui</a>";
-            break;
-            // Russian, Russian (Ukraine)
 
-        case 'ru_RU':
-        case 'ru_UA':
-            $text = "Ты говоришь по-русски? Если у вас есть вопросы о плагине Ultimate Social Media, задайте свой вопрос в форуме поддержки, мы постараемся ответить на русский: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Нажмите здесь</a>";
 
+                        break;
 
 
-            break;
 
-
-
-            /* Spanish (Argentina), Spanish (Chile), Spanish (Colombia), Spanish (Mexico),
+                        /* Spanish (Argentina), Spanish (Chile), Spanish (Colombia), Spanish (Mexico),
 
             Spanish (Peru), Spanish (Puerto Rico), Spanish (Spain), Spanish (Venezuela) */
-        case 'es_AR':
-        case 'es_CL':
-        case 'es_CO':
-        case 'es_MX':
-        case 'es_PE':
-        case 'es_PR':
+                    case 'es_AR':
+                    case 'es_CL':
+                    case 'es_CO':
+                    case 'es_MX':
+                    case 'es_PE':
+                    case 'es_PR':
 
-        case 'es_ES':
-        case 'es_VE':
-            $text = "¿Tu hablas español? Si tiene alguna pregunta sobre el complemento Ultimate Social Media, formule su pregunta en el foro de soporte, intentaremos responder en español: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>haga clic aquí</a>";
+                    case 'es_ES':
+                    case 'es_VE':
+                        $text = "¿Tu hablas español? Si tiene alguna pregunta sobre el complemento Ultimate Social Media, formule su pregunta en el foro de soporte, intentaremos responder en español: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>haga clic aquí</a>";
 
-            break;
-            //  Swedish
-        case 'sv_SE':
-
-
-
-            $text = "Pratar du svenska? Om du har frågor om programmet Ultimate Social Media, fråga din fråga i supportforumet, vi försöker svara på svenska: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klicka här</a>";
-
-            break;
-            //  Turkish
-        case 'tr_TR':
-
-            $text = "Sen Türkçe konuş? Nihai Sosyal Medya eklentisi hakkında sorularınız varsa, sorunuza Destek Forumu'nda sorun, Türkçe olarak cevap vermeye çalışacağız: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Tıklayın</a>";
-
-            break;
-            //  Ukrainian
-        case 'uk':
-
-            $text = "Ви говорите по-українськи? Якщо у вас є запитання про плагін Ultimate Social Media, задайте своє питання на Форумі підтримки, ми спробуємо відповісти українською: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>натисніть тут</a>";
-
-            break;
-            //  Vietnamese
-        case 'vi':
-
-            $text = "Bạn nói tiếng việt không Nếu bạn có câu hỏi về plugin Ultimate Social Media, hãy đặt câu hỏi của bạn trong Diễn đàn hỗ trợ, chúng tôi sẽ cố gắng trả lời bằng tiếng Việt: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Nhấp vào đây</a>";
-
-            break;
-    }
-    return $text;
-}
-function sfsi_language_notice()
-{
-    if (isset($_GET['page']) && "sfsi-options" == $_GET['page']) :
-        $langText    = sfsi_get_language_notice_text();
-
-        $isDismissed = get_option('sfsi_lang_notice_dismissed');
-        if (!empty($langText) && false == $isDismissed) { ?>
+                        break;
+                        //  Swedish
+                    case 'sv_SE':
 
 
 
-<div id="sfsi_plus_langnotice" class="notice notice-info">
-    <p><?php echo $langText; ?></p>
-    <button type="button" class="sfsi-notice-dismiss notice-dismiss"></button>
-</div>
-<?php } ?>
-<?php endif;
-}
-function sfsi_dismiss_lang_notice()
-{
+                        $text = "Pratar du svenska? Om du har frågor om programmet Ultimate Social Media, fråga din fråga i supportforumet, vi försöker svara på svenska: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Klicka här</a>";
 
-    if (!wp_verify_nonce($_POST['nonce'], "sfsi_dismiss_lang_notice'")) {
+                        break;
+                        //  Turkish
+                    case 'tr_TR':
 
-        echo  json_encode(array('res' => "error"));
-        exit;
-    }
+                        $text = "Sen Türkçe konuş? Nihai Sosyal Medya eklentisi hakkında sorularınız varsa, sorunuza Destek Forumu'nda sorun, Türkçe olarak cevap vermeye çalışacağız: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Tıklayın</a>";
 
-    if (!current_user_can('manage_options')) {
-        echo json_encode(array('res' => 'not allowed'));
-        die();
-    }
-    echo update_option('sfsi_lang_notice_dismissed', true) ? "true" : "false";
+                        break;
+                        //  Ukrainian
+                    case 'uk':
 
-    die;
-}
-add_action('wp_ajax_sfsi_dismiss_lang_notice', 'sfsi_dismiss_lang_notice');
-// ********************************* Link to support forum for different languages CLOSES *******************************//
+                        $text = "Ви говорите по-українськи? Якщо у вас є запитання про плагін Ultimate Social Media, задайте своє питання на Форумі підтримки, ми спробуємо відповісти українською: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>натисніть тут</a>";
 
-// ********************************* Notice for removal of AddThis option STARTS *******************************//
+                        break;
+                        //  Vietnamese
+                    case 'vi':
 
-function sfsi_addThis_removal_notice()
-{
-    if (isset($_GET['page']) && "sfsi-options" == $_GET['page']) :
+                        $text = "Bạn nói tiếng việt không Nếu bạn có câu hỏi về plugin Ultimate Social Media, hãy đặt câu hỏi của bạn trong Diễn đàn hỗ trợ, chúng tôi sẽ cố gắng trả lời bằng tiếng Việt: <a target='_blank' href='https://goo.gl/ZiFsAF#no-topic-0'>Nhấp vào đây</a>";
 
+                        break;
+                }
+                return $text;
+            }
+            function sfsi_language_notice()
+            {
+                if (isset($_GET['page']) && "sfsi-options" == $_GET['page']) :
+                    $langText    = sfsi_get_language_notice_text();
 
-
-        $sfsi_addThis_removalText    = "We removed Addthis from the plugin due to issues with GDPR, the new EU data protection regulation.";
-        $isDismissed   =  get_option('sfsi_addThis_icon_removal_notice_dismissed', false);
-        if (false == $isDismissed) { ?>
+                    $isDismissed = get_option('sfsi_lang_notice_dismissed');
+                    if (!empty($langText) && false == $isDismissed) { ?>
 
 
 
-<div id="sfsi_plus_addThis_removal_notice" class="notice notice-info">
-    <p><?php echo $sfsi_addThis_removalText; ?></p>
-    <button type="button" class="sfsi-AddThis-notice-dismiss notice-dismiss"></button>
-</div>
-<?php } ?>
-<?php endif;
-}
-function sfsi_dismiss_addthhis_removal_notice()
-{
+                    <div id="sfsi_plus_langnotice" class="notice notice-info">
+                        <p><?php echo $langText; ?></p>
+                        <button type="button" class="sfsi-notice-dismiss notice-dismiss"></button>
+                    </div>
+                <?php } ?>
+                <?php endif;
+                }
+                function sfsi_dismiss_lang_notice()
+                {
 
-    if (!wp_verify_nonce($_POST['nonce'], "sfsi_dismiss_addThis_icon_notice")) {
+                    if (!wp_verify_nonce($_POST['nonce'], "sfsi_dismiss_lang_notice'")) {
 
-        echo  json_encode(array('res' => "error"));
-        exit;
-    }
+                        echo  json_encode(array('res' => "error"));
+                        exit;
+                    }
 
-    if (!current_user_can('manage_options')) {
-        echo json_encode(array('res' => 'not allowed'));
-        die();
-    }
+                    if (!current_user_can('manage_options')) {
+                        echo json_encode(array('res' => 'not allowed'));
+                        die();
+                    }
+                    echo update_option('sfsi_lang_notice_dismissed', true) ? "true" : "false";
 
-    echo (string) update_option('sfsi_addThis_icon_removal_notice_dismissed', true);
+                    die;
+                }
+                add_action('wp_ajax_sfsi_dismiss_lang_notice', 'sfsi_dismiss_lang_notice');
+                // ********************************* Link to support forum for different languages CLOSES *******************************//
 
-    die;
-}
-add_action('wp_ajax_sfsi_dismiss_addThis_icon_notice', 'sfsi_dismiss_addthhis_removal_notice');
-// ********************************* Notice for removal of AddThis option CLOSES *******************************//
-// ********************************* Link to support forum left of every Save button STARTS *******************************//
-function sfsi_ask_for_help($viewNumber)
-{ ?>
-<div class="sfsi_askforhelp askhelpInview<?php echo $viewNumber; ?>">
-    <img src="<?php echo SFSI_PLUGURL . "images/questionmark.png"; ?>" alt="error" />
-    <span>Questions? <a target="_blank" href="#" onclick="event.preventDefault();sfsi_open_chat(event)"><b>Ask
-                us</b></a></span>
-</div>
-<?php }
-// ********************************* Link to support forum left of every Save button CLOSES *******************************//
-// ********************************* Notice for error reporting STARTS *******************************//
-function sfsi_error_reporting_notice()
-{
-    if (is_admin()) :
+                // ********************************* Notice for removal of AddThis option STARTS *******************************//
+
+                function sfsi_addThis_removal_notice()
+                {
+                    if (isset($_GET['page']) && "sfsi-options" == $_GET['page']) :
 
 
 
-        $sfsi_error_reporting_notice_txt    = 'We noticed that you have set error reporting to "yes" in wp-config. Our plugin (Ultimate Social Media Icons) switches this to "off" so that no errors are displayed (which may also impact error messages from your theme or other plugins). If you don\'t want that, please select the respective option under question 6 (at the bottom).';
-        $isDismissed   =  get_option('sfsi_error_reporting_notice_dismissed', false);
-        $option5 = unserialize(get_option('sfsi_section5_options', false));
-        $sfsi_icons_suppress_errors = isset($option5['sfsi_icons_suppress_errors']) && !empty($option5['sfsi_icons_suppress_errors']) ? $option5['sfsi_icons_suppress_errors'] : false;
-        if (isset($isDismissed) && false == $isDismissed && defined('WP_DEBUG') && false != WP_DEBUG && "yes" == $sfsi_icons_suppress_errors) { ?>
+                        $sfsi_addThis_removalText    = "We removed Addthis from the plugin due to issues with GDPR, the new EU data protection regulation.";
+                        $isDismissed   =  get_option('sfsi_addThis_icon_removal_notice_dismissed', false);
+                        if (false == $isDismissed) { ?>
 
 
 
-<div style="padding: 10px;margin-left: 0px;position: relative;" id="sfsi_error_reporting_notice" class="error notice">
-    <p><?php echo $sfsi_error_reporting_notice_txt; ?></p>
-    <button type="button" class="sfsi_error_reporting_notice-dismiss notice-dismiss"></button>
-</div>
-<script type="text/javascript">
-    window.addEventListener('sfsi_functions_loaded',function(){
-        if (typeof jQuery != 'undefined') {
-            (function sfsi_dismiss_notice(btnClass, ajaxAction, nonce) {
+                    <div id="sfsi_plus_addThis_removal_notice" class="notice notice-info">
+                        <p><?php echo $sfsi_addThis_removalText; ?></p>
+                        <button type="button" class="sfsi-AddThis-notice-dismiss notice-dismiss"></button>
+                    </div>
+                <?php } ?>
+            <?php endif;
+            }
+            function sfsi_dismiss_addthhis_removal_notice()
+            {
+
+                if (!wp_verify_nonce($_POST['nonce'], "sfsi_dismiss_addThis_icon_notice")) {
+
+                    echo  json_encode(array('res' => "error"));
+                    exit;
+                }
+
+                if (!current_user_can('manage_options')) {
+                    echo json_encode(array('res' => 'not allowed'));
+                    die();
+                }
+
+                echo (string) update_option('sfsi_addThis_icon_removal_notice_dismissed', true);
+
+                die;
+            }
+            add_action('wp_ajax_sfsi_dismiss_addThis_icon_notice', 'sfsi_dismiss_addthhis_removal_notice');
+            // ********************************* Notice for removal of AddThis option CLOSES *******************************//
+            // ********************************* Link to support forum left of every Save button STARTS *******************************//
+            function sfsi_ask_for_help($viewNumber)
+            { ?>
+            <div class="sfsi_askforhelp askhelpInview<?php echo $viewNumber; ?>">
+                <img src="<?php echo SFSI_PLUGURL . "images/questionmark.png"; ?>" alt="error" />
+                <span>Questions? <a target="_blank" href="#" onclick="event.preventDefault();sfsi_open_chat(event)"><b>Ask
+                            us</b></a></span>
+            </div>
+            <?php }
+            // ********************************* Link to support forum left of every Save button CLOSES *******************************//
+            // ********************************* Notice for error reporting STARTS *******************************//
+            function sfsi_error_reporting_notice()
+            {
+                if (is_admin()) :
 
 
 
-                var btnClass = "." + btnClass;
-                var ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>";
-                jQuery(document).on("click", btnClass, function() {
+                    $sfsi_error_reporting_notice_txt    = 'We noticed that you have set error reporting to "yes" in wp-config. Our plugin (Ultimate Social Media Icons) switches this to "off" so that no errors are displayed (which may also impact error messages from your theme or other plugins). If you don\'t want that, please select the respective option under question 6 (at the bottom).';
+                    $isDismissed   =  get_option('sfsi_error_reporting_notice_dismissed', false);
+                    $option5 = unserialize(get_option('sfsi_section5_options', false));
+                    $sfsi_icons_suppress_errors = isset($option5['sfsi_icons_suppress_errors']) && !empty($option5['sfsi_icons_suppress_errors']) ? $option5['sfsi_icons_suppress_errors'] : false;
+                    if (isset($isDismissed) && false == $isDismissed && defined('WP_DEBUG') && false != WP_DEBUG && "yes" == $sfsi_icons_suppress_errors) { ?>
 
 
 
-                    jQuery.ajax({
+                    <div style="padding: 10px;margin-left: 0px;position: relative;" id="sfsi_error_reporting_notice" class="error notice">
+                        <p><?php echo $sfsi_error_reporting_notice_txt; ?></p>
+                        <button type="button" class="sfsi_error_reporting_notice-dismiss notice-dismiss"></button>
+                    </div>
+                    <script type="text/javascript">
+                        window.addEventListener('sfsi_functions_loaded', function() {
+                            if (typeof jQuery != 'undefined') {
+                                (function sfsi_dismiss_notice(btnClass, ajaxAction, nonce) {
 
-                        url: ajaxurl,
 
-                        type: "post",
 
-                        data: {
-                            action: ajaxAction
-                        },
+                                    var btnClass = "." + btnClass;
+                                    var ajaxurl = "<?php echo admin_url('admin-ajax.php'); ?>";
+                                    jQuery(document).on("click", btnClass, function() {
 
-                        success: function(e) {
 
-                            if (false != e) {
 
-                                jQuery(btnClass).parent().remove();
+                                        jQuery.ajax({
+
+                                            url: ajaxurl,
+
+                                            type: "post",
+
+                                            data: {
+                                                action: ajaxAction
+                                            },
+
+                                            success: function(e) {
+
+                                                if (false != e) {
+
+                                                    jQuery(btnClass).parent().remove();
+
+                                                }
+
+                                            }
+
+                                        });
+                                    });
+                                }("sfsi_error_reporting_notice-dismiss", "sfsi_dismiss_error_reporting_notice",
+                                    "<?php echo wp_create_nonce('sfsi_dismiss_error_reporting_notice'); ?>"));
 
                             }
-
-                        }
-
-                    });
-                });
-            }("sfsi_error_reporting_notice-dismiss", "sfsi_dismiss_error_reporting_notice",
-                "<?php echo wp_create_nonce('sfsi_dismiss_error_reporting_notice'); ?>"));
-
+                        });
+                    </script>
+                <?php } ?>
+        <?php endif;
         }
-    });
-</script>
-<?php } ?>
-<?php endif;
-}
-function sfsi_dismiss_error_reporting_notice()
-{
+        function sfsi_dismiss_error_reporting_notice()
+        {
 
-    if (!wp_verify_nonce($_POST['nonce'], "sfsi_dismiss_error_reporting_notice")) {
+            if (!wp_verify_nonce($_POST['nonce'], "sfsi_dismiss_error_reporting_notice")) {
 
-        echo  json_encode(array('res' => "error"));
-        exit;
-    }
+                echo  json_encode(array('res' => "error"));
+                exit;
+            }
 
-    if (!current_user_can('manage_options')) {
-        echo json_encode(array('res' => 'not allowed'));
-        die();
-    }
+            if (!current_user_can('manage_options')) {
+                echo json_encode(array('res' => 'not allowed'));
+                die();
+            }
 
-    echo (string) update_option('sfsi_error_reporting_notice_dismissed', true);
+            echo (string) update_option('sfsi_error_reporting_notice_dismissed', true);
 
-    die;
-}
+            die;
+        }
 
-add_action('wp_ajax_sfsi_dismiss_error_reporting_notice', 'sfsi_dismiss_error_reporting_notice');
-// ********************************* Notice for error reporting CLOSE *******************************//
-?>
+        add_action('wp_ajax_sfsi_dismiss_error_reporting_notice', 'sfsi_dismiss_error_reporting_notice');
+        // ********************************* Notice for error reporting CLOSE *******************************//
+        ?>

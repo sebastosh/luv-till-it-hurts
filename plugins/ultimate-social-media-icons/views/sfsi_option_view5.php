@@ -49,6 +49,12 @@
 	$option5['sfsi_icons_Alignment'] 			= 	(isset($option5['sfsi_icons_Alignment']))
 														? sanitize_text_field($option5['sfsi_icons_Alignment'])
 														: '';
+	$option5['sfsi_icons_Alignment_via_widget'] = 	(isset($option5['sfsi_icons_Alignment_via_widget']))
+														? sanitize_text_field($option5['sfsi_icons_Alignment_via_widget'])
+														: '';	
+	$option5['sfsi_icons_Alignment_via_shortcode'] 	= 	(isset($option5['sfsi_icons_Alignment_via_shortcode']))
+														? sanitize_text_field($option5['sfsi_icons_Alignment_via_shortcode'])
+														: '';
 	$option5['sfsi_icons_perRow'] 				= 	(isset($option5['sfsi_icons_perRow']))
 														? intval($option5['sfsi_icons_perRow'])
 														: '';
@@ -194,11 +200,41 @@
     
     <div class="row">
 	<h4>Alignments</h4>
-	<div class="icons_size">
-		<div style="width: 210px;float: left;position: relative;">
-			<span>Alignment of icons:</span>
-			<ins class="sfsi_icons_other_allign" style="position: absolute;bottom: -22px;left: 0;width: 200px;color: rgb(128,136,145);">
-				(with respect to each other)
+	<div class="icons_size" style="width: max-content;display:flow-root">
+		<span>Icons per row:</span>
+		<input name="sfsi_icons_perRow" type="text" value="<?php echo ($option5['sfsi_icons_perRow']!='') ?  $option5['sfsi_icons_perRow'] : '' ;?>" />
+		<ins class="leave_empty" style="margin-bottom: 34px;">Leave empty if you don't want to <br /> define this</ins>
+	</div>
+	<div class="icons_size" style="width: max-content;">
+		<div style="width: 232px;float: left;position: relative;">
+			<span style="line-height: 26px;margin-bottom: 22px;">Alignment of icons within a widget:</span>
+			
+		</div>
+		<div class="field">
+			<select name="sfsi_icons_Alignment_via_widget" id="sfsi_icons_Alignment_via_widget" class="styled">
+				<option value="center" <?php echo ($option5['sfsi_icons_Alignment_via_widget']=='center') ?  'selected="selected"' : '' ;?>>Centered</option>
+				<option value="right" <?php echo ($option5['sfsi_icons_Alignment_via_widget']=='right') ?  'selected="selected"' : '' ;?>>Right</option>
+				<option value="left" <?php echo ($option5['sfsi_icons_Alignment_via_widget']=='left') ?  'selected="selected"' : '' ;?>>Left</option>
+			</select>
+		</div>
+	</div>
+	<div class="icons_size" style="width: max-content;">
+		<div style="width: 232px;float: left;position: relative;">
+			<span style="line-height: 26px;margin-bottom: 22px;">Alignment of icons if placed via shortcode:</span>
+		</div>
+		<div class="field">
+			<select name="sfsi_icons_Alignment_via_shortcode" id="sfsi_icons_Alignment_via_shortcode" class="styled">
+				<option value="center" <?php echo ($option5['sfsi_icons_Alignment_via_shortcode']=='center') ?  'selected="selected"' : '' ;?>>Centered</option>
+				<option value="right" <?php echo ($option5['sfsi_icons_Alignment_via_shortcode']=='right') ?  'selected="selected"' : '' ;?>>Right</option>
+				<option value="left" <?php echo ($option5['sfsi_icons_Alignment_via_shortcode']=='left') ?  'selected="selected"' : '' ;?>>Left</option>
+			</select>
+		</div>
+	</div>
+	<div class="icons_size" style="width: max-content;">
+		<div style="width: 232px;float: left;position: relative;">
+			<span style="line-height: 26px;margin-bottom: 10px;">Alignment of icons In the second row:</span>
+			<ins class="sfsi_icons_other_allign" style="bottom: -22px;left: 0;width: 200px;color: rgb(128,136,145);">
+				(with respect to icons in the first row; only relevant if your icons show in two or more rows)
 			</ins>
 		</div>
 		<div class="field">
@@ -208,13 +244,10 @@
 				<option value="left" <?php echo ($option5['sfsi_icons_Alignment']=='left') ?  'selected="selected"' : '' ;?>>Left</option>
 			</select>
 		</div>
-		<span>Icons per row:</span>
-		<input name="sfsi_icons_perRow" type="text" value="<?php echo ($option5['sfsi_icons_perRow']!='') ?  $option5['sfsi_icons_perRow'] : '' ;?>" />
-		<ins class="leave_empty">Leave empty if you don't want to <br /> define this</ins>
 	</div>
 
     <div class= "sfsi_new_prmium_follw" style="margin-top: 38px;">
-		<p><b>New: </b>The Premium Plugin gives several more alignment options: <br>- &nbsp;&nbsp; Show icons vertically<br>- &nbsp;&nbsp; Align icons within a widget (left, right, centered)<br>- &nbsp;&nbsp; Align icons within the «container» where you place them via shortcode (left, right, centered) <br><a style="cursor:pointer" class="pop-up" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)"  class="sfisi_font_bold" target="_blank">Go premium now</a><a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=more_alignment_options&utm_medium=banner" class="sfsi_font_inherit" target="_blank"> or learn more.</a></p>
+		<p><b>New: </b>In the Premium Plugin you can show the icons vertically and give them different alignment options for icons placed on mobile <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=more_alignment_options&utm_medium=banner" class="sfsi_font_inherit" target="_blank"> See all features.</a></p>
 	</div>
 
     </div>

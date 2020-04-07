@@ -13,14 +13,15 @@ const {
 	InspectorControls,
 	withColors,
 	ContrastChecker,
-	PanelColorSettings
-} = wp.editor;
+	PanelColorSettings,
+} = wp.blockEditor;
 
-const { PanelBody,
+const {
+	PanelBody,
 	SelectControl,
 	TextControl,
 	FormToggle,
-	withFallbackStyles
+	withFallbackStyles,
 } = wp.components;
 
 /**
@@ -29,22 +30,39 @@ const { PanelBody,
 import Padding from './../../../utils/components/padding';
 import Margin from './../../../utils/components/margin';
 import ButtonSettings from './../../../utils/inspector/button';
+import RenderSettingControl from '../../../utils/components/settings/renderSettingControl';
 
 /* Apply fallback styles. */
 const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { backgroundColor, textColor, buttonBackgroundColor, buttonTextColor } = ownProps.attributes;
+	const {
+		backgroundColor,
+		textColor,
+		buttonBackgroundColor,
+		buttonTextColor,
+	} = ownProps.attributes;
 	const editableNode = node.querySelector( '[contenteditable="true"]' );
-	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
+	const computedStyles = editableNode
+		? getComputedStyle( editableNode )
+		: null;
 	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
-		fallbackButtonBackgroundColor: buttonBackgroundColor || ! computedStyles ? undefined : computedStyles.buttonBackgroundColor,
-		fallbackButtonTextColor: buttonTextColor || ! computedStyles ? undefined : computedStyles.buttonTextColor
+		fallbackBackgroundColor:
+			backgroundColor || ! computedStyles
+				? undefined
+				: computedStyles.backgroundColor,
+		fallbackTextColor:
+			textColor || ! computedStyles ? undefined : computedStyles.color,
+		fallbackButtonBackgroundColor:
+			buttonBackgroundColor || ! computedStyles
+				? undefined
+				: computedStyles.buttonBackgroundColor,
+		fallbackButtonTextColor:
+			buttonTextColor || ! computedStyles
+				? undefined
+				: computedStyles.buttonTextColor,
 	};
-});
+} );
 
 class Inspector extends Component {
-
 	doubleOptInChange( event ) {
 		if ( this.props.doubleOptIn ) {
 			this.props.doubleOptIn( event.target.checked );
@@ -52,7 +70,6 @@ class Inspector extends Component {
 	}
 
 	render() {
-
 		const {
 			attributes,
 			setAttributes,
@@ -67,180 +84,251 @@ class Inspector extends Component {
 			buttonTextColor,
 			fallbackButtonTextColor,
 			setButtonBackgroundColor,
-			setButtonTextColor
+			setButtonTextColor,
 		} = this.props;
 
-		let mailingListProviders = {
-			'mailchimp': {
+		const mailingListProviders = {
+			mailchimp: {
 				label: 'Mailchimp',
 				value: 'mailchimp',
 				lists: [
 					{
 						label: __( 'Select a list', 'atomic-blocks' ),
-						value: ''
-					}
-				]
-			}
+						value: '',
+					},
+				],
+			},
 		};
 
-		atomic_blocks_newsletter_block_vars.mailingListProviders.mailchimp.lists.map( ( item ) =>
-			mailingListProviders.mailchimp.lists.push({ label: item.name, value: item.id })
+		atomic_blocks_newsletter_block_vars.mailingListProviders.mailchimp.lists.map(
+			( item ) =>
+				mailingListProviders.mailchimp.lists.push( {
+					label: item.name,
+					value: item.id,
+				} )
 		);
 
 		return (
 			<InspectorControls>
-
 				<PanelBody
 					title={ __( 'Newsletter', 'atomic-blocks' ) }
 					initialOpen={ attributes.mailingList ? false : true }
 				>
-					<SelectControl
-						label={ __( 'Mailing List', 'atomic-blocks' ) }
-						help={ __( 'The list people will be subscribed to.', 'atomic-blocks' ) }
-						options={ mailingListProviders.mailchimp.lists }
-						value={ attributes.mailingList }
-						onChange={ ( value ) => setAttributes({ mailingList: value }) }
-					/>
-
-					<TextControl
-						type="string"
-						label={ __( 'Success Message', 'atomic-blocks' ) }
-						help={ __( 'The message shown when people successfully subscribe.', 'atomic-blocks' ) }
-						value={ attributes.successMessage }
-						onChange={ ( value ) => setAttributes({ successMessage: value }) }
-					/>
-
-					<div className="ab-newsletter-double-opt-in-setting-wrapper">
-						<FormToggle
-							id={ 'double-opt-in-toggle-' + this.props.instanceId }
-							className="ab-newsletter-double-opt-in-toggle"
-							checked={ attributes.doubleOptIn }
-							onChange={ ( event ) => setAttributes({ doubleOptIn: event.target.checked }) }
+					<RenderSettingControl id="ab_newsletter_mailingList">
+						<SelectControl
+							label={ __( 'Mailing List', 'atomic-blocks' ) }
+							help={ __(
+								'The list people will be subscribed to.',
+								'atomic-blocks'
+							) }
+							options={ mailingListProviders.mailchimp.lists }
+							value={ attributes.mailingList }
+							onChange={ ( value ) =>
+								setAttributes( { mailingList: value } )
+							}
 						/>
-						<label
-							className="ab-newsletter-double-opt-in-setting-label"
-							htmlFor={ 'double-opt-in-toggle-' + this.props.instanceId }
-						>
-							{ __( 'Enable Double Opt-In', 'atomic-blocks' ) }
-						</label>
-						<p className="description">
-							{ __( 'Send contacts an opt-in confirmation email when they subscribe to your list.', 'atomic-blocks' ) }
-						</p>
-					</div>
+					</RenderSettingControl>
 
+					<RenderSettingControl id="ab_newsletter_successMessage">
+						<TextControl
+							type="string"
+							label={ __( 'Success Message', 'atomic-blocks' ) }
+							help={ __(
+								'The message shown when people successfully subscribe.',
+								'atomic-blocks'
+							) }
+							value={ attributes.successMessage }
+							onChange={ ( value ) =>
+								setAttributes( { successMessage: value } )
+							}
+						/>
+					</RenderSettingControl>
+
+					<RenderSettingControl id="ab_newsletter_doubleOptIn">
+						<div className="ab-newsletter-double-opt-in-setting-wrapper">
+							<FormToggle
+								id={
+									'double-opt-in-toggle-' +
+									this.props.instanceId
+								}
+								className="ab-newsletter-double-opt-in-toggle"
+								checked={ attributes.doubleOptIn }
+								onChange={ ( event ) =>
+									setAttributes( {
+										doubleOptIn: event.target.checked,
+									} )
+								}
+							/>
+							<label
+								className="ab-newsletter-double-opt-in-setting-label"
+								htmlFor={
+									'double-opt-in-toggle-' +
+									this.props.instanceId
+								}
+							>
+								{ __(
+									'Enable Double Opt-In',
+									'atomic-blocks'
+								) }
+							</label>
+							<p className="description">
+								{ __(
+									'Send contacts an opt-in confirmation email when they subscribe to your list.',
+									'atomic-blocks'
+								) }
+							</p>
+						</div>
+					</RenderSettingControl>
 				</PanelBody>
 
 				<PanelBody
 					title={ __( 'General', 'atomic-blocks' ) }
 					initialOpen={ attributes.mailingList ? true : false }
 				>
-					<Padding
+					<RenderSettingControl id="ab_newsletter_containerPadding">
+						<Padding
+							// Enable padding on all sides
+							paddingEnable={ true }
+							paddingTitle={ __(
+								'Block Padding',
+								'atomic-blocks'
+							) }
+							paddingHelp={ __(
+								'Adjust the padding applied to the inside of the block.',
+								'atomic-blocks'
+							) }
+							padding={ attributes.containerPadding }
+							paddingMin="0"
+							paddingMax="100"
+							onChangePadding={ ( containerPadding ) =>
+								setAttributes( { containerPadding } )
+							}
+						/>
+					</RenderSettingControl>
 
-						// Enable padding on all sides
-						paddingEnable={ true }
-						paddingTitle={ __( 'Block Padding', 'atomic-blocks' ) }
-						paddingHelp={ __( 'Adjust the padding applied to the inside of the block.', 'atomic-blocks' ) }
-						padding={ attributes.containerPadding }
-						paddingMin="0"
-						paddingMax="100"
-						onChangePadding={ containerPadding => setAttributes({ containerPadding }) }
-					/>
-
-					<Margin
-
-						// Enable margin top setting
-						marginEnableTop={ true }
-						marginTopLabel={ __( 'Block Margin Top', 'atomic-blocks' ) }
-						marginTop={ attributes.containerMarginTop }
-						marginTopMin="0"
-						marginTopMax="200"
-						onChangeMarginTop={ containerMarginTop => setAttributes({ containerMarginTop }) }
-
-						// Enable margin bottom setting
-						marginEnableBottom={ true }
-						marginBottomLabel={ __( 'Block Margin Bottom', 'atomic-blocks' ) }
-						marginBottom={ attributes.containerMarginBottom }
-						marginBottomMin="0"
-						marginBottomMax="200"
-						onChangeMarginBottom={ containerMarginBottom => setAttributes({ containerMarginBottom }) }
-					/>
+					<RenderSettingControl id="ab_newsletter_containerMargin">
+						<Margin
+							// Enable margin top setting
+							marginEnableTop={ true }
+							marginTopLabel={ __(
+								'Block Margin Top',
+								'atomic-blocks'
+							) }
+							marginTop={ attributes.containerMarginTop }
+							marginTopMin="0"
+							marginTopMax="200"
+							onChangeMarginTop={ ( containerMarginTop ) =>
+								setAttributes( { containerMarginTop } )
+							}
+							// Enable margin bottom setting
+							marginEnableBottom={ true }
+							marginBottomLabel={ __(
+								'Block Margin Bottom',
+								'atomic-blocks'
+							) }
+							marginBottom={ attributes.containerMarginBottom }
+							marginBottomMin="0"
+							marginBottomMax="200"
+							onChangeMarginBottom={ ( containerMarginBottom ) =>
+								setAttributes( { containerMarginBottom } )
+							}
+						/>
+					</RenderSettingControl>
 
 					<ButtonSettings
 						enableButtonTarget={ false }
 						buttonSize={ attributes.buttonSize }
-						onChangeButtonSize={ buttonSize => setAttributes({ buttonSize }) }
+						onChangeButtonSize={ ( buttonSize ) =>
+							setAttributes( { buttonSize } )
+						}
 						buttonShape={ attributes.buttonShape }
-						onChangeButtonShape={ buttonShape => setAttributes({ buttonShape }) }
+						onChangeButtonShape={ ( buttonShape ) =>
+							setAttributes( { buttonShape } )
+						}
 						enableButtonBackgroundColor={ false }
 						enableButtonTextColor={ false }
 					/>
 				</PanelBody>
 
-				<PanelColorSettings
-					title={ __( 'Color', 'atomic-blocks' ) }
-					initialOpen={ false }
-					colorSettings={ [
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Block Background Color', 'atomic-blocks' )
-						},
-						{
-							value: textColor.color,
-							onChange: setTextColor,
-							label: __( 'Block Text Color', 'atomic-blocks' )
-						},
-						{
-							value: buttonBackgroundColor.color,
-							onChange: setButtonBackgroundColor,
-							label: __( 'Button Background Color', 'atomic-blocks' )
-						},
-						{
-							value: buttonTextColor.color,
-							onChange: setButtonTextColor,
-							label: __( 'Button Text Color', 'atomic-blocks' )
-						}
-					] }
-				>
-					{ /* Compare block background and block text color */ }
-					<ContrastChecker
-						{ ...{
-							textColor: textColor.color,
-							backgroundColor: backgroundColor.color,
-							fallbackTextColor,
-							fallbackBackgroundColor
-						} }
-					/>
-					{ /* Compare button background and button text color */ }
-					<ContrastChecker
-						{ ...{
-							textColor: buttonTextColor.color,
-							backgroundColor: buttonBackgroundColor.color,
-							fallbackButtonTextColor,
-							fallbackButtonBackgroundColor
-						} }
-					/>
-					{ /* Compare block background button background color */ }
-					<ContrastChecker
-						{ ...{
-							textColor: buttonBackgroundColor.color,
-							backgroundColor: backgroundColor.color,
-							fallbackButtonBackgroundColor,
-							fallbackBackgroundColor
-						} }
-					/>
-				</PanelColorSettings>
+				<RenderSettingControl id="ab_newsletter_colorOptions">
+					<PanelColorSettings
+						title={ __( 'Color', 'atomic-blocks' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __(
+									'Block Background Color',
+									'atomic-blocks'
+								),
+							},
+							{
+								value: textColor.color,
+								onChange: setTextColor,
+								label: __(
+									'Block Text Color',
+									'atomic-blocks'
+								),
+							},
+							{
+								value: buttonBackgroundColor.color,
+								onChange: setButtonBackgroundColor,
+								label: __(
+									'Button Background Color',
+									'atomic-blocks'
+								),
+							},
+							{
+								value: buttonTextColor.color,
+								onChange: setButtonTextColor,
+								label: __(
+									'Button Text Color',
+									'atomic-blocks'
+								),
+							},
+						] }
+					>
+						{ /* Compare block background and block text color */ }
+						<ContrastChecker
+							{ ...{
+								textColor: textColor.color,
+								backgroundColor: backgroundColor.color,
+								fallbackTextColor,
+								fallbackBackgroundColor,
+							} }
+						/>
+						{ /* Compare button background and button text color */ }
+						<ContrastChecker
+							{ ...{
+								textColor: buttonTextColor.color,
+								backgroundColor: buttonBackgroundColor.color,
+								fallbackButtonTextColor,
+								fallbackButtonBackgroundColor,
+							} }
+						/>
+						{ /* Compare block background button background color */ }
+						<ContrastChecker
+							{ ...{
+								textColor: buttonBackgroundColor.color,
+								backgroundColor: backgroundColor.color,
+								fallbackButtonBackgroundColor,
+								fallbackBackgroundColor,
+							} }
+						/>
+					</PanelColorSettings>
+				</RenderSettingControl>
 			</InspectorControls>
 		);
 	}
 }
 
-export default compose([
+export default compose( [
 	applyFallbackStyles,
 	withColors(
 		'backgroundColor',
 		{ textColor: 'color' },
 		{ buttonBackgroundColor: 'background-color' },
-		{ buttonTextColor: 'color' },
-	)
-])( Inspector );
+		{ buttonTextColor: 'color' }
+	),
+] )( Inspector );

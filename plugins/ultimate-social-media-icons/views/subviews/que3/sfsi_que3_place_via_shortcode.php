@@ -33,5 +33,27 @@
 
 	                </div>				
 				</p>
-			</div>			
+			</div>		
+			
 		</li>
+		
+
+		<li class="sfsi_show_via_onhover  " style="display:none">
+						<div class="radio_section tb_4_ck">
+						<span class="checkbox" style="background-position:0px 0px!important;width:31px"></span>
+						<input name="" type="checkbox" disable value="" class="hide" style="display:none;" />
+						</div>
+					<div class="sfsi_right_info">
+							 <p style="display: inline-flex;">
+							<span class="sfsi_toglepstpgspn" style="display:inline-block;float:left;">In your theme's header</span>
+						</p>
+						<p>
+							Placing icons in your thene's header can be tricky / technical as CSS & PHP know-how is required (as every theme is different, no "automic" placement is possible).
+						</p>
+						<p>
+							You can try via shortcode (see above), however if you don't want any hassle, check out our <span style="text-decoration: underline;">Premium plugin</span> where - as part of our service - we can place the icons for you, making theme adjustments
+							where needed. This ensures perfect the perfect appearance (on all devices) for your icons. <a class="pop-up" style="cursor:pointer; color: #12a252 !important;border-bottom: 1px solid #12a252;text-decoration: none;font-weight: bold;" target="_blank">
+							Get it now </a>
+						</p>
+						</div> 
+					</li>

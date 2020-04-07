@@ -2,20 +2,16 @@
 Contributors: socialdude, socialtech
 Tags: social media, share, buttons, social widget, icons, share icons, share buttons, sharing icons, sharing buttons, social share, sharing, social sharing
 Requires at least: 3.5
-Tested up to: 5.2.2
-Stable tag: 2.4.2
+Tested up to: 5.4
+Stable tag: 2.5.4
 License: GPLv2 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-
-Share buttons and share icons plugin for social media sharing on Facebook, Twitter, Instagram, Whatsapp, Pinterest etc.
-
-== Description ==
 
 Social media plugin which let's you add share icons for RSS, Email, Facebook, Twitter, LinkedIn, Pinterest, Instagram, Youtube, 'Share' (covering 200+ other social media platforms) and upload custom share icons of your choice. 
 
 This free plugin has a lot to offer. Even more can be found in the Premium Plugin, please watch this short video: 
 
-[vimeo https://vimeo.com/269140798] 
+[youtube https://youtu.be/xaZ8m5zSYRg]
 
 See [all features of the Premium plugin](https://www.ultimatelysocial.com/usm-premium/).
 
@@ -274,6 +270,58 @@ You cannot use the same plugin twice, however you can install both the USM as we
 
 
 == Changelog ==
+= 2.5.4 =
+* Fixed syntax errors
+* Fixed open in a new window icons
+* Removed automatic scroll
+
+= 2.5.3 =
+* Fixed UI issues.
+* Fixed problems with moving to Follow.it
+
+= 2.5.2 =
+* Updated to follow.it 
+* Updated notifications to make them less annoying
+
+= 2.5.1 =
+* Price Change.
+* Icon per row fixed css.
+
+= 2.5.0 =
+* Fixed LinkedIn share to correct urls.
+
+= 2.4.9 =
+* Fixed Pinterest Save icon.
+
+= 2.4.8 =
+* Fixed Fblike
+
+= 2.4.7 =
+* Added Margins above and below responsive icons
+* Updated the display for widget
+* Replaced with icons which reduces the loading time
+
+= 2.4.6 =
+* Updated Tweet about my page can be empty.
+* Updated Export section aligned center to button.
+* Updated top_arow css removed.
+
+= 2.4.5 =
+* Updated Export section and success message after export.
+* Updated the ping function.
+* Added Lazy load css.
+
+= 2.4.4 =
+* All console.log commented.
+* Added new  analyst 5.4.
+* Updated the wp version compatablity.
+* Added Export section.
+
+= 2.4.3 =
+* Updated Url encoded
+* Added auto open of question 3
+* Updated location.href escaped
+* Design changes in show icon after post
 
 = 2.4.2 =
 * Solved the unserialize problem.
@@ -535,7 +583,7 @@ You cannot use the same plugin twice, however you can install both the USM as we
 * Issue fixed that sometimes incorrect error-messages showed on front-end
 * Credit link updated
 * More icons added for pro-version
-* SpecificFeeds adjusted for paid option
+* follow.it adjusted for paid option
 * De-installation will now clear database entirely
 * Upgrade to pro-link renamed
 
@@ -872,5 +920,5 @@ You cannot use the same plugin twice, however you can install both the USM as we
 
 == Upgrade Notice ==
 
-= 2.4.2 =
+= 2.5.4 =
 Please upgrade

@@ -330,9 +330,29 @@ $mouseover_other_icons_transition_effect = (isset($option3['mouseover_other_icon
                             <a style="color: #12a252 !important;font-weight: bold; border-bottom:none;text-decoration: none;">
                                 Premium Feature:
                             </a>
-                            <span>Upload a custom design for the social media platforms implemented in the plugin under question number 1 - </span>
+                            <span>Upload any icons you want <a class="pop-up" style="cursor:pointer; color: #12a252 !important;border-bottom: 1px solid #12a252;text-decoration: none;font-weight: bold;" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" target="_blank">
+                                Get it now. 
+                            </a>&nbsp;  Custom design for the social media platforms implemented in the plugin under question number 1 - </span>
                             <a class="pop-up" style="cursor:pointer; color: #12a252 !important;border-bottom: 1px solid #12a252;text-decoration: none;font-weight: bold;" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" target="_blank">
                                 Get it now.
+                            </a>
+                        </p>
+                    </div>
+                </li>
+                <li class="sfsi_custom_icons_q4">
+                    <div style="float: left;">
+                        <a class="pop-up" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" target="_blank" style="display: flex;">
+
+                            <input type="radio" class="styled" />
+
+                            <label style="line-height:20px !important;margin-top:15px;">Tailored</label>
+                        </a>
+                    </div>
+                    <div>
+                        <p style="margin-top: 3px;">
+                            <span>Let us create icons matching your site perfectly (both in terms of colors and shape). </span>
+                            <a href="https://sellcodes.com/0AL0J23f" style="cursor:pointer; color: #12a252 !important;border-bottom: 1px solid #12a252;text-decoration: none;font-weight: bold;" target="_blank">
+                                Learn more.
                             </a>
                         </p>
                     </div>

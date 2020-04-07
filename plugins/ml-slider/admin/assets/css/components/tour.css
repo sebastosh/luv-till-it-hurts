@@ -34,7 +34,7 @@
 }
 
 .metaslider-tour.shepherd-element-attached-top .shepherd-content:before {
-	border-bottom-color: config('colors.orange') !important;
+	border-bottom-color: theme('colors.orange') !important;
 }
 .metaslider-tour.shepherd-element-attached-bottom.shepherd-element-attached-right .shepherd-content:before {
 	top: 100%;
@@ -49,7 +49,7 @@
 	border-left-color: transparent !important;
 	border-top-color: transparent !important;
 	border-right-color: transparent !important;
-    border-bottom-color: config('colors.orange') !important;
+    border-bottom-color: theme('colors.orange') !important;
 }
 
 .shepherd-element-attached-bottom.shepherd-element-attached-right.shepherd-target-attached-top.shepherd-target-attached-left .shepherd-content:before,

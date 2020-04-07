@@ -2,20 +2,24 @@
 
 defined('ABSPATH') || exit;
 
-class TNP_Composer {
+require_once __DIR__ . '/logger.php';
+require_once __DIR__ . '/store.php';
+require_once __DIR__ . '/composer.php';
+require_once __DIR__ . '/addon.php';
+require_once __DIR__ . '/mailer.php';
+require_once __DIR__ . '/themes.php';
 
-    static $block_dirs = array();
+class TNP_Media {
 
-    static function register_block($dir) {
-        // Checks
+    var $url;
+    var $width;
+    var $height;
+    var $alt;
 
-        if (!file_exists($dir . '/block.php')) {
-            $error = new WP_Error('1', 'block.php missing on folder ' . $dir);
-            NewsletterEmails::instance()->logger->error($error);
-            return $error;
-        }
-        self::$block_dirs[] = $dir;
-        return true;
+    /** Sets the width recalculating the height */
+    public function set_width($width) {
+        $this->height = floor($width / $this->width * $this->height);
+        $this->width = $width;
     }
 
 }
@@ -76,107 +80,6 @@ abstract class TNP_User {
  * @property array $options The subscriber status
  * */
 abstract class TNP_Email {
-    
-}
-
-/**
- * @property string $id Theme identifier
- * @property string $dir Absolute path to the theme folder
- * @property string $name Theme name
- * */
-class TNP_Theme {
-
-    var $dir;
-    var $name;
-
-    public function get_defaults() {
-        @include $this->dir . '/theme-defaults.php';
-        if (!isset($theme_defaults) || !is_array($theme_defaults))
-            return array();
-        return $theme_defaults;
-    }
-
-}
-
-class NewsletterAddon {
-
-    var $logger;
-    var $admin_logger;
-    var $name;
-    var $options;
-    var $version;
-
-    public function __construct($name, $version = '0.0.0') {
-        $this->name = $name;
-        $this->version = $version;
-        if (is_admin()) {
-            $old_version = get_option('newsletter_' . $name . '_version');
-            if ($version != $old_version) {
-                $this->upgrade($old_version === false);
-                update_option('newsletter_' . $name . '_version', $version, false);
-            }
-        }
-        add_action('newsletter_init', array($this, 'init'));
-
-        if (is_admin()) {
-            if (!class_exists('NewsletterExtensions')) {
-                add_filter('plugin_row_meta', function ($plugin_meta, $plugin_file) {
-                    if ($plugin_file === 'newsletter-' . $this->name . '/' . $this->name . '.php') {
-                        $plugin_meta[] = '<a href="admin.php?page=newsletter_main_extensions" style="font-weight: bold">Newsletter Addons Manager required</a>';
-                    }
-                    return $plugin_meta;
-                }, 10, 2);
-            }
-        }
-    }
-
-    function upgrade($first_install = false) {
-    }
-
-    function init() {
-        
-    }
-
-    function get_logger() {
-        if (!$this->logger) {
-            $this->logger = new NewsletterLogger($this->name);
-        }
-        return $this->logger;
-    }
-
-    function get_admin_logger() {
-        if (!$this->admin_logger) {
-            $this->admin_logger = new NewsletterLogger($this->name . '-admin');
-        }
-        return $this->admin_logger;
-    }
-
-    function setup_options() {
-        if ($this->options)
-            return;
-        $this->options = get_option('newsletter_' . $this->name, array());
-    }
-
-    function save_options($options) {
-        update_option('newsletter_' . $this->name, $options);
-        $this->setup_options();
-    }
-
-    /**
-     * @global wpdb $wpdb
-     * @param string $query
-     */
-    function query($query) {
-        global $wpdb;
-
-        $r = $wpdb->query($query);
-        if ($r === false) {
-            $logger = $this->get_logger();
-            $logger->fatal($query);
-            $logger->fatal($wpdb->last_error);
-        }
-        return $r;
-    }
 
 }
 
@@ -258,7 +161,7 @@ class NewsletterModule {
     }
 
     /**
-     * 
+     *
      * @global wpdb $wpdb
      * @param string $query
      */
@@ -268,13 +171,24 @@ class NewsletterModule {
         $this->logger->debug($query);
         $r = $wpdb->query($query);
         if ($r === false) {
+            $this->logger->fatal($query);
+            $this->logger->fatal($wpdb->last_error);
+        }
+        return $r;
+    }
+
+    function get_results($query) {
+        global $wpdb;
+        $r = $wpdb->get_results($query);
+        if ($r === false) {
+            $this->logger->fatal($query);
             $this->logger->fatal($wpdb->last_error);
         }
         return $r;
     }
 
     /**
-     * 
+     *
      * @global wpdb $wpdb
      * @param string $table
      * @param array $data
@@ -512,8 +426,10 @@ class NewsletterModule {
     }
 
     static function normalize_name($name) {
+        $name = html_entity_decode($name, ENT_QUOTES);
         $name = str_replace(';', ' ', $name);
         $name = strip_tags($name);
+
         return $name;
     }
 
@@ -694,53 +610,8 @@ class NewsletterModule {
         return $text;
     }
 
-    function get_styles() {
-
-        $list = array('' => 'none');
-
-        $dir = NEWSLETTER_DIR . '/' . $this->module . '/styles';
-        $handle = @opendir($dir);
-
-        if ($handle !== false) {
-            while ($file = readdir($handle)) {
-                if ($file == '.' || $file == '..')
-                    continue;
-                if (substr($file, -4) != '.css')
-                    continue;
-                $list[$file] = substr($file, 0, strlen($file) - 4);
-            }
-            closedir($handle);
-        }
-
-        $dir = WP_CONTENT_DIR . '/extensions/newsletter/' . $this->module . '/styles';
-        if (is_dir($dir)) {
-            $handle = @opendir($dir);
-
-            if ($handle !== false) {
-                while ($file = readdir($handle)) {
-                    if ($file == '.' || $file == '..')
-                        continue;
-                    if (isset($list[$file]))
-                        continue;
-                    if (substr($file, -4) != '.css')
-                        continue;
-                    $list[$file] = substr($file, 0, strlen($file) - 4);
-                }
-                closedir($handle);
-            }
-        }
-        return $list;
-    }
-
-    function get_style_url($style) {
-        if (is_file(WP_CONTENT_DIR . '/extensions/newsletter/' . $this->module . '/styles/' . $style))
-            return WP_CONTENT_URL . '/extensions/newsletter/' . $this->module . '/styles/' . $style;
-        else
-            return plugins_url('newsletter') . '/' . $this->module . '/styles/' . $style;
-    }
-
     function admin_menu() {
-        
+
     }
 
     function add_menu_page($page, $title, $capability = '') {
@@ -751,10 +622,10 @@ class NewsletterModule {
     }
 
     function add_admin_page($page, $title) {
-        if (!Newsletter::instance()->is_allowed())
+        if (!Newsletter::instance()->is_allowed()) {
             return;
+        }
         $name = 'newsletter_' . $this->module . '_' . $page;
-        $name = apply_filters('newsletter_admin_page', $name);
         add_submenu_page(null, $title, $title, 'exist', $name, array($this, 'menu_page'));
     }
 
@@ -807,9 +678,10 @@ class NewsletterModule {
 
     /**
      * Retrieves an email from DB and unserialize the options.
-     * 
+     *
      * @param mixed $id
      * @param string $format
+     * @return TNP_Email An object with the same fields of TNP_Email, but not actually of that type
      */
     function get_email($id, $format = OBJECT) {
         $email = $this->store->get_single(NEWSLETTER_EMAILS_TABLE, $id, $format);
@@ -837,7 +709,8 @@ class NewsletterModule {
     }
 
     /**
-     * Save an email and provide serialization, if needed, of $email['options']. 
+     * Save an email and provide serialization, if needed, of $email['options'].
+     * @return TNP_Email
      */
     function save_email($email, $return_format = OBJECT) {
         if (is_object($email)) {
@@ -869,17 +742,21 @@ class NewsletterModule {
 
         if (isset($_REQUEST['nek'])) {
             list($id, $token) = @explode('-', $_REQUEST['nek'], 2);
+        } else if (isset($_COOKIE['tnpe'])) {
+            list($id, $token) = @explode('-', $_COOKIE['tnpe'], 2);
         } else {
             return null;
         }
 
         $email = $this->get_email($id);
 
+        // TODO: Check the token? It's really useful?
+
         return $email;
     }
 
     /**
-     * 
+     *
      * @global wpdb $wpdb
      * @param int|array $id
      * @return boolean
@@ -1055,7 +932,7 @@ class NewsletterModule {
      * @global type $wpdb
      * @param string|int|object|array $id_or_email
      * @param string $format
-     * @return TNP_User
+     * @return TNP_User|null
      */
     function get_user($id_or_email, $format = OBJECT) {
         global $wpdb;
@@ -1086,6 +963,16 @@ class NewsletterModule {
     }
 
     /**
+     * Accepts a user ID or a TNP_User object. Does not check if the user really exists.
+     *
+     * @param type $user
+     */
+    function get_user_edit_url($user) {
+        $id = $this->to_int_id($user);
+        return admin_url('admin.php') . '?page=newsletter_users_edit&id=' . $id;
+    }
+
+    /**
      * Returns the user unique key
      * @param TNP_User $user
      * @return string
@@ -1113,9 +1000,9 @@ class NewsletterModule {
 
     /**
      * Return the user identified by the "nk" parameter (POST or GET).
-     * If no user can be found or the token is not matching, returns null. 
+     * If no user can be found or the token is not matching, returns null.
      * If die_on_fail is true it dies instead of return null.
-     * 
+     *
      * @param bool $die_on_fail
      * @return TNP_User
      */
@@ -1208,7 +1095,7 @@ class NewsletterModule {
     }
 
     /**
-     * 
+     *
      * @return TNP_List[]
      */
     function get_lists_public($language = '') {
@@ -1230,7 +1117,7 @@ class NewsletterModule {
 
     /**
      * Lists to be shown on subscription form.
-     * 
+     *
      * @return TNP_List[]
      */
     function get_lists_for_subscription($language = '') {
@@ -1252,7 +1139,7 @@ class NewsletterModule {
 
     /**
      * Returns the lists to be shown in the profile page.
-     * 
+     *
      * @return TNP_List[]
      */
     function get_lists_for_profile($language = '') {
@@ -1274,7 +1161,7 @@ class NewsletterModule {
 
     /**
      * Returns a list as an object (with the same signature of TNP_List)
-     * 
+     *
      * @param int $id
      * @return TNP_List
      */
@@ -1321,7 +1208,7 @@ class NewsletterModule {
 
     /**
      * Updates the user last activity timestamp.
-     * 
+     *
      * @global wpdb $wpdb
      * @param TNP_User $user
      */
@@ -1339,7 +1226,7 @@ class NewsletterModule {
     /**
      * Finds single style blocks and adds a style attribute to every HTML tag with a class exactly matching the rules in the style
      * block. HTML tags can use the attribute "inline-class" to exact match a style rules if they need a composite class definition.
-     * 
+     *
      * @param string $content
      * @param boolean $strip_style_blocks
      * @return string
@@ -1380,7 +1267,7 @@ class NewsletterModule {
 
     /**
      * Deletes a subscriber and cleans up all the stats table with his correlated data.
-     * 
+     *
      * @global wpdb $wpdb
      * @param int|id[] $id
      */
@@ -1403,7 +1290,7 @@ class NewsletterModule {
     /**
      * Add to a destination URL the parameters to identify the user, the email and to show
      * an alert message, if required. The parameters are then managed by the [newsletter] shortcode.
-     * 
+     *
      * @param string $url If empty the standard newsletter page URL is used (usually it is empty, but sometime a custom URL has been specified)
      * @param string $message_key The message identifier
      * @param TNP_User|int $user
@@ -1447,7 +1334,7 @@ class NewsletterModule {
 
     /**
      * Builds a standard Newsletter action URL for the specified action.
-     * 
+     *
      * @param string $action
      * @param TNP_User $user
      * @param TNP_Email $email
@@ -1455,6 +1342,7 @@ class NewsletterModule {
      */
     function build_action_url($action, $user = null, $email = null) {
         $url = $this->add_qs($this->get_home_url(), 'na=' . urlencode($action));
+        //$url = $this->add_qs(admin_url('admin-ajax.php'), 'action=newsletter&na=' . urlencode($action));
         if ($user) {
             $url .= '&nk=' . urlencode($this->get_user_key($user));
         }
@@ -1539,7 +1427,7 @@ class NewsletterModule {
 
     /**
      * Changes a user status. Accept a user object, user id or user email.
-     * 
+     *
      * @param TNP_User $user
      * @param string $status
      * @return TNP_User
@@ -1555,7 +1443,7 @@ class NewsletterModule {
     }
 
     /**
-     * 
+     *
      * @global wpdb $wpdb
      * @param TNP_User $user
      * @return TNP_User
@@ -1571,8 +1459,8 @@ class NewsletterModule {
     }
 
     /**
-     * Create a log entry with the meaningful user data. 
-     * 
+     * Create a log entry with the meaningful user data.
+     *
      * @global wpdb $wpdb
      * @param TNP_User $user
      * @param string $source
@@ -1593,7 +1481,7 @@ class NewsletterModule {
     }
 
     /**
-     * 
+     *
      * @global wpdb $wpdb
      * @param TNP_User $user
      * @param int $list
@@ -1616,7 +1504,7 @@ class NewsletterModule {
     }
 
     /**
-     * 
+     *
      * @param int $wp_user_id
      * @param string $format
      * @return TNP_User
@@ -1639,7 +1527,7 @@ class NewsletterModule {
 
     /**
      * Replaces every possible Newsletter tag ({...}) in a piece of text or HTML.
-     * 
+     *
      * @global wpdb $wpdb
      * @param string $text
      * @param mixed $user Can be an object, associative array or id
@@ -1650,6 +1538,12 @@ class NewsletterModule {
     function replace($text, $user = null, $email = null, $referrer = null) {
         global $wpdb;
 
+        if (strpos($text, '<p') !== false) {
+            $esc_html = true;
+        } else {
+            $esc_html = false;
+        }
+
         static $home_url = false;
 
         if (!$home_url) {
@@ -1659,7 +1553,7 @@ class NewsletterModule {
 //$this->logger->debug('Replace start');
         if ($user !== null && !is_object($user)) {
             if (is_array($user)) {
-                $user = (object) $user; //$this->get_user($user['id']);
+                $user = (object) $user;
             } else if (is_numeric($user)) {
                 $user = $this->get_user($user);
             } else {
@@ -1669,7 +1563,7 @@ class NewsletterModule {
 
         if ($email !== null && !is_object($email)) {
             if (is_array($email)) {
-                $email = (object) $email; //$this->get_user($user['id']);
+                $email = (object) $email;
             } else if (is_numeric($email)) {
                 $email = $this->get_email($email);
             } else {
@@ -1697,7 +1591,7 @@ class NewsletterModule {
                 $text = str_replace(' {name}', '', $text);
                 $text = str_replace('{name}', '', $text);
             } else {
-                $text = str_replace('{name}', $name, $text);
+                $text = str_replace('{name}', esc_html($name), $text);
             }
 
             switch ($user->sex) {
@@ -1712,10 +1606,11 @@ class NewsletterModule {
             }
 
 
-            $text = str_replace('{surname}', $user->surname, $text);
-            $text = str_replace('{last_name}', $user->surname, $text);
+            // Deprecated
+            $text = str_replace('{surname}', esc_html($user->surname), $text);
+            $text = str_replace('{last_name}', esc_html($user->surname), $text);
 
-            $full_name = trim($user->name . ' ' . $user->surname);
+            $full_name = esc_html(trim($user->name . ' ' . $user->surname));
             if (empty($full_name)) {
                 $text = str_replace(' {full_name}', '', $text);
                 $text = str_replace('{full_name}', '', $text);
@@ -1739,18 +1634,8 @@ class NewsletterModule {
             $base = (empty($this->options_main['url']) ? get_option('home') : $this->options_main['url']);
             $id_token = '&amp;ni=' . $user->id . '&amp;nt=' . $user->token;
 
-
-            $nek = false;
-            if ($email) {
-                $nek = $this->get_email_key($email);
-                $text = str_replace('{email_id}', $email->id, $text);
-                $text = str_replace('{email_key}', $nek, $text);
-                $text = str_replace('{email_subject}', $email->subject, $text);
-                $text = $this->replace_url($text, 'EMAIL_URL', $this->build_action_url('v', $user) . '&id=' . $email->id);
-            }
-
             $text = $this->replace_url($text, 'SUBSCRIPTION_CONFIRM_URL', $this->build_action_url('c', $user));
-            $text = $this->replace_url($text, 'ACTIVATION_URL', $this->build_action_url('v', $user));
+            $text = $this->replace_url($text, 'ACTIVATION_URL', $this->build_action_url('c', $user));
 
 // Obsolete.
             $text = $this->replace_url($text, 'FOLLOWUP_SUBSCRIPTION_URL', self::add_qs($base, 'nm=fs' . $id_token));
@@ -1760,8 +1645,18 @@ class NewsletterModule {
         } else {
             $text = $this->replace_url($text, 'SUBSCRIPTION_CONFIRM_URL', '#');
             $text = $this->replace_url($text, 'ACTIVATION_URL', '#');
-            $text = $this->replace_url($text, 'UNSUBSCRIPTION_CONFIRM_URL', '#');
-            $text = $this->replace_url($text, 'UNSUBSCRIPTION_URL', '#');
+        }
+
+        if ($email) {
+            $nek = $this->get_email_key($email);
+            $text = str_replace('{email_id}', $email->id, $text);
+            $text = str_replace('{email_key}', $nek, $text);
+            $text = str_replace('{email_subject}', $email->subject, $text);
+            // Deprecated
+            $text = str_replace('{subject}', $email->subject, $text);
+            $text = $this->replace_url($text, 'EMAIL_URL', $this->build_action_url('v', $user) . '&id=' . $email->id);
+        } else {
+            $text = $this->replace_url($text, 'EMAIL_URL', '#');
         }
 
         if (strpos($text, '{subscription_form}') !== false) {
@@ -1936,6 +1831,13 @@ class NewsletterModule {
         return round($value / $total * 100);
     }
 
+    /**
+     * Takes in a variable and checks if object, array or scalar and return the integer representing
+     * a database record id.
+     *
+     * @param mixed $var
+     * @return in
+     */
     static function to_int_id($var) {
         if (is_object($var)) {
             return (int) $var->id;
@@ -1944,6 +1846,19 @@ class NewsletterModule {
             return (int) $var['id'];
         }
         return (int) $var;
+    }
+
+    static function to_array($text) {
+        $text = trim($text);
+        if (empty($text)) {
+            return array();
+        }
+        $text = preg_split("/\\r\\n/", $text);
+        $text = array_map('trim', $text);
+        $text = array_map('strtolower', $text);
+        $text = array_filter($text);
+
+        return $text;
     }
 
     static function sanitize_ip($ip) {
@@ -1976,22 +1891,29 @@ class NewsletterModule {
         return $url;
     }
 
+    static function clean_eol($text) {
+        $text = str_replace("\r\n", "\n", $text);
+        $text = str_replace("\r", "\n", $text);
+        $text = str_replace("\n", "\r\n", $text);
+        return $text;
+    }
+
     /**
      * Return the current language code. Optionally, if a user is passed and it has a language
      * the user language is returned.
      * If there is no language available, an empty string is returned.
-     * 
+     *
      * @param TNP_User $user
      * @return string The language code
      */
     function get_current_language($user = null) {
-        global $TRP_LANGUAGE, $current_user;
-// TODO: Check if the blog is multilanguage?
+        global $current_user;
 
         if ($user && $user->language) {
             return $user->language;
         }
 
+        // WPML
         if (class_exists('SitePress')) {
             $current_language = apply_filters('wpml_current_language', '');
             if ($current_language == 'all') {
@@ -1999,10 +1921,13 @@ class NewsletterModule {
             }
             return $current_language;
         }
+
+        // Polylang
         if (function_exists('pll_current_language')) {
             return pll_current_language();
         }
 
+        // Trnslatepress and/or others
         $current_language = apply_filters('newsletter_current_language', '');
 
         return $current_language;
@@ -2093,6 +2018,40 @@ class NewsletterModule {
         return $posts;
     }
 
+	protected function generate_admin_notification_message( $user ) {
+
+		$message = "Subscriber details:\n\n" .
+		           "email: " . $user->email . "\n" .
+		           "first name: " . $user->name . "\n" .
+		           "last name: " . $user->surname . "\n" .
+		           "gender: " . $user->sex . "\n";
+
+		$lists = $this->get_lists();
+		foreach ( $lists as $list ) {
+			$field   = 'list_' . $list->id;
+			$message .= $list->name . ': ' . ( empty( $user->$field ) ? "NO" : "YES" ) . "\n";
+		}
+
+		for ( $i = 0; $i < NEWSLETTER_PROFILE_MAX; $i ++ ) {
+			if ( empty( $this->options_profile[ 'profile_' . $i ] ) ) {
+				continue;
+			}
+			$field   = 'profile_' . $i;
+			$message .= $this->options_profile[ 'profile_' . $i ] . ': ' . $user->$field . "\n";
+		}
+
+		$message .= "token: " . $user->token . "\n" .
+		            "status: " . $user->status . "\n";
+
+		return $message;
+	}
+
+	protected function generate_admin_notification_subject( $subject ) {
+		$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
+
+		return '[' . $blogname . '] ' . $subject;
+	}
+
 }
 
 /**
@@ -2113,7 +2072,7 @@ function newsletter_get_post_image($post_id = null, $size = 'thumbnail', $altern
 
 /**
  * Accepts a post or a post ID.
- * 
+ *
  * @param WP_Post $post
  */
 function newsletter_the_excerpt($post, $words = 30) {

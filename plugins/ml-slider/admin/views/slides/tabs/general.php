@@ -24,7 +24,7 @@
 	$target = get_post_meta($slide_id, 'ml-slider_new_window', true) ? 'checked=checked' : ''; 
 ?>
 <div class="row has-right-checkbox">
-	<input class="url" type="text" name="attachment[<?php echo $slide_id; ?>][url]" placeholder="<?php _e("URL", "ml-slider"); ?>" value="<?php echo $url; ?>" />
+	<input class="url" data-lpignore="true" type="text" name="attachment[<?php echo $slide_id; ?>][url]" placeholder="<?php _e("URL", "ml-slider"); ?>" value="<?php echo $url; ?>" />
 	<div class="input-label right new_window">
 		<label><?php _e("Open in a new window", "ml-slider"); ?> <input autocomplete="off" tabindex="0" type="checkbox" name="attachment[<?php echo $slide_id; ?>][new_window]" <?php echo $target; ?> /></label>
 	</div>

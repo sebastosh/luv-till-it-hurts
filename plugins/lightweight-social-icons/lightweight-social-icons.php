@@ -3,7 +3,7 @@
 Plugin Name: Lightweight Social Icons
 Plugin URI: http://generatepress.com/lightweight-social-icons
 Description: Add simple icon font social media buttons. Choose the order, colors, size and more for 42 different icons!
-Version: 1.0.1
+Version: 1.1
 Author: Thomas Usborne
 Author URI: http://edge22.com
 License: GNU General Public License v2 or later
@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: lightweight-social-icons
 */
 
-define( 'LSI_VERSION', '1.0.1' );
+define( 'LSI_VERSION', '1.1' );
 
 add_action( 'plugins_loaded', 'lsi_load_textdomain' );
 /**
@@ -95,6 +95,10 @@ class lsi_Widget extends WP_Widget {
 				$rel_attribute = apply_filters( 'lsi_icon_rel_attribute','rel="nofollow"' );
 				$title_attribute = apply_filters( 'lsi_icon_title_attribute','title="' . $options[$name]['name'] . '"' );
 				$accessibility = apply_filters( 'lsi_icon_aria_attribute','aria-label="' . $options[$name]['name'] . '"' );
+
+				if ( $new_window && 'email' !== $name ) {
+					$rel_attribute = apply_filters( 'lsi_icon_rel_attribute', 'rel="nofollow noopener noreferrer"' );
+				}
 
 				$output .= sprintf(
 					'<li class="lsi-social-%3$s"><a class="%4$s" %5$s %6$s %7$s href="%1$s" %2$s><i class="lsicon lsicon-%3$s"></i></a></li>',

@@ -9,15 +9,15 @@ define('ress_readmore_button', $ress_readmore_button);
 define('rss_readmore_text2', $rss_readmore_text2);
 
 $feedId 		= sanitize_text_field(get_option('sfsi_feed_id',false));
-$connectToFeed 	= "http://www.specificfeeds.com/?".base64_encode("userprofile=wordpress&feed_id=".$feedId);
-$connectFeedLgn	= "http://www.specificfeeds.com/?".base64_encode("userprofile=wordpress&feed_id=".$feedId."&logintype=login");
+$connectToFeed 	= "http://api.follow.it/?".base64_encode("userprofile=wordpress&feed_id=".$feedId);
+$connectFeedLgn	= "http://api.follow.it/?".base64_encode("userprofile=wordpress&feed_id=".$feedId."&logintype=login");
 ?>
 
 <div class="pop-overlay read-overlay sfsi_feedClaimingOverlay" >
     <div class="pop_up_box sfsi_pop_up"  >
         <img src="<?php echo SFSI_PLUGURL; ?>images/newclose.png" id="close_popup" class="sfsicloseBtn" alt="error" />
         <center>
-            <form id="calimingOptimizationForm" method="get" action="https://www.specificfeeds.com/wpclaimfeeds/getFullAccess" target="_blank">
+            <form id="calimingOptimizationForm" method="get" action="https://api.follow.it/wpclaimfeeds/getFullAccess" target="_blank">
                 <h1>Enter the email you want to use</h1>
                 <div class="form-field">
                     <input type="hidden" name="feed_id" value="<?php echo $feedId; ?>" />
@@ -29,7 +29,7 @@ $connectFeedLgn	= "http://www.specificfeeds.com/?".base64_encode("userprofile=wo
                     </a>
                 </div>
                 <p>
-                	This will create your FREE acccount on <a target="_blank" href="<?php echo $connectToFeed?>">SpecificFeeds</a>. We will treat your data (and your subscribers’ data!) highly confidentially, see our <a target="_blank" href="https://www.specificfeeds.com/page/privacy-policy ">Privacy Policy</a>.
+                	This will create your FREE acccount on <a target="_blank" href="https://follow.it/">follow.it</a>. We will treat your data (and your subscribers’ data!) highly confidentially, see our <a target="_blank" href="https://follow.it/info/privacy">Privacy Policy</a>.
               </p>
                
             </form>
@@ -94,7 +94,7 @@ $connectFeedLgn	= "http://www.specificfeeds.com/?".base64_encode("userprofile=wo
      $visit_iconsUrl= SFSI_PLUGURL."/images/visit_icons/";
      $soicalObj     = new sfsi_SocialHelper();
 
-     $twitetr_share = 'http://specificfeeds.com';
+     $twitetr_share = 'http://follow.it';
      $twitter_text  = 'Create Your Perfect Newspaper for free';
 
      if(isset($option2['sfsi_twitter_followUserName']) && !empty($option2['sfsi_twitter_followUserName'])){
@@ -156,8 +156,8 @@ $connectFeedLgn	= "http://www.specificfeeds.com/?".base64_encode("userprofile=wo
     </div>
 </div><!-- END twiiter example pop-up -->
 <?php 
-	$youtube_url = isset($option2['sfsi_youtube_pageUrl']) && !empty($option2['sfsi_youtube_pageUrl']) ?  $option2['sfsi_youtube_pageUrl'] : 'http://www.youtube.com/user/SpecificFeeds' ;
-	$youtube_user= isset($option4['sfsi_youtube_user']) && !empty($option4['sfsi_youtube_user']) ?  $option4['sfsi_youtube_user'] : 'SpecificFeeds' ;
+	$youtube_url = isset($option2['sfsi_youtube_pageUrl']) && !empty($option2['sfsi_youtube_pageUrl']) ?  $option2['sfsi_youtube_pageUrl'] : 'http://www.youtube.com/user/follow.it' ;
+	$youtube_user= isset($option4['sfsi_youtube_user']) && !empty($option4['sfsi_youtube_user']) ?  $option4['sfsi_youtube_user'] : 'follow.it' ;
 ?>
 <!-- You tube  example pop up -->
 <div class="pop-overlay read-overlay ytex-s2" >
@@ -180,7 +180,7 @@ $connectFeedLgn	= "http://www.specificfeeds.com/?".base64_encode("userprofile=wo
 
 <?php 
 
-$pin_url= isset($option2['sfsi_pinterest_pageUrl']) && !empty($option2['sfsi_pinterest_pageUrl']) ?  $option2['sfsi_pinterest_pageUrl'] : 'http://pinterest.com/specificfeeds' ;
+$pin_url= isset($option2['sfsi_pinterest_pageUrl']) && !empty($option2['sfsi_pinterest_pageUrl']) ?  $option2['sfsi_pinterest_pageUrl'] : 'http://pinterest.com/follow.it' ;
 ?>
 <!-- Pinterest  example pop up -->
 <div class="pop-overlay read-overlay pinex-s2" >
@@ -229,7 +229,7 @@ $pin_url= isset($option2['sfsi_pinterest_pageUrl']) && !empty($option2['sfsi_pin
 
 <div class="pop-overlay read-overlay demail-1" >
     <div class="pop_up_box sfsi_pop_up " >
-       <h4>Note: Also if you already offer a newsletter it makes sense to offer this option too, because it will get you <span class="mediam_txt">more readers</span>, as explained <a href="http://www.specificfeeds.com/rss" target="new" style="color:#5A6570;display: inline;text-decoration:underline">here</a>. </h4>
+       <h4>Note: Also if you already offer a newsletter it makes sense to offer this option too, because it will get you <span class="mediam_txt">more readers</span>, as explained <a href="http://api.follow.it/rss" target="new" style="color:#5A6570;display: inline;text-decoration:underline">here</a>. </h4>
        <div class="button"><a href="javascript:;" class="hideemailpop" title="Ok, keep it active for the time being,I want to see how it works">Ok, keep it active for the time being, <br />
 I want to see how it works</a></div>
        <a href="javascript:;" id="deac_email2" title="Deactivate it">Deactivate it</a>
@@ -615,7 +615,7 @@ I want to see how it works</a></div>
         <div style="margin:10px 70px;border-radius:10px;border:1px solid #bbb;font-size: 17px;line-height: 28px;" >
           <ol style="padding: 15px 20px 10px 10px; font-size: 18px; letter-spacing: 0.5px; color: #000000;">
             <li>You‘ll get access to <a href="https://www.ultimatelysocial.com/usm-premium/" target="_black" style="color: #000000;">all premium features</a></li>
-            <li>The plugin is <b>priced really fairly</b> starting at <del>44.98 USD</del> today: 40% off!</li>
+            <li>The plugin is <b>priced really fairly</b> starting at <del>49.98 USD</del> today: 40% off!</li>
             <li><b>Use it for lifetime:</b> Support and updates are limited to six months, however after that it will not be disabled, you can keep using the plugin (even if you don‘t renew)</li>
             <li>One license is valid for one site (as support is included), but we <b>offer 20% discounts</b> for all future purchases</li>
             <li>We provide a <b>14 day money-back guarantee</b> if you‘re not satisfied for <u>any reason</u></li>

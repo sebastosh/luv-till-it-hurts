@@ -71,7 +71,7 @@ $option8['sfsi_form_button_background'] = (isset($option8['sfsi_form_button_back
 <div class="tab8">
     <?php
 
-    $connectToFeed = "http://www.specificfeeds.com/?" . base64_encode("userprofile=wordpress&feed_id=" . $feedId);
+    $connectToFeed = "http://api.follow.it/?" . base64_encode("userprofile=wordpress&feed_id=" . $feedId);
 
     ?>
 
@@ -139,7 +139,7 @@ $option8['sfsi_form_button_background'] = (isset($option8['sfsi_form_button_back
 
                 $sfsi_feediid = sanitize_text_field(get_option('sfsi_feed_id'));
 
-                $url = "https://www.specificfeeds.com/widgets/subscribeWidget/";
+                $url = "https://api.follow.it/subscription-form/";
 
                 $url = $url . $sfsi_feediid . '/8/';
 
@@ -153,13 +153,14 @@ $option8['sfsi_form_button_background'] = (isset($option8['sfsi_form_button_back
 
                         <div style="margin: 5px 0; width: 100%;">
 
-                            <input style="padding: 10px 0px !important; width: 100% !important;" type="email" placeholder="Enter your email" value="" name="data[Widget][email]" />
+                            <input style="padding: 10px 0px !important; width: 100% !important;" type="email" placeholder="Enter your email" name="email" />
 
                         </div>
 
                         <div style="margin: 5px 0; width: 100%;">
+						<input type="hidden" name="action" value="followPub">
 
-                            <input style="padding: 10px 0px !important; width: 100% !important;" type="submit" name="subscribe" value="Subscribe" /><input type="hidden" name="data[Widget][feed_id]" value="<?php echo $sfsi_feediid ?>"><input type="hidden" name="data[Widget][feedtype]" value="8">
+                            <input style="padding: 10px 0px !important; width: 100% !important;" type="submit" name="subscribe" />
 
                         </div>
 
@@ -923,7 +924,7 @@ function get_sfsiSubscriptionForm($hglht = null)
 
             <div class="sfsi_subscription_form_field">
 
-                <input type="email" name="data[Widget][email]" placeholder="Enter your email" value="" <?php if ($hglht == "email") {
+                <input type="email" name="email" placeholder="Enter your email" value="" <?php if ($hglht == "email") {
                                                                                                             echo 'class="sfsi_highlight"';
                                                                                                         } ?> />
 

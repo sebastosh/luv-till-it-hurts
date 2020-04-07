@@ -1,5 +1,5 @@
 <?php
-if (!defined('ABSPATH')) exit;
+defined('ABSPATH') || exit;
 
 @include_once NEWSLETTER_INCLUDES_DIR . '/controls.php';
 $module = Newsletter::instance();
@@ -23,69 +23,20 @@ if (!$controls->is_action()) {
     }
 
     if ($controls->is_action('test')) {
-
-        require_once ABSPATH . WPINC . '/class-phpmailer.php';
-        require_once ABSPATH . WPINC . '/class-smtp.php';
-        $mail = new PHPMailer();
-        ob_start();
-        $mail->IsSMTP();
-        $mail->SMTPDebug = true;
-        $mail->CharSet = 'UTF-8';
-        $message = 'This Email is sent by PHPMailer of WordPress';
-        $mail->IsHTML(false);
-        $mail->Body = $message;
-        $mail->From = $module->options['sender_email'];
-        $mail->FromName = $module->options['sender_name'];
-        if (!empty($module->options['return_path'])) {
-            $mail->Sender = $module->options['return_path'];
-        }
-        if (!empty($module->options['reply_to'])) {
-            $mail->AddReplyTo($module->options['reply_to']);
-        }
-
-        $mail->Subject = '[' . get_option('blogname') . '] SMTP test';
-
-        $mail->Host = $controls->data['host'];
-        if (!empty($controls->data['port'])) {
-            $mail->Port = (int) $controls->data['port'];
-        }
-
-        $mail->SMTPSecure = $controls->data['secure'];
-        $mail->SMTPAutoTLS = false;
         
-        if ($controls->data['ssl_insecure'] == 1) {
-                $mail->SMTPOptions = array(
-                    'ssl' => array(
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    )
-                );
-        }
+        $mailer = new NewsletterDefaultSMTPMailer($controls->data);
+        $message = NewsletterMailerAddon::get_test_message($controls->data['test_email']);
+        
+        $r = $mailer->send($message);
 
-        if (!empty($controls->data['user'])) {
-            $mail->SMTPAuth = true;
-            $mail->Username = $controls->data['user'];
-            $mail->Password = $controls->data['pass'];
-        }
+        if (is_wp_error($r)) {
+            $controls->errors = $r->get_error_message();
+            $controls->errors .= '<br><a href="https://www.thenewsletterplugin.com/documentation/?p=15170" target="_blank"><strong>' . __('Read more', 'newsletter') . '</strong></a>.';
 
-        $mail->SMTPKeepAlive = true;
-        $mail->ClearAddresses();
-        $mail->AddAddress($controls->data['test_email']);
-
-        $mail->Send();
-        $mail->SmtpClose();
-        $debug = htmlspecialchars(ob_get_clean());
-
-        if ($mail->IsError()) {
-            $controls->errors = '<strong>Connection/email delivery failed.</strong><br>You should contact your provider reporting the SMTP parameter and asking about connection to that SMTP.<br><br>';
-            $controls->errors = $mail->ErrorInfo;
-        } else
+        } else {
             $controls->messages = 'Success.';
-
-        $controls->messages .= '<textarea style="width:100%; height:200px; font-size:12px; font-family: monospace">';
-        $controls->messages .= $debug;
-        $controls->messages .= '</textarea>';
+        }
+        
     }
 }
 
@@ -103,7 +54,7 @@ if (empty($controls->data['enabled']) && !empty($controls->data['host'])) {
         <h2><?php _e('SMTP Settings', 'newsletter') ?></h2>
     
     <p>
-        <i class="fa fa-info-circle"></i> <a href="https://www.thenewsletterplugin.com/extensions" target="_blank">Discover how SMTP services can boost your newsletters!</a>
+        <i class="fas fa-info-circle"></i> <a href="https://www.thenewsletterplugin.com/extensions" target="_blank">Discover how SMTP services can boost your newsletters!</a>
         <!--
     <p>SMTP (Simple Mail Transfer Protocol) refers to external delivery services you can use to send emails.</p>
     <p>SMTP services are usually more reliable, secure and spam-aware than the standard delivery method available to your blog.</p>
@@ -154,7 +105,7 @@ if (empty($controls->data['enabled']) && !empty($controls->data['host'])) {
                 <th>Authentication</th>
                 <td>
                     user: <?php $controls->text('user', 30); ?>
-                    password: <?php $controls->text('pass', 30); ?>
+                    password: <?php $controls->password('pass', 30); ?>
                     <p class="description">
                         If authentication is not required, leave "user" field blank.
                     </p>

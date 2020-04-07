@@ -124,10 +124,17 @@ if ($controls->is_action('test') || $controls->is_action('save') || $controls->i
     } else {
         $email['send_on'] = $controls->data['send_on'];
     }
-
+    
     // Reset and refill the options
-    $email['options'] = array();
-
+    // Try without the reset and let's see where the problems are
+    //$email['options'] = array();
+    
+    // Reset only specific keys
+    unset($email['options']['lists']);
+    unset($email['options']['lists_operator']);
+    unset($email['options']['lists_exclude']);
+    unset($email['options']['sex']);
+    
     foreach ($controls->data as $name => $value) {
         if (strpos($name, 'options_') === 0) {
             $email['options'][substr($name, 8)] = $value;
@@ -144,6 +151,10 @@ if ($controls->is_action('test') || $controls->is_action('save') || $controls->i
 
     if ($email['options']['wp_users'] == '1') {
         $query .= " and wp_user_id<>0";
+    }
+    
+    if (!empty($email['options']['language'])) {
+        $query .= " and language='" . esc_sql((string) $email['options']['language']) . "'";
     }
     
     
@@ -216,15 +227,18 @@ if ($controls->is_action('test') || $controls->is_action('save') || $controls->i
 }
 
 if ($controls->is_action('send') || $controls->is_action('schedule')) {
+    
+    NewsletterStatistics::instance()->reset_stats($email);
+    
     if ($email['subject'] == '') {
         $controls->errors = __('A subject is required to send', 'newsletter');
     } else {
         $wpdb->update(NEWSLETTER_EMAILS_TABLE, array('status' => 'sending'), array('id' => $email_id));
         $email['status'] = 'sending';
         if ($controls->is_action('send')) {
-	        $controls->messages = __( 'Now sending.', 'newsletter' );
+            $controls->messages = __( 'Now sending.', 'newsletter' );
         } else {
-	        $controls->messages = __( 'Scheduled.', 'newsletter' );
+            $controls->messages = __( 'Scheduled.', 'newsletter' );
         }
     }
 }
@@ -283,7 +297,7 @@ if ($email['status'] != 'sent') {
                         <?php } else { ?>
                         
                         <a class="button-primary" href="<?php echo $module->get_editor_url($email_id, $editor_type)?>">
-                                <i class="fa fa-edit"></i> <?php _e('Edit', 'newsletter') ?>
+                                <i class="fas fa-edit"></i> <?php _e('Edit', 'newsletter') ?>
                             </a>
 
                         <?php } ?>
@@ -373,6 +387,14 @@ if ($email['status'] != 'sent') {
                                 <?php $controls->select2('options_lists_exclude', $lists, null, true, null, __('None', 'newsletter')); ?>
                             </td>
                         </tr>
+                        
+                        <tr>
+                            <th><?php _e('Language', 'newsletter') ?></th>
+                            <td>
+                                <?php $controls->language('options_language'); ?>
+                            </td>
+                        </tr>
+                        
                         <tr>
                             <th><?php _e('Gender', 'newsletter') ?></th>
                             <td>

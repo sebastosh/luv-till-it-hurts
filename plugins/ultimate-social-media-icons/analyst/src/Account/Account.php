@@ -246,13 +246,8 @@ class Account implements TrackerContract
 		$question = isset($_POST['question']) ? stripslashes($_POST['question']) : null;
         $reason = isset($_POST['reason']) ? stripslashes($_POST['reason']) : null;
 
-		$response = DeactivateRequest::make($this->collector, $this->id, $this->path, $question, $reason)
+		DeactivateRequest::make($this->collector, $this->id, $this->path, $question, $reason)
 			->execute($this->requestor);
-
-		// Exit if request failed
-		if (!$response->isSuccess()) {
-			wp_send_json_error($response->body);
-		}
 
 		$this->setIsInstalled(false);
 
@@ -268,12 +263,7 @@ class Account implements TrackerContract
 	 */
 	public function onOptInListener()
 	{
-		$response = OptInRequest::make($this->collector, $this->id, $this->path)->execute($this->requestor);
-
-		// Exit if request failed
-		if (!$response->isSuccess()) {
-			wp_send_json_error($response->body);
-		}
+		OptInRequest::make($this->collector, $this->id, $this->path)->execute($this->requestor);
 
 		$this->setIsOptedIn(true);
 
@@ -289,12 +279,7 @@ class Account implements TrackerContract
 	 */
 	public function onOptOutListener()
 	{
-		$response = OptOutRequest::make($this->collector, $this->id, $this->path)->execute($this->requestor);
-
-		// Exit if request failed
-		if (!$response->isSuccess()) {
-			wp_send_json_error($response->body);
-		}
+		OptOutRequest::make($this->collector, $this->id, $this->path)->execute($this->requestor);
 
 		$this->setIsOptedIn(false);
 
@@ -318,12 +303,7 @@ class Account implements TrackerContract
 		$this->setIsInstallResolved(true);
 		$cache->delete('plugin_to_install');
 
-		$response = InstallRequest::make($this->collector, $this->id, $this->path)->execute($this->requestor);
-
-		// Exit if request failed
-		if (!$response->isSuccess()) {
-			wp_send_json_error($response->body);
-		}
+		InstallRequest::make($this->collector, $this->id, $this->path)->execute($this->requestor);
 
 		$this->setIsSigned(true);
 

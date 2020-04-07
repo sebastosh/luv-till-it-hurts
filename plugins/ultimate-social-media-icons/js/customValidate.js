@@ -36,16 +36,16 @@ function sfsi_validationStep2()
         }    
   }
   /* validate twitter about page */
-    if(sfsi_validator(SFSI('input[name="sfsi_twitter_aboutPage"]'),'activte') && sfsi_validator(SFSI('input[name="sfsi_twitter_aboutPage"]'),'checked'))
-  {
+  //   if(sfsi_validator(SFSI('input[name="sfsi_twitter_aboutPage"]'),'activte') && sfsi_validator(SFSI('input[name="sfsi_twitter_aboutPage"]'),'checked'))
+  // {
        
-        if(!sfsi_validator(SFSI('#sfsi_twitter_aboutPageText'),'blank'))
-        {   showErrorSuc("error","Error : Tweet about my page is blank ",2);
-            SFSI('#sfsi_twitter_aboutPageText').addClass('inputError');
+  //       // if(!sfsi_validator(SFSI('#sfsi_twitter_aboutPageText'),'blank'))
+  //       // {   showErrorSuc("error","Error : Tweet about my page is blank ",2);
+  //       //     SFSI('#sfsi_twitter_aboutPageText').addClass('inputError');
             
-            return false;
-        }    
-  }  
+  //       //     return false;
+  //       // }    
+  // }  
   
   /* twitter validation */
     if(sfsi_validator(SFSI('input[name="sfsi_twitter_page"]'),'activte') && sfsi_validator(SFSI('input[name="sfsi_twitter_page"]'),'checked'))

@@ -4,27 +4,27 @@
  */
 ?>
 <metaslider-toolbar inline-template>
-	<div id="ms-toolbar" class="flex flex-col items-center bg-white h-16 shadow-sm mb-12 lg:sticky z-999" :class="{'shadow-md':scrolling}">
-		<div class="container h-full">
-			<div class="flex items-center h-full -mx-6">
-				<div class="flex items-center h-full py-2 px-6">
-					<img style="height:2.3rem;width:2.3rem" width=40 height=40 class="mr-2" src="<?php echo METASLIDER_ADMIN_URL ?>images/metaslider_logo_large.png" alt="MetaSlider">
+	<div id="ms-toolbar" class="flex flex-col items-center bg-white h-16 shadow-sm lg:sticky z-999" :class="{'shadow-md':scrolling}">
+		<div class="container h-full px-6">
+			<div class="flex items-center h-full -mx-4">
+				<div class="flex items-center h-full py-2 px-4">
+					<img style="height:2.3rem;width:2.3rem" width=40 height=40 class="mr-2 rtl:mr-0 rtl:ml-2" src="<?php echo METASLIDER_ADMIN_URL ?>images/metaslider_logo_large.png" alt="MetaSlider">
 					<span class="text-2xl font-sans font-thin text-orange leading-none">
 						<span class="font-normal">Meta</span>Slider
-						<span class="block font-semibold text-sm font-mono text-grey tracking-tight">
-							v<?php echo metaslider_pro_is_active() ?  metaslider_pro_version() : $this->version; ?>
+						<span class="block font-semibold text-sm font-mono text-gray tracking-tight">
+							v<?php echo metaslider_pro_is_active() ?  metaslider_pro_version() . '<span class="ml-1">Premium</span>' : $this->version; ?>
 						</span>
 					</span>
 				</div>
 				<?php if ($this->slider) : ?>
-				<div class="flex-grow h-full px-6">
-					<div class="-mx-6 items-center flex h-full">
-						<div class="flex-grow px-6 py-4 h-full">
-							<!-- TODO: Add module to switch slideshows -->
-							<!-- <input data-lpignore="true" type="text" class="h-full w-full" /> -->
+				<div class="flex-grow h-full px-4">
+					<div class="-mx-4 items-center flex h-full">
+						<div class="flex items-center flex-grow px-4 h-full">
+							<?php $max_drawer = apply_filters('metaslider_max_slideshows_in_drawer', 25); ?>
+							<metaslider-switcher max="<?php echo $max_drawer; ?>"></metaslider-switcher>
 						</div>
-						<div class="px-6 h-full">
-							<div class="flex justify-end items-center h-full text-grey">
+						<div class="px-4 h-full">
+							<div class="flex justify-end items-center h-full text-gray">
 
 								<button @click.prevent="addSlide()" id="add-new-slide" class='ms-toolbar-button tipsy-tooltip-bottom-toolbar' title='<?php _e("Add a new slide", "ml-slider") ?>'>
 									<i>
@@ -33,7 +33,7 @@
 									<span><?php _e("Add Slide", "ml-slider") ?></span>
 								</button>
 
-								<button @click.prevent="preview()" id="preview-slideshow" title="<?php _e('Save & open preview', 'ml-slider'); ?> (ALT + P)" class="ms-toolbar-button tipsy-tooltip-bottom-toolbar" :class="{disabled: $parent.saving}">
+								<button @click.prevent="preview()" id="preview-slideshow" title="<?php echo htmlentities(__('Save & open preview', 'ml-slider')); ?><br><?php echo htmlentities(_x('(alt + p)', 'This is a keyboard shortcut.', 'ml-slider')); ?>" class="ms-toolbar-button tipsy-tooltip-bottom-toolbar" :class="{disabled: $parent.saving}">
 									<i>
 										<font-awesome-icon transform="grow-2" icon="eye"></font-awesome-icon>
 									</i>
@@ -79,8 +79,8 @@
 
 								<!-- TODO: Create a vue component -->
 								<!-- TODO: check what triggers id="ms-save" -->
-								<button @click.prevent="save()" title="<?php _e('Save slideshow', 'ml-slider'); ?>" id="ms-save" class="ms-toolbar-button tipsy-tooltip-bottom-toolbar" :class="{disabled: $parent.saving}">
-									<i v-if="$parent.saving">
+								<button @click.prevent="save()" title="<?php _e('Save slideshow', 'ml-slider'); ?>" id="ms-save" class="ms-toolbar-button tipsy-tooltip-bottom-toolbar" :class="{disabled: locked}">
+									<i v-if="locked">
 										<font-awesome-icon transform="grow-2" spin icon="spinner"></font-awesome-icon>
 									</i>
 									<i v-else>
@@ -97,3 +97,8 @@
 		</div>
 	</div>
 </metaslider-toolbar>
+<?php 
+if ($this->slider) {
+	$nav_opened = filter_var(get_user_option('metaslider_nav_drawer_opened'), FILTER_VALIDATE_BOOLEAN); ?>
+	<metaslider-drawer :open="<?php echo $nav_opened ? 'true' : 'false' ?>"></metaslider-drawer>
+<?php }

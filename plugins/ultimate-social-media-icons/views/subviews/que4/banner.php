@@ -130,7 +130,7 @@
 
     <?php } ?>
 
-    <div class="col-md-12 sf_si_default_design">
+    <div class="col-md-12 sf_si_default_design" style="display: flex;">
 
         <div class="col-md-4 zeropadding"><?php sfsi_banner_sub_section("A) More default design styles", $arrDefaultImages, "https://www.ultimatelysocial.com/extra-icon-styles/"); ?></div>
 

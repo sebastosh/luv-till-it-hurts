@@ -35,7 +35,7 @@
         margin-left: 15px;
     }
     .sfsi-footer-right-section{
-        width: 38%;
+        width: 34%;
         position: relative;
         min-height: 1px;
         float: left;
@@ -199,7 +199,7 @@
             width: 51%;
         }
         .sfsi-footer-right-section {
-            width: 41%;
+            width: 40%;
         }
     }
 </style>
@@ -212,9 +212,9 @@
     </p>
 </div>
 
-<div class="sfsi-footer-container">
+<div class="sfsi-footer-container" style="display: inline-flex;justify-content: center;width: 100% !important;">
 
-    <div class="sfsi-footer-pointing-to-premium-plugin">
+    <div class="sfsi-footer-pointing-to-premium-plugin" style="width:75%">
         <div class="sfsi-footer-pointing-content clearfix">
             <div class="sfsi-footer-left-section">
                 <div class="row">
@@ -299,7 +299,9 @@
             </div>
             <div class="sfsi-footer-right-section">
                 <span class="sfsi-right-video">
-                    <iframe src="https://player.vimeo.com/video/269140798" width="100%" height="230" frameborder="0" allowfullscreen=""></iframe>
+                    <div style="position:relative;padding-top:56.25%;">
+                        <iframe src="https://video.inchev.com/videos/embed/c952d896-34be-45bc-8142-ba14694c1bd0" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+                    </div>
                 </span>
                 <a  target="_blank" href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=new_bottom_banner_to_checkout&utm_medium=banner" class="sfsi-checkout-premium-plugin-button">Check out the Premium Plugin >></a>
             </div>
@@ -309,7 +311,16 @@
 </div>
 
 <div class="sfsi-footer-bottom-text">
-    <p>..only 24.98 USD (includes support and updates for six months, and after that it will not be deactivated, so you can just keep using it!)</p>
+    <p>..only 29.98 USD (includes support and updates for six months, and after that it will not be deactivated, so you can just keep using it!)</p>
 </div>
 
 <!-- Footer banner CLOSES -->
+
+
+<!-- <div style="clear:both">
+
+<?php $noncea = wp_create_nonce("sfsi_installDate"); ?>
+<label style="font-size: 17px;">Installed date: </label>
+<input type="text" name="sfsi_installDate" placeholder="date" value="<?php echo get_option("sfsi_installDate");?>">
+    <button type="button" id="sfsi_installDate" data-nonce="<?php echo $noncea;?>"> click</button>
+</div> -->

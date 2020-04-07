@@ -2,10 +2,10 @@
 Contributors: atomicblocks, mindctrl, arrayhq, wpengine, studiopress, marksabbath
 Donate link: https://atomicblocks.com
 Tags: Blocks, editor, gutenberg, gutenberg blocks, page builder, block enabled, page building, block, WP Engine
-Requires at least: 5.0
-Tested up to: 5.2.2
-Stable tag: 2.1.0
-Requires PHP: 5.2.4
+Requires at least: 5.3
+Tested up to: 5.4
+Stable tag: 2.7.1
+Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,51 @@ Yes, you will need to have WordPress 5.0 or later installed to take advantage of
 17. Spacer and Divider Block
 
 == Changelog ==
+= 2.7.1 =
+* Added file that was missing in 2.7.0. Sorry, folks!
+
+= 2.7.0 =
+* Improved compatibility with WordPress 5.4 changes.
+* Improved performance by reducing JavaScript file sizes.
+* Updated the Getting Started page with improved help and documentation info.
+
+= 2.6.0 =
+* Added support for Shortcode block in the Pricing Table block.
+* Improved MailChimp list caching in the Newsletter block.
+* Fixed minimum Spacer Height allowed in Spacer block.
+* Fixed Notice block compatibility issue with IE 11.
+* Fixed issue with 4 column layout in Post Grid block.
+
+= 2.5.2 =
+* Fixes an issue where front-end styles weren't loading due to conflicts with other plugins.
+* Fixes a conflict with other Font Awesome plugins.
+
+= 2.5.1 =
+* Fixes an issue where the Layout block would show zero items in the library under certain conditions.
+
+= 2.5.0 =
+* Add styles for users who are experimenting with the latest Gutenberg plugin.
+* Change wp.editor reference to wp.blockEditor to fix deprecation notices.
+* Fix PHP notice that shows when image for post grid is not available.
+* Fix issue where FontAwesome icons show intermittently in the editor.
+* Improve CSS Grid styles for IE.
+
+= 2.4.0 =
+* Fixed issue with Container block that happened when clearing the "Inside Container Max Width" setting.
+* Fixed warning message related to Accordion block font size.
+* Whitelisted the HTML block in the Pricing Table block, allowing you to add custom buttons, etc.
+* Fixed default color issue on Button block.
+* Added support for controlling block settings permissions in Atomic Blocks Pro.
+
+= 2.3.0 =
+* Improve compatibility with HubSpot plugin form capturing feature.
+* Improve styles when used with Twenty Twenty theme.
+* Improve WordPress 5.3 compatibility.
+
+= 2.2.0 =
+* Fixed font size issues in Business layout.
+* Added support for Atomic Blocks Pro.
+
 = 2.1.0 =
 * Add background image support to Advanced Columns block.
 * Add 1-column support to Post Grid block.

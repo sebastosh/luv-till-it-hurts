@@ -3,9 +3,9 @@ Contributors: matchalabs, DavidAnderson, dnutbourne, kbat82
 Tags: slideshow, slider, image slider, carousel, gallery, flexslider, wordpress slider, nivoslider, rotating banner, responsive slideshow, seo slideshow, unsplash
 Donate link: https://david.dw-perspective.org.uk/donate
 Requires at least: 3.5
-Stable tag: 3.14.0
+Stable tag: 3.16.1
 Requires PHP: 5.2
-Tested up to: 5.2
+Tested up to: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,6 +14,8 @@ Easy to use WordPress slider plugin. Create SEO-optimized responsive slideshows 
 == Description ==
 
 Create powerful, SEO-optimized slideshows in minutes with the world's #1 slider plugin!
+
+[vimeo https://vimeo.com/393891282]
 
 With WordPress’ most popular slider plugin, enhancing your blog or website couldn’t be easier: simply select images from your WordPress Media Library, drag and drop them into place, and then set the slide captions, links and SEO fields all from one page.
 
@@ -165,17 +167,65 @@ See https://www.metaslider.com/documentation/image-cropping/
 
 == Changelog ==
 
+= 3.16.1 - 2020/April/03 =
+
+* TWEAK: Updates the media_buttons_context hook to use media_buttons
+
+= 3.16.0 - 2020/Mar/25 =
+
+* FEATURE: Adds sorting options to the dropdown drawer module
+* TWEAK: Expand error handler attempt to catch errors from elsewhere
+* TWEAK: Expand search results from 15 to 25 and make that customizable
+* TWEAK: Adds a reactive title module
+* TWEAK: Updates to use WP style notifications and modals
+* TWEAK: Loads in recent slideshows and lets the user opt to load more
+* TWEAK: Switches anitmation to requestAnimationFrame for added performance
+* TWEAK: Separates settings saving logic from slides, and saves in chunks of 10 slides
+* TWEAK: Adds warning message to users that have a very low input var setting
+* TWEAK: Adds fallback for 404 routes to admin-ajax
+* TWEAK: Adds ability to use the JS dev build for debugging. Use SCRIPT_DEBUG to enable
+* FIX: Fixes issue where single quotes in settings input fields would cause a blank page
+* FIX: Removes unwanted side menu items on the media library view
+
+= 3.15.3 - 2019/Nov/28 =
+
+* FIX: Updates layout breaks in WP5.3
+
+= 3.15.2 - 2019/Nov/14 =
+
+* TWEAK: Adds loaded event that other plugins can wait for
+* TWEAK: Updates a few UI elements on the search bar and slideshow drawer
+* TWEAK: Adds better checks for error messages
+* FIX: Fixes an issue where cetain settings would show when not needed
+* FIX: Fixes a layout break in IE11
+* FIX: Addresses performance issues with a very large collection of slideshows
+
+= 3.15.1 - 2019/Oct/22 =
+
+* FIX: Adds better check for slide image thumbnails and count
+* FIX: Updates $ to jQuery on the admin settings screen
+
+= 3.15.0 - 2019/Oct/21 =
+
+* FEATURE: Adds a new way to navigate slideshows
+* TWEAK: Adds various accessibility enhancements to FlexSlider
+* TWEAK: Adds extra checks for REST enabled sites
+* TWEAK: Updates notices
+* FIX: Updates various RTL language styling issues
+* FIX: Fixes bug where new slides wouldn't crop until pressing save
+* FIX: Fixes various layout breaks from other languages
+
 = 3.14.0 - 2019/July/26 =
 
 * FEATURE: Adds ability to duplicate a slideshow
 * FEATURE: Adds toolbar with various utilities
 * FEATURE: Adds unified notification system
 * REFACTOR: Moves inline styles out of the body tag
-* REFACTOR: Refactors the preview module to be caled from anywhere
+* REFACTOR: Refactors the preview module to be called from anywhere
 * REFACTOR: Refactors the way slides and the slideshow saving works
 * REFACTOR: Refactors the shortcode copy module
 * REFACTOR: Adds helper functions to better manage the routes files
-* FIX: Fixes bug where adding a class name via Gutenberg crashes the block
+* FIX: Fixes a bug where adding a class name via Gutenberg crashes the block
 
 = 3.13.1 - 2019/May/11 =
 
@@ -784,4 +834,4 @@ More info/Comments: http://www.metaslider.com/coming-soon-meta-slider-2-6-free/
 * Initial version
 
 == Upgrade Notice ==
-* 3.14.0 : Update now to be able to duplicate your slideshow
+* 3.16.1 : Update now to address a warning being shown on the edit screen.

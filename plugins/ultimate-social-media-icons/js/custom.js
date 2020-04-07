@@ -301,7 +301,7 @@ SFSI(document).ready(function(s) {
         var s = parseInt(SFSI(".sfsi_wDiv").height()) + 15 + "px";
         SFSI(".sfsi_holders").each(function() {
             SFSI(this).css("height", s);
-			SFSI(".sfsi_widget").css("min-height", "auto");
+			SFSI(".sfsi_widget");
         });
     }, 200);
 });
@@ -321,7 +321,7 @@ function close_overlay(selector){
 function sfsi_wechat_share(url){
     if(jQuery('.sfsi_wechat_follow_overlay').length==0){
           jQuery('body').append("<div class='sfsi_wechat_follow_overlay sfsi_overlay show'><div class='sfsi_inner_display'><a class='close_btn' href='' onclick='event.preventDefault();close_overlay(\".sfsi_wechat_follow_overlay\")' >×</a><div style='width:95%;max-width:500px; min-height:80%;background-color:#fff;margin:0 auto;margin:10% auto;padding: 20px 0;'><div style='width:90%;margin: 0 auto;text-align:center'><div class='sfsi_wechat_qr_display' style='display:inline-block'></div></div><div style='width:80%;margin:10px auto 0 auto;text-align:center;font-weight:900;font-size:25px;'>\"Scan QR Code\" in WeChat and press ··· to share!</div></div></div>");
-          new QRCode(jQuery('.sfsi_wechat_follow_overlay .sfsi_wechat_qr_display')[0], window.location.href)
+          new QRCode(jQuery('.sfsi_wechat_follow_overlay .sfsi_wechat_qr_display')[0], encodeURI(decodeURI(window.location.href)))
           jQuery('.sfsi_wechat_follow_overlay .sfsi_wechat_qr_display img').attr('nopin','nopin')
       }else{
           jQuery('.sfsi_wechat_follow_overlay').removeClass('hide').addClass('show').show();
@@ -329,14 +329,14 @@ function sfsi_wechat_share(url){
 }
 function sfsi_mobile_wechat_share(url){
     if(jQuery('.sfsi_wechat_follow_overlay').length==0){
-        jQuery('body').append("<div class='sfsi_wechat_follow_overlay sfsi_overlay show'><div class='sfsi_inner_display'><a class='close_btn' href='' onclick=\"event.preventDefault();close_overlay(\'.sfsi_wechat_follow_overlay\')\" >×</a><div style='width:95%; min-height:80%;background-color:#fff;margin:0 auto;margin:30% auto;padding: 20px 0;'><div style='width:90%;margin: 0 auto;'><input type='text' value='"+window.location.href+"' style='width:100%;padding:7px 0;text-align:center' /></div><div style='width:80%;margin:10px auto 0 auto'><div  class='sfsi_upload_butt_container' ><button onclick='sfsi_copy_text_parent_input(event)' class='upload_butt' >Copy</button></div><div class='sfsi_upload_butt_container' ><a href='weixin://' class='upload_butt'>Open WeChat</a></div></div></div></div>");
+        jQuery('body').append("<div class='sfsi_wechat_follow_overlay sfsi_overlay show'><div class='sfsi_inner_display'><a class='close_btn' href='' onclick=\"event.preventDefault();close_overlay(\'.sfsi_wechat_follow_overlay\')\" >×</a><div style='width:95%; min-height:80%;background-color:#fff;margin:0 auto;margin:30% auto;padding: 20px 0;'><div style='width:90%;margin: 0 auto;'><input type='text' value='"+encodeURI(decodeURI(window.location.href))+"' style='width:100%;padding:7px 0;text-align:center' /></div><div style='width:80%;margin:10px auto 0 auto'><div  class='sfsi_upload_butt_container' ><button onclick='sfsi_copy_text_parent_input(event)' class='upload_butt' >Copy</button></div><div class='sfsi_upload_butt_container' ><a href='weixin://' class='upload_butt'>Open WeChat</a></div></div></div></div>");
     }else{
         jQuery('.sfsi_wechat_scan').removeClass('hide').addClass('show');
     }
 }
 function sfsi_copy_text_parent_input(event){
     var target = jQuery(event.target);
-    console.log(target);
+    // console.log(target);
     input_target= target.parent().parent().parent().find('input');
     input_target.select();
     document.execCommand('copy');
@@ -416,11 +416,81 @@ function sfsi_widget_set(){
             var title_hght = jQuery(this).parent(".widget.sfsi").children(".widget-title").height();
             var totl_hght = parseInt( title_hght ) + parseInt( wdgt_hght );
             jQuery(this).parent(".widget.sfsi").css("min-height", totl_hght+"px");
-            console.log('widget');
+            // console.log('widget');
         }
     });
 }
 
+function sfsi_pinterest_modal_images(event,url,title) {
+    console.log(event);
+    event && event.preventDefault();
+  var imgSrc = [];
+  var page_title;
+
+  page_title = SFSI('meta[property="og:title"]').attr('content');
+  if(undefined == page_title){
+    page_title = SFSI('head title').text();
+  }
+  if(undefined == title){
+    title = page_title;
+  }
+  if(undefined == url){
+    url = window.location.href;
+    // url = encodeURIComponent(window.location.href);
+  }
+  SFSI('body img').each(function (index) {
+    var src = SFSI(this).attr('src') || "";
+    var height = SFSI(this).height();
+    var width = SFSI(this).width();
+    var image_title = SFSI(this).attr('title') || "";
+    var alt = SFSI(this).attr('alt') || "";
+    var no_pin = SFSI(this).attr('data-pin-nopin') || "";
+    var no_pin_old = SFSI(this).attr('nopin') || "";
+
+    if (src !== "" && !src.startsWith("javascript") && height > 100 && width > 100 && no_pin_old !== "nopin" && no_pin !== "true") {
+      imgSrc.push({
+        src: src,
+        title: title && "" !== title ? title : (image_title && "" !== image_title ? image_title : alt)
+      });
+    }
+  });
+
+  sfsi_pinterest_modal();
+  console.log(imgSrc);
+  if(imgSrc.length==0){
+    var meta_img = SFSI('meta[property="og:image"]').attr('content');
+    if(undefined == meta_img){
+        meta_img ="";
+    }
+    SFSI('.sfsi_flex_container').append('<div><a href="http://www.pinterest.com/pin/create/button/?url=' + url + '&media=&description=' + encodeURIComponent(page_title).replace('+', '%20').replace("#", "%23") + '"><div style="width:140px;height:90px;display:inline-block;" ></div><span class="sfsi_pinterest_overlay"><img data-pin-nopin="true" height="30" width="30" src="' + window.sfsi_icon_ajax_object.plugin_url + '/images/pinterest.png" /></span></a></div>')
+  }else{
+
+      // console.log(imgSrc);
+      SFSI.each(imgSrc, function (index, val) {
+          // console.log('discrip',val);
+          SFSI('.sfsi_flex_container').append('<div><a href="http://www.pinterest.com/pin/create/button/?url=' + url + '&media=' + val.src + '&description=' + encodeURIComponent(val.title ? val.title : page_title).replace('+', '%20').replace("#", "%23") + '"><img style="display:inline"  data-pin-nopin="true" src="' + val.src + '"><span class="sfsi_pinterest_overlay" style="width:140px;left:unset;"><img data-pin-nopin="true" height="30" width="30" style="display:inline" src="' + window.sfsi_icon_ajax_object.plugin_url + '/images/pinterest.png" /></span></a></div>');
+      });
+    }
+    event.preventDefault();
+
+}
+
+function sfsi_pinterest_modal(imgs) {
+  // if (jQuery('.sfsi_premium_wechat_follow_overlay').length == 0) {
+  jQuery('body').append(
+    "<div class='sfsi_wechat_follow_overlay sfsi_overlay show'>" +
+    "<div class='sfsi_inner_display'>" +
+    '<a class="close_btn" href="" onclick="event.preventDefault();close_overlay(\'.sfsi_wechat_follow_overlay\')" >×</a>' +
+    "<div style='width:95%;max-width:500px; min-height:80%;background-color:#fff;margin:0 auto;margin:10% auto;padding: 20px 0;border-radius: 20px;'>" +
+    "<h4 style='margin-left:10px;'>Pin It on Pinterest</h4>" +
+    "<div class='sfsi_flex_container'>" +
+
+    "</div>" +
+    "</div>" +
+    "</div>" +
+    "</div>"
+  );
+}
 
 // should execute at last so that every function is acceable in body.
 var sfsi_functions_loaded =  new CustomEvent('sfsi_functions_loaded',{detail:{"abc":"def"}});

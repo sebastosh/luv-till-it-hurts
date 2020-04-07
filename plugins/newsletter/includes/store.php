@@ -1,5 +1,5 @@
 <?php
-if (!defined('ABSPATH')) exit;
+defined('ABSPATH') || exit;
 
 @require_once NEWSLETTER_INCLUDES_DIR . '/logger.php';
 
@@ -35,7 +35,7 @@ class NewsletterStore {
         global $wpdb;
         $field_name = (string)$field_name;
         if (preg_match('/^[a-zA-Z_]+$/', $field_name) == 0) {
-            $this->logger->error('Invalis field name: ' . $field_name);
+            $this->logger->fatal('Invalis field name: ' . $field_name);
             return false;
         }
         $id = (int)$id;
@@ -225,7 +225,7 @@ class NewsletterStore {
             $this->logger->error('Invalis field name: ' . $field_name);
             return false;
         }
-        $result = $wpdb->query($wpdb->prepare("update $table set $field=%s where id=%d", $value, $id));
+        $result = $wpdb->query($wpdb->prepare("update $table set $field=%s where id=%d limit 1", $value, $id));
 
         if ($wpdb->last_error) {
             $this->logger->error($wpdb->last_error);

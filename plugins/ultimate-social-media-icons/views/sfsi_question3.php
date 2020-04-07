@@ -1,7 +1,11 @@
 <?php
 
 $option9   = unserialize(get_option('sfsi_section9_options', false));
-
+$analyst_cache = unserialize(get_option("analyst_cache"));
+$sfsi_willshow_analyst_popup =false;
+if(!is_null($analyst_cache) && isset($analyst_cache["plugin_to_install"])){	
+	$sfsi_willshow_analyst_popup =true;
+}
 ?>
 
 <div class="tab9">
@@ -11,7 +15,7 @@ $option9   = unserialize(get_option('sfsi_section9_options', false));
 	<ul class="sfsi_icn_listing8">
 
 
-
+	<span id="sfsi_analyst_pop" style="display:none" data-status="<?php echo $sfsi_willshow_analyst_popup?"yes":"no"; ?>" ></span>
 
 	<p class="clear">Please select one or multiple placement options: </p>
 
@@ -42,6 +46,7 @@ $option9   = unserialize(get_option('sfsi_section9_options', false));
 		<?php @include(SFSI_DOCROOT . '/views/subviews/que3/sfsi_que3_place_via_after_posts.php'); ?>
 
 		<!--**********************  Show pinterest over image hover  post****************************************-->
+		
 
 		<li class="sfsi_show_via_onhover disabled_checkbox">
 
@@ -71,6 +76,40 @@ $option9   = unserialize(get_option('sfsi_section9_options', false));
 
 		</li>
 
+		<?php
+		$sfsi_woocommerce_path = "woocommerce/woocommerce.php";
+		if(is_plugin_active($sfsi_woocommerce_path)){
+		?>
+		<li class="sfsi_show_via_onhover disabled_checkbox">
+
+
+
+			<div class="radio_section tb_4_ck">
+
+				<span class="checkbox" style="background-position:0px 0px!important;width:31px"></span>
+
+				<input name="" type="checkbox" disable value="" class="hide" style="display:none;" /></div>
+
+
+
+			<div class="sfsi_right_info sfsi_Woocommerce_disable">
+
+
+
+				<p style="display:block">
+
+					<span class="sfsi_toglepstpgspn" style="display:inline-block;float:left;">On your Woocommerce product pages </span>- <span><a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=woocomerce_placement&utm_medium=link" target="_blank" style="font-weight:800">Premium feature</a></span>
+
+				</p>
+
+
+
+			</div>
+
+		</li>
+		<?php
+		}
+		?>
 	</ul>
 
 

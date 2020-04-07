@@ -98,40 +98,114 @@ if (!isset($option6['sfsi_rectfbshare'])) {
   <div class="tab6">
     <ul class="sfsi_icn_listing8">
 
-      <li class="sfsibeforeafterpostselector">
+      <li class="sfsibeforeafterpostselector" style="max-width: none">
         <div class="radio_section tb_4_ck"></div>
         <div class="sfsi_right_info">
           <ul class="sfsi_tab_3_icns sfsi_shwthmbfraftr" style="margin:0">
-            <li onclick="sfsi_togglbtmsection('sfsi_toggleonlystndrshrng, .sfsi_responsive_hide', 'sfsi_toggleonlyrspvshrng, .sfsi_responsive_show', this);" class="clckbltglcls sfsi_border_left_0">
-              <input name="sfsi_display_button_type" <?php echo ($option6['sfsi_display_button_type'] == 'standard_buttons') ?  'checked="true"' : ''; ?> type="radio" value="standard_buttons" class="styled" />
-              <label class="labelhdng4">
-                Original icons
-              </label>
-            </li>
-            <li onclick="sfsi_togglbtmsection('sfsi_toggleonlyrspvshrng, .sfsi_responsive_show', 'sfsi_toggleonlystndrshrng, .sfsi_responsive_hide', this);" class="clckbltglcls sfsi_border_left_0">
+            <li onclick="sfsi_togglbtmsection('sfsi_toggleonlyrspvshrng, .sfsi_responsive_show', 'sfsi_toggleonlystndrshrng, .sfsi_responsive_hide', this);sfsi_responsive_icon_show_responsive_options();" class="clckbltglcls sfsi_border_left_0" style="width:29%!important">
               <input name="sfsi_display_button_type" <?php echo ($option6['sfsi_display_button_type'] == 'responsive_button') ?  'checked="true"' : ''; ?> type="radio" value="responsive_button" class="styled" />
-              <label class="labelhdng4">
+              <label class="labelhdng4" style="margin-top:2px">
                 Responsive icons
               </label>
             </li>
-            <li class="clckbltglcls sfsi_border_left_0 sfsi_disable_radio" style="width: 43% !important">
+            <li onclick="sfsi_togglbtmsection('sfsi_toggleonlystndrshrng, .sfsi_responsive_hide', 'sfsi_toggleonlyrspvshrng, .sfsi_responsive_show', this);" class="clckbltglcls sfsi_border_left_0" style="width:29%!important">
+              <input name="sfsi_display_button_type" <?php echo ($option6['sfsi_display_button_type'] == 'standard_buttons') ?  'checked="true"' : ''; ?> type="radio" value="standard_buttons" class="styled" />
+              <label class="labelhdng4" style="margin-top:2px">
+                Original icons
+              </label>
+            </li>
+            <li class="clckbltglcls sfsi_border_left_0 sfsi_disable_radio" style="width: 42% !important">
               <input type="radio" class="styled" />
-              <label class="labelhdng4">
+              <label class="labelhdng4"  style="margin-top:2px" >
                 Display the icons I selected above
               </label>
             </li>
-            <p class="clear sfsi_border_left_0" style="margin-left: 40px;width: 80%;width:calc( 100% - 102px );font-family: helveticaregular;font-size: 18px;color: #5c6267;margin: 10px 27px;margin-bottom: 18px;">Greyed-out options are available only in the <a class="pop-up" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" class="sfisi_font_bold" style="border-bottom: 1px solid #12a252;color: #12a252 !important;cursor:pointer;" target="_blank">Premium Plugin</a></p>
+            <p class="clear sfsi_border_left_0" style="width: 80%;width:calc( 100% - 102px );font-family:helveticaneue-light;font-size: 18px;color: #5a6570!important;margin: 10px 27px;margin-bottom: 0!important;margin-left:22px!important;padding-left: 0!important">Greyed-out options are available only in the <a class="pop-up" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" class="sfisi_font_bold" style="border-bottom: 1px solid #12a252;color: #12a252 !important;cursor:pointer;font-size:18px;" target="_blank">Premium Plugin</a></p>
+            <?php $display = ($option6['sfsi_display_button_type'] == 'responsive_button') ? "display:block;border-left:0!important":"display:none;border-left:0!important"; ?>
+            <li class="sfsi_toggleonlyrspvshrng" style="margin-left:20px;<?php echo $display; ?>">
+              <label style="width: 80%;width:calc( 100% - 102px );font-family: helveticaneue-light;font-size: 18px;color: #5a6570;margin: 10px 0px;margin-top:-15px!important; padding-top:0!important">These
+                are responsive & independent from the icons you selected elsewhere in the plugin.
+                Preview:</label>
+              <div style="width: 80%; margin-left:5px;  width:calc( 100% - 102px );">
+                <div class="sfsi_responsive_icon_preview" style="width:calc( 100% - 50px );margin-left:-15px">
 
+                  <?php echo sfsi_social_responsive_buttons(null, $option6, true); ?>
+                </div> <!-- end sfsi_responsive_icon_preview -->
+              </div>
+              <ul>
+                <li class="sfsi_responsive_default_icon_container sfsi_border_left_0 " style="margin: 10px 0px">
+                  <label class="heading-label select-icons">
+                    Select Icons
+                  </label>
+                </li>
+                <?php foreach ($sfsi_responsive_icons['default_icons'] as $icon => $icon_config) :
+                  ?>
+                  <li class="sfsi_responsive_default_icon_container sfsi_vertical_center sfsi_border_left_0">
+                    <div class="radio_section tb_4_ck">
+                      <input name="sfsi_responsive_<?php echo $icon; ?>_display" <?php echo ($icon_config['active'] == 'yes') ?  'checked="true"' : ''; ?> id="sfsi_responsive_<?php echo $icon; ?>_display" type="checkbox" value="yes" class="styled" data-icon="<?php echo $icon; ?>" />
+                    </div>
+                    <span class="sfsi_icon_container">
+                      <div class="sfsi_responsive_icon_item_container sfsi_responsive_icon_<?php echo strtolower($icon); ?>_container" style="word-break:break-all;padding-left:0">
+                        <div style="display: inline-block;height: 40px;width: 40px;text-align: center;vertical-align: middle!important;float: left;">
+                          <img style="float:none" src="<?php echo SFSI_PLUGURL; ?>images/responsive-icon/<?php echo $icon; ?><?php echo 'Follow' === $icon ? '.png' : '.svg'; ?>">
+                        </div>
+                        <span> <?php echo $icon_config["text"];  ?> </span>
+                      </div>
+                    </span>
+                    <input type="text" class="sfsi_responsive_input" name="sfsi_responsive_<?php echo $icon ?>_input" value="<?php echo $icon_config["text"]; ?>" />
+                    <a href="#" class="sfsi_responsive_default_url_toggler" style="text-decoration: none;">Define URL*</a>
+                    <input style="display:none" class="sfsi_responsive_url_input" type="text" placeholder="Enter url" name="sfsi_responsive_<?php echo $icon ?>_url_input" value="<?php echo $icon_config["url"]; ?>" />
+                    <a href="#" class="sfsi_responsive_default_url_hide" style="display:none"><span class="sfsi_cancel_text">Cancel</span><span class="sfsi_cancel_icon">&times;</span></a>
+                  </li>
+
+                <?php endforeach; ?>
+              </ul>
+              &nbsp;
+              <p style="font-size:16px !important;padding-top: 0px;">
+                <span>* All icons have «sharing» feature enabled by default. If you want to give them a
+                  different function (e.g link to your Facebook page) then please click on «Define
+                  url» next to the icon.</span>
+              </p>
+              <?php if ($option6['sfsi_show_premium_placement_box'] == 'yes') { ?>
+                <div class="sfsi_new_prmium_follw" style="width: 91%;">
+                  <p style="font-size:20px !important">
+                    <b>New: </b>In the Premium Plugin, we also added: Pinterest, Linkedin, WhatsApp, VK,
+                    OK, Telegram, Weibo, WeChat, Xing and the option to add custom icons. There are more placement options too, e.g.
+                    place the responsive icons before/after posts/pages, show them only on
+                    desktop/mobile, insert them manually (via shortcode).<a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=responsive_icons&utm_medium=banner" class="sfsi_font_inherit" target="_blank"> See all features</a>
+                  </p>
+                </div>
+              <?php } ?>
+
+              <div class="options">
+                <label class="heading-label" style="width:auto!important;margin-top: 11px;margin-right: 11px;">
+                  <b>So: do you want to display those at the end of every post?</b>
+                </label>
+                <ul style="display:flex">
+                  <li style="min-width: 200px">
+                    <input name="sfsi_responsive_icons_end_post" <?php echo ($option6['sfsi_responsive_icons_end_post'] == 'yes') ?  'checked="true"' : ''; ?> type="radio" value="yes" class="styled" />
+                    <label class="labelhdng4" style="width: auto;">
+                      Yes
+                    </label>
+                  </li>
+                  <li>
+                    <input name="sfsi_responsive_icons_end_post" <?php echo ($option6['sfsi_responsive_icons_end_post'] == 'no') ?  'checked="true"' : ''; ?> type="radio" value="no" class="styled" />
+                    <label class="labelhdng4" style="width: auto;">
+                      No
+                    </label>
+                  </li>
+              </div>
+            </li>
             <?php if ($option6['sfsi_display_button_type'] == 'standard_buttons') : $display = "display:block";
             else :  $display = "display:none";
             endif; ?>
-            <li class="sfsi_toggleonlystndrshrng" style="<?php echo $display; ?>">
+            <li class="sfsi_toggleonlystndrshrng" style="margin-left:20px;<?php echo $display; ?>">
               <div class="radiodisplaysection" style="<?php echo $display; ?>">
 
 
 
                 <!-- icons example  section -->
-                <div class="social_icon_like1 cstmdsplyulwpr sfsi_center">
+                <div class="social_icon_like1 cstmdsplyulwpr">
 
                   <ul>
                     <li>
@@ -191,8 +265,8 @@ if (!isset($option6['sfsi_rectfbshare'])) {
                   <li></li>
                 </ul>
                 <?php if ($option6['sfsi_show_premium_placement_box'] == 'yes') { ?>
-                  <p class="sfsi_prem_plu_desc ">
-                    <b>New: </b>We also added a Linkedin share-icon in the Premium Plugin. <a class="pop-up" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" class="sfisi_font_bold" style="border-bottom: 1px solid #12a252;color: #12a252 !important;cursor:pointer;" target="_blank">Go premium now</a><a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usm_settings_page&utm_campaign=linkedin_icon&utm_medium=banner" class="sfsi_font_inherit" style="color: #12a252 !important" target="_blank"> or
+                  <p class="sfsi_prem_plu_desc " style="float:left">
+                    <b>New: </b>We also added a Linkedin share-icon in the Premium Plugin. <a class="pop-up" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" class="sfisi_font_bold" style="border-bottom: 1px solid #12a252;color: #12a252 !important;cursor:pointer;font-size:18px;" target="_blank">Go premium now</a><a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usm_settings_page&utm_campaign=linkedin_icon&utm_medium=banner" class="sfsi_font_inherit" style="color: #12a252 !important" target="_blank"> or
                       learn more</a>
                   </p>
                 <?php } ?>
@@ -272,87 +346,10 @@ if (!isset($option6['sfsi_rectfbshare'])) {
                 </div>
               </div>
             </li>
-            <?php if ($option6['sfsi_display_button_type'] == 'responsive_button') : $display = "display:block";
-            else :  $display = "display:none";
-            endif; ?>
-            <li class="sfsi_toggleonlyrspvshrng" style="<?php echo $display; ?>">
-              <label style="width: 80%;width:calc( 100% - 102px );font-family: helveticaregular;font-size: 18px;color: #5c6267;margin: 10px 0px;">These
-                are responsive & independent from the icons you selected elsewhere in the plugin.
-                Preview:</label>
-              <div style="width: 80%; margin-left:5px;  width:calc( 100% - 102px );">
-                <div class="sfsi_responsive_icon_preview" style="width:calc( 100% - 50px )">
-
-                  <?php echo sfsi_social_responsive_buttons(null, $option6, true); ?>
-                </div> <!-- end sfsi_responsive_icon_preview -->
-              </div>
-              <ul>
-                <li class="sfsi_responsive_default_icon_container sfsi_border_left_0 " style="margin: 10px 0px">
-                  <label class="heading-label select-icons">
-                    Select Icons
-                  </label>
-                </li>
-                <?php foreach ($sfsi_responsive_icons['default_icons'] as $icon => $icon_config) :
-                  ?>
-                  <li class="sfsi_responsive_default_icon_container sfsi_vertical_center sfsi_border_left_0">
-                    <div class="radio_section tb_4_ck">
-                      <input name="sfsi_responsive_<?php echo $icon; ?>_display" <?php echo ($icon_config['active'] == 'yes') ?  'checked="true"' : ''; ?> id="sfsi_responsive_<?php echo $icon; ?>_display" type="checkbox" value="yes" class="styled" data-icon="<?php echo $icon; ?>" />
-                    </div>
-                    <span class="sfsi_icon_container">
-                      <div class="sfsi_responsive_icon_item_container sfsi_responsive_icon_<?php echo strtolower($icon); ?>_container" style="word-break:break-all;padding-left:0">
-                        <div style="display: inline-block;height: 40px;width: 40px;text-align: center;vertical-align: middle!important;float: left;">
-                          <img style="float:none" src="<?php echo SFSI_PLUGURL; ?>images/responsive-icon/<?php echo $icon; ?><?php echo 'Follow' === $icon ? '.png' : '.svg'; ?>">
-                        </div>
-                        <span> <?php echo $icon_config["text"];  ?> </span>
-                      </div>
-                    </span>
-                    <input type="text" class="sfsi_responsive_input" name="sfsi_responsive_<?php echo $icon ?>_input" value="<?php echo $icon_config["text"]; ?>" />
-                    <a href="#" class="sfsi_responsive_default_url_toggler" style="text-decoration: none;">Define URL*</a>
-                    <input style="display:none" class="sfsi_responsive_url_input" type="text" placeholder="Enter url" name="sfsi_responsive_<?php echo $icon ?>_url_input" value="<?php echo $icon_config["url"]; ?>" />
-                    <a href="#" class="sfsi_responsive_default_url_hide" style="display:none"><span class="sfsi_cancel_text">Cancel</span><span class="sfsi_cancel_icon">&times;</span></a>
-                  </li>
-
-                <?php endforeach; ?>
-              </ul>
-              &nbsp;
-              <p style="font-size:16px !important;padding-top: 0px;">
-                <span>* All icons have «sharing» feature enabled by default. If you want to give them a
-                  different function (e.g link to your Facebook page) then please click on «Define
-                  url» next to the icon.</span>
-              </p>
-              <?php if ($option6['sfsi_show_premium_placement_box'] == 'yes') { ?>
-                <div class="sfsi_new_prmium_follw" style="width: 91%;">
-                  <p style="font-size:20px !important">
-                    <b>New: </b>In the Premium Plugin, we also added: Pinterest, Linkedin, WhatsApp, VK,
-                    OK, Telegram, Weibo, WeChat, Xing and the option to add custom icons. There are more
-                    important options to add custom icons. There are more placement options too, e.g.
-                    place the responsive icons before/after posts/pages, show them only on
-                    desktop/mobile, insert them manually (via shortcode).<a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=responsive_icons&utm_medium=banner" class="sfsi_font_inherit" target="_blank"> See all features</a>
-                  </p>
-                </div>
-              <?php } ?>
-
-              <div class="options">
-                <label class="heading-label" style="width:auto!important;margin-top: 11px;margin-right: 11px;">
-                  <b>So: do you want to display those at the end of every post?</b>
-                </label>
-                <ul style="display:flex">
-                  <li style="min-width: 200px">
-                    <input name="sfsi_responsive_icons_end_post" <?php echo ($option6['sfsi_responsive_icons_end_post'] == 'yes') ?  'checked="true"' : ''; ?> type="radio" value="yes" class="styled" />
-                    <label class="labelhdng4" style="width: auto;">
-                      Yes
-                    </label>
-                  </li>
-                  <li>
-                    <input name="sfsi_responsive_icons_end_post" <?php echo ($option6['sfsi_responsive_icons_end_post'] == 'no') ?  'checked="true"' : ''; ?> type="radio" value="no" class="styled" />
-                    <label class="labelhdng4" style="width: auto;">
-                      No
-                    </label>
-                  </li>
-              </div>
-            </li>
-
+            
+            <?php $display2 = ($option6['sfsi_display_button_type'] == 'responsive_button' && $option6['sfsi_responsive_icons_end_post'] == 'yes' ) ? "display:block;border-left:0!important":"display:none;border-left:0!important"; ?>
             <!-- sfsi_responsive_icons_end_post -->
-            <li class="sfsi_responsive_icon_option_li sfsi_responsive_show " style="<?php echo ($option6['sfsi_responsive_icons_end_post'] == 'yes') ? 'display:block' : 'display:none' ?>">
+            <li class="sfsi_responsive_icon_option_li sfsi_responsive_show " style="margin-left:20px;border-left:0;<?php echo $display2 ?>">
               <label class="options heading-label" style="margin: 0px 0px 12px 0px;">
                 Design options
               </label>
@@ -459,6 +456,22 @@ if (!isset($option6['sfsi_rectfbshare'])) {
                 </div>
               </div>
 
+              <div class="options sfsi_margin_top_0 sfsi_inputSec">
+                <label class="first">
+                  Margins:
+                </label>
+                <div class="field" style="float: none;">
+                <span class="span_before_input" style="width: 120px;">Above Icon</span>
+                  <input type="number" value="<?php echo isset($sfsi_responsive_icons["settings"]) && isset($sfsi_responsive_icons["settings"]["margin_above"]) ? $sfsi_responsive_icons["settings"]["margin_above"] : 0;  ?>" name="sfsi_responsive_icons_settings_margin_above" style="float:none" />
+                  <span class="span_after_input">px</span>
+                </div>
+                <div class="field" style="float: none;">
+                <span class="span_before_input" style="width: 120px;">Below Icon</span>
+                  <input type="number" value="<?php echo isset($sfsi_responsive_icons["settings"]) && isset($sfsi_responsive_icons["settings"]["margin_below"]) ? $sfsi_responsive_icons["settings"]["margin_below"] : 0;  ?>" name="sfsi_responsive_icons_settings_margin_below" style="float:none" />
+                  <span class="span_after_input">px</span>
+                </div>
+              </div>
+
               <div class="options sfsi_margin_top_0">
                 <label class="first">
                   Text on icons:
@@ -477,7 +490,7 @@ if (!isset($option6['sfsi_rectfbshare'])) {
                 </div>
               </div>
             </li>
-            <li class="sfsi_responsive_icon_option_li sfsi_responsive_show" style="<?php echo $display; ?>">
+            <li class="sfsi_responsive_icon_option_li sfsi_responsive_show" style="margin-left:20px;border-left:0;<?php echo $display; ?>">
               <label class=" options heading-label">
                 Share count
               </label>

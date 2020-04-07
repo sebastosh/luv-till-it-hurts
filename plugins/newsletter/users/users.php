@@ -2,8 +2,6 @@
 
 defined('ABSPATH') || exit;
 
-require_once NEWSLETTER_INCLUDES_DIR . '/module.php';
-
 class NewsletterUsers extends NewsletterModule {
 
     static $instance;
@@ -20,10 +18,6 @@ class NewsletterUsers extends NewsletterModule {
 
     function __construct() {
         parent::__construct('users', '1.3.0');
-        add_action('init', array($this, 'hook_init'));
-    }
-
-    function hook_init() {
         if (is_admin()) {
             add_action('wp_ajax_newsletter_users_export', array($this, 'hook_wp_ajax_newsletter_users_export'));
         }
@@ -193,6 +187,13 @@ class NewsletterUsers extends NewsletterModule {
         $text = str_replace("\n", ' ', $text);
         $text = str_replace("\r", ' ', $text);
         $text = str_replace(";", ' ', $text);
+        
+        // Do you wonder? Excel...
+        $first = substr($text, 0, 1);
+        if ($first == '=' || $first == '+' || $first == '-' || $first == '@')
+        {
+            $text = "'" . $text;
+        }
         return $text;
     }
 

@@ -4,6 +4,7 @@ function theme_back_enqueue_script()
 {
 	if (isset($_GET['page'])) {
 		if ($_GET['page'] == 'sfsi-options') {
+			wp_enqueue_style("SFSIbootstrap", SFSI_PLUGURL . 'css/bootstrap.min.css');
 			wp_enqueue_style("SFSImainAdminCss", SFSI_PLUGURL . 'css/sfsi-admin-style.css');
 			/* include CSS for backend  */
 			wp_enqueue_style('thickbox');
@@ -12,6 +13,7 @@ function theme_back_enqueue_script()
 			wp_enqueue_style("wp-color-picker");
 		}
 	}
+	wp_enqueue_style("SFSImainAdminCommonCss", SFSI_PLUGURL . 'css/sfsi-admin-common-style.css');
 
 	//including floating option css
 	$option9 =  unserialize(get_option('sfsi_section9_options', false));

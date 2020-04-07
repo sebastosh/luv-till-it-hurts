@@ -3,7 +3,6 @@
  */
 
 // Import block dependencies and components
-import classnames from 'classnames';
 import Inspector from './components/inspector';
 import Container from './components/container';
 
@@ -24,156 +23,84 @@ const { Component } = wp.element;
 const { registerBlockType } = wp.blocks;
 
 // Register editor components
-const {
-	AlignmentToolbar,
-	BlockControls,
-	BlockAlignmentToolbar,
-	MediaUpload,
-	RichText,
-	InnerBlocks
-} = wp.editor;
-
-// Register components
-const {
-	Button,
-	withFallbackStyles,
-	IconButton,
-	Dashicon,
-	withState,
-	Toolbar
-} = wp.components;
+const { BlockControls, BlockAlignmentToolbar, InnerBlocks } = wp.blockEditor;
 
 const blockAttributes = {
 	containerPaddingTop: {
-		type: 'number'
+		type: 'number',
 	},
 	containerPaddingRight: {
-		type: 'number'
+		type: 'number',
 	},
 	containerPaddingBottom: {
-		type: 'number'
+		type: 'number',
 	},
 	containerPaddingLeft: {
-		type: 'number'
+		type: 'number',
 	},
 	containerMarginTop: {
-		type: 'number'
+		type: 'number',
 	},
 	containerMarginBottom: {
-		type: 'number'
+		type: 'number',
 	},
 	containerWidth: {
-		type: 'string'
+		type: 'string',
 	},
 	containerMaxWidth: {
 		type: 'number',
-		default: 1600
 	},
 	containerBackgroundColor: {
-		type: 'string'
+		type: 'string',
 	},
 	containerImgURL: {
 		type: 'string',
 		source: 'attribute',
 		attribute: 'src',
-		selector: 'img'
+		selector: 'img',
 	},
 	containerImgID: {
-		type: 'number'
+		type: 'number',
 	},
 	containerImgAlt: {
 		type: 'string',
 		source: 'attribute',
 		attribute: 'alt',
-		selector: 'img'
+		selector: 'img',
 	},
 	containerDimRatio: {
 		type: 'number',
-		default: 50
-	}
+		default: 50,
+	},
 };
 
 class ABContainerBlock extends Component {
-
 	render() {
-
 		// Setup the attributes
 		const {
-			attributes: {
-				containerPaddingTop,
-				containerPaddingRight,
-				containerPaddingBottom,
-				containerPaddingLeft,
-				containerMarginTop,
-				containerMarginBottom,
-				containerWidth,
-				containerMaxWidth,
-				containerBackgroundColor,
-				containerImgURL,
-				containerImgID,
-				containerImgAlt,
-				containerDimRatio
-			},
-			attributes,
-			isSelected,
-			editable,
-			className,
-			setAttributes
+			attributes: { containerWidth },
+			setAttributes,
 		} = this.props;
 
-		const onSelectImage = img => {
-			setAttributes({
-				containerImgID: img.id,
-				containerImgURL: img.url,
-				containerImgAlt: img.alt
-			});
-		};
-
 		return [
-
 			// Show the alignment toolbar on focus
-			<BlockControls>
+			<BlockControls key={ 'ab-container-block-controls-' + this.props.clientId } >
 				<BlockAlignmentToolbar
 					value={ containerWidth }
-					onChange={ containerWidth => setAttributes({ containerWidth }) }
+					onChange={ ( containerWidth ) =>
+						setAttributes( { containerWidth } )
+					}
 					controls={ [ 'center', 'full' ] }
 				/>
 			</BlockControls>,
 
 			// Show the block controls on focus
-			<Inspector
-				{ ...{ setAttributes, ...this.props } }
-			/>,
+			<Inspector key={ 'ab-container-inspector-' + this.props.clientId } { ...{ setAttributes, ...this.props } } />,
 
 			// Show the container markup in the editor
-			<Container { ...this.props }>
-				<div className="ab-container-inside">
-					{ containerImgURL && !! containerImgURL.length && (
-						<div className="ab-container-image-wrap">
-							<img
-								className={ classnames(
-									'ab-container-image',
-									dimRatioToClass( containerDimRatio ),
-									{
-										'has-background-dim': 0 !== containerDimRatio
-									}
-								) }
-								src={ containerImgURL }
-								alt={ containerImgAlt }
-							/>
-						</div>
-					) }
-
-					<div
-						className="ab-container-content"
-						style={ {
-							maxWidth: `${containerMaxWidth}px`
-						} }
-					>
-						<InnerBlocks />
-					</div>
-				</div>
-			</Container>
+			<Container key={ 'ab-container-' + this.props.clientId } { ...this.props }>
+				<InnerBlocks />
+			</Container>,
 		];
 	}
 }
@@ -181,19 +108,35 @@ class ABContainerBlock extends Component {
 // Register the block
 registerBlockType( 'atomic-blocks/ab-container', {
 	title: __( 'AB Container', 'atomic-blocks' ),
-	description: __( 'Add a container block to wrap several blocks in a parent container.', 'atomic-blocks' ),
+	description: __(
+		'Add a container block to wrap several blocks in a parent container.',
+		'atomic-blocks'
+	),
 	icon: 'editor-table',
 	category: 'atomic-blocks',
 	keywords: [
 		__( 'container', 'atomic-blocks' ),
 		__( 'section', 'atomic-blocks' ),
-		__( 'atomic', 'atomic-blocks' )
+		__( 'atomic', 'atomic-blocks' ),
 	],
 
 	attributes: blockAttributes,
 
-	getEditWrapperProps({ containerWidth }) {
-		if ( 'left' === containerWidth || 'right' === containerWidth || 'full' === containerWidth ) {
+	ab_settings_data: {
+		ab_container_containerOptions: {
+			title: __( 'Container Options', 'atomic-blocks' ),
+		},
+		ab_container_backgroundOptions: {
+			title: __( 'Background Options', 'atomic-blocks' ),
+		},
+	},
+
+	getEditWrapperProps( { containerWidth } ) {
+		if (
+			'left' === containerWidth ||
+			'right' === containerWidth ||
+			'full' === containerWidth
+		) {
 			return { 'data-align': containerWidth };
 		}
 	},
@@ -202,70 +145,14 @@ registerBlockType( 'atomic-blocks/ab-container', {
 	edit: ABContainerBlock,
 
 	// Save the attributes and markup
-	save: function( props ) {
-
-		// Setup the attributes
-		const {
-			containerPaddingTop,
-			containerPaddingRight,
-			containerPaddingBottom,
-			containerPaddingLeft,
-			containerMarginTop,
-			containerMarginBottom,
-			containerWidth,
-			containerMaxWidth,
-			containerBackgroundColor,
-			containerImgURL,
-			containerImgID,
-			containerImgAlt,
-			containerDimRatio
-		} = props.attributes;
-
+	save( props ) {
 		// Save the block markup for the front end
 		return (
 			<Container { ...props }>
-				<div className="ab-container-inside">
-					{ containerImgURL && !! containerImgURL.length && (
-						<div className="ab-container-image-wrap">
-							<img
-								className={ classnames(
-									'ab-container-image',
-									dimRatioToClass( containerDimRatio ),
-									{
-										'has-background-dim': 0 !== containerDimRatio
-									}
-								) }
-								src={ containerImgURL }
-								alt={ containerImgAlt }
-							/>
-						</div>
-					) }
-
-					<div
-						className="ab-container-content"
-						style={ {
-							maxWidth: `${containerMaxWidth}px`
-						} }
-					>
-						<InnerBlocks.Content />
-					</div>
-				</div>
+				<InnerBlocks.Content />
 			</Container>
 		);
 	},
 
-	deprecated: deprecated
-
-});
-
-function dimRatioToClass( ratio ) {
-	return ( 0 === ratio || 50 === ratio ) ?
-		null :
-		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
-}
-
-function backgroundImageStyles( url ) {
-	return url ?
-		{ backgroundImage: `url(${ url })` } :
-		undefined;
-}
+	deprecated,
+} );

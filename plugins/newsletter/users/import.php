@@ -25,7 +25,7 @@ if ($controls->is_action('import')) {
     }
 
     // Set the selected preferences inside the
-    if (!is_array($controls->data['preferences']))
+    if (!isset($controls->data['preferences']) || !is_array($controls->data['preferences']))
         $controls->data['preferences'] = array();
 
 //    if ($options['followup'] == 'activate') {

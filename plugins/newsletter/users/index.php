@@ -99,7 +99,7 @@ if ($controls->is_action('search')) {
 }
 
 // Eventually fix the page
-if ($controls->data['search_page'] < 0)
+if (!isset($controls->data['search_page']) || $controls->data['search_page'] < 0)
     $controls->data['search_page'] = 0;
 if ($controls->data['search_page'] > $last_page)
     $controls->data['search_page'] = $last_page;
@@ -236,7 +236,6 @@ $controls->data['search_page'] ++;
 
                 <?php $controls->button('first', '«'); ?>
                 <?php $controls->button('prev', '‹'); ?>
-                <?php $controls->text('search_page', 3); ?> of <?php echo $last_page + 1 ?> <?php $controls->button('go', __('Go', 'newsletter')); ?>
                 <?php $controls->button('next', '›'); ?>
                 <?php $controls->button('last', '»'); ?>
             </div>

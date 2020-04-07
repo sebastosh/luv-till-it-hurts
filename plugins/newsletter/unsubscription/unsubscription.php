@@ -2,8 +2,6 @@
 
 defined('ABSPATH') || exit;
 
-require_once NEWSLETTER_INCLUDES_DIR . '/module.php';
-
 class NewsletterUnsubscription extends NewsletterModule {
 
     static $instance;
@@ -19,20 +17,16 @@ class NewsletterUnsubscription extends NewsletterModule {
     }
 
     function __construct() {
-        parent::__construct('unsubscription', '1.0.0');
-        add_action('init', array($this, 'hook_init'), 1);
-        add_action('wp_loaded', array($this, 'hook_wp_loaded'));
-    }
-
-    function hook_init() {
+        parent::__construct('unsubscription', '1.0.1');
         add_filter('newsletter_replace', array($this, 'hook_newsletter_replace'), 10, 3);
         add_filter('newsletter_page_text', array($this, 'hook_newsletter_page_text'), 10, 3);
+        add_action('newsletter_action', array($this, 'hook_newsletter_action'));
     }
 
-    function hook_wp_loaded() {
+    function hook_newsletter_action($action) {
         global $wpdb;
 
-        switch (Newsletter::instance()->action) {
+        switch ($action) {
             case 'u':
                 $user = $this->get_user_from_request();
                 $email = $this->get_email_from_request();
@@ -44,7 +38,7 @@ class NewsletterUnsubscription extends NewsletterModule {
                 wp_redirect($url);
                 die();
                 break;
-                
+
             case 'uc':
                 if ($this->antibot_form_check()) {
                     $user = $this->unsubscribe();
@@ -96,12 +90,12 @@ class NewsletterUnsubscription extends NewsletterModule {
 
         $email = $this->get_email_from_request();
         if ($email) {
-            $wpdb->update(NEWSLETTER_USERS_TABLE, array('unsub_email_id' => (int) $email_id, 'unsub_time' => time()), array('id' => $user->id));
+            $wpdb->update(NEWSLETTER_USERS_TABLE, array('unsub_email_id' => (int) $email->id, 'unsub_time' => time()), array('id' => $user->id));
         }
 
         $this->send_unsubscribed_email($user);
 
-        NewsletterSubscription::instance()->notify_admin($user, 'Newsletter unsubscription');
+        $this->notify_admin_on_unsubscription($user);
 
         return $user;
     }
@@ -118,10 +112,24 @@ class NewsletterUnsubscription extends NewsletterModule {
         return NewsletterSubscription::instance()->mail($user, $subject, $message);
     }
 
+	function notify_admin_on_unsubscription( $user ) {
+
+		if ( empty( $this->options['notify_admin_on_unsubscription'] ) ) {
+			return;
+		}
+
+		$message = $this->generate_admin_notification_message( $user );
+		$email   = trim( get_option( 'admin_email' ) );
+		$subject = $this->generate_admin_notification_subject( 'Newsletter unsubscription' );
+
+		Newsletter::instance()->mail( $email, $subject, array( 'text' => $message ) );
+
+	}
+
     /**
-     * Reactivate the subscriber extracted from the request setting his status 
+     * Reactivate the subscriber extracted from the request setting his status
      * to confirmed and logging. No email are sent. Dies on subscriber extraction failure.
-     * 
+     *
      * @return TNP_User
      */
     function reactivate() {
@@ -135,13 +143,14 @@ class NewsletterUnsubscription extends NewsletterModule {
 
     function hook_newsletter_replace($text, $user, $email) {
 
-        if (!$user) {
-            return $text;
+        if ($user) {
+            $text = $this->replace_url($text, 'UNSUBSCRIPTION_CONFIRM_URL', $this->build_action_url('uc', $user, $email));
+            $text = $this->replace_url($text, 'UNSUBSCRIPTION_URL', $this->build_action_url('u', $user, $email));
+            $text = $this->replace_url($text, 'REACTIVATE_URL', $this->build_action_url('reactivate', $user, $email));
+        } else {
+            $text = $this->replace_url($text, 'UNSUBSCRIPTION_CONFIRM_URL', '#');
+            $text = $this->replace_url($text, 'UNSUBSCRIPTION_URL', '#');
         }
-
-        $text = $this->replace_url($text, 'UNSUBSCRIPTION_CONFIRM_URL', $this->build_action_url('uc', $user, $email));
-        $text = $this->replace_url($text, 'UNSUBSCRIPTION_URL', $this->build_action_url('u', $user, $email));
-        $text = $this->replace_url($text, 'REACTIVATE_URL', $this->build_action_url('reactivate', $user, $email));
 
         return $text;
     }

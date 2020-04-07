@@ -10,7 +10,13 @@ class NewsletterControls {
     var $action = false;
     var $button_data = '';
     var $errors = '';
+    /**
+     * @var string
+     */
     var $messages = '';
+    /**
+     * @var array 
+     */
     var $warnings = array();
     var $countries = array(
         'AF' => 'Afghanistan',
@@ -259,7 +265,6 @@ class NewsletterControls {
         'ZM' => 'Zambia',
         'ZW' => 'Zimbabwe',
         'XX' => 'Undefined',
-        
         'CW' => 'Curaçao',
         'SS' => 'South Sudan',
         'EU' => 'Europe (generic)',
@@ -377,6 +382,13 @@ class NewsletterControls {
         }
     }
 
+    function add_message($text) {
+        if (!empty($this->messages)) {
+            $this->messages .= '<br><br>';
+        }
+        $this->messages .= $text;
+    }
+
     function add_message_saved() {
         if (!empty($this->messages)) {
             $this->messages .= '<br><br>';
@@ -412,7 +424,7 @@ class NewsletterControls {
         if (!$current_language) {
             return;
         }
-        $this->warnings[] = 'You are configuring the language <strong>' . $newsletter->get_language_label($current_language) . '</strong>. Switch to "all languages" to see every options.';
+        $this->warnings[] = 'You are configuring the language <strong>' . $newsletter->get_language_label($current_language) . '</strong>. Switch to "all languages" to see all options.';
     }
 
     function hint($text, $url = '') {
@@ -442,7 +454,7 @@ class NewsletterControls {
         echo '</select>&nbsp;&nbsp;&nbsp;';
     }
 
-    function enabled($name) {
+    function enabled($name = 'enabled') {
         $value = isset($this->data[$name]) ? (int) $this->data[$name] : 0;
 
         echo '<select style="width: 100px" name="options[' . esc_attr($name) . ']">';
@@ -742,11 +754,20 @@ class NewsletterControls {
         }
     }
 
+    function password($name, $size = 20, $placeholder = '') {
+        $value = $this->get_value($name);
+        echo '<input id="options-', esc_attr($name), '" placeholder="' . esc_attr($placeholder) . '" name="options[' . $name . ']" type="password" autocomplete="off" ';
+        if (!empty($size)) {
+            echo 'size="' . $size . '" ';
+        }
+        echo 'value="', esc_attr($value), '">';
+    }
+
     function text($name, $size = 20, $placeholder = '') {
         $value = $this->get_value($name);
         echo '<input id="options-', esc_attr($name), '" placeholder="' . esc_attr($placeholder) . '" name="options[' . $name . ']" type="text" ';
         if (!empty($size)) {
-            echo 'size="' . $size . '"';
+            echo 'size="' . $size . '" ';
         }
         echo 'value="', esc_attr($value), '">';
     }
@@ -780,35 +801,46 @@ class NewsletterControls {
         }
     }
 
+    function action_link($action, $label, $function = null) {
+        if ($function != null) {
+            echo '<input class="button-link" type="button" value="' . esc_attr($label) . '" onclick="this.form.act.value=\'' . esc_attr($action) . '\';' . esc_html($function) . '"/>';
+        } else {
+            echo '<input class="button-link" type="submit" value="' . esc_attr($label) . '" onclick="this.form.act.value=\'' . esc_attr($action) . '\';return true;"/>';
+        }
+    }
+
     /**
      * With translated "Save" label.
      */
     function button_save($function = null) {
-        $this->button_primary('save', '<i class="fa fa-save"></i> ' . __('Save', 'newsletter'), $function);
+        $this->button_primary('save', '<i class="fas fa-save"></i> ' . __('Save', 'newsletter'), $function);
     }
 
     function button_reset($data = '') {
         echo '<button class="button-secondary" onclick="this.form.btn.value=\'' . esc_attr($data) . '\';this.form.act.value=\'reset\';if (!confirm(\'';
         echo esc_attr(esc_js(__('Proceed?', 'newsletter')));
         echo '\')) return false;">';
-        echo '<i class="fa fa-reply"></i> ';
+        echo '<i class="fas fa-reply"></i> ';
         echo esc_html(__('Reset', 'newsletter'));
         echo '</button>';
     }
-    
+
     function button_link($url, $label) {
         echo '<a href="', esc_attr($url), '" class="button-primary">', $label, '</a>';
     }
-    
-    function button_configure($url) {
-        echo '<a href="', esc_attr($url), '" class="button-primary"><i class="fa fa-cog"></i>', _e('Configure', 'newsletter'), '</a>';
-    }    
 
-    function button_back($url) {
+    function button_configure($url) {
+        echo '<a href="', esc_attr($url), '" class="button-primary"><i class="fas fa-cog"></i>', _e('Configure', 'newsletter'), '</a>';
+    }
+
+    function button_back($url, $label = null) {
         echo '<a href="';
         echo esc_attr($url);
-        echo '" class="button-primary"><i class="fa fa-chevron-left"></i>&nbsp;';
-        _e('Back', 'newsletter');
+        echo '" class="button-primary"><i class="fas fa-chevron-left"></i>';
+        if (is_null($label)) {
+            echo '&nbsp;';
+            _e('Back', 'newsletter');
+        }
         echo '</a>';
     }
 
@@ -816,25 +848,64 @@ class NewsletterControls {
      * Creates a button with "copy" action.
      * @param type $data
      */
-    function button_copy($data = '') {
+    function button_copy($data = '', $label = null) {
         echo '<button class="button-secondary" onclick="this.form.btn.value=\'' . esc_attr($data) . '\';this.form.act.value=\'copy\';if (!confirm(\'';
-        echo esc_attr(esc_js(__('Proceed?', 'newsletter')));
-        echo '\')) return false;">';
-        echo '<i class="fa fa-copy"></i> ';
-        echo esc_html(__('Duplicate', 'newsletter'));
+        echo esc_attr(esc_js(__('Proceed with copy?', 'newsletter')));
+        echo '\')) return false;"';
+        if (empty($label)) {
+            echo 'title="', esc_attr(__('Duplicate', 'newsletter')), '"';
+        }
+        echo '>';
+        echo '<i class="fas fa-copy"></i>';
+        if (is_null($label)) {
+        echo ' ', esc_html(__('Duplicate', 'newsletter'));
+        } else {
+            if (!empty($label)) {
+                echo ' ' , $label;
+            }
+        }
         echo '</button>';
     }
+    
+    function button_test($action = 'test', $label = 'Test') {
+        echo '<button class="button-secondary" onclick="this.form.act.value=\'' . esc_attr($action) . '\';if (!confirm(\'';
+        echo esc_attr(esc_js(__('Proceed with a test?', 'newsletter')));
+        echo '\')) return false;"';
+        if (empty($label)) {
+            echo 'title="', esc_attr(__('Run a test', 'newsletter')), '"';
+        }
+        echo '>';
+        echo '<i class="fas fa-vial"></i>';
+        if (is_null($label)) {
+        echo ' ', esc_html(__('Run a test', 'newsletter'));
+        } else {
+            if (!empty($label)) {
+                echo ' ' , $label;
+            }
+        }
+        echo '</button>';
+    }    
 
     /**
-     * Creates a button wirh "delete" action.
+     * Creates a button with "delete" action.
      * @param type $data
      */
-    function button_delete($data = '') {
-        echo '<button class="button-secondary" onclick="this.form.btn.value=\'' . esc_attr($data) . '\';this.form.act.value=\'delete\';if (!confirm(\'';
-        echo esc_attr(esc_js(__('Proceed?', 'newsletter')));
-        echo '\')) return false;">';
-        echo '<i class="fa fa-times"></i> ';
-        echo esc_html(__('Delete', 'newsletter'));
+    function button_delete($data = '', $label = null) {
+        echo '<button class="button-secondary" style="background-color: darkred; color: #ffffff" onclick="this.form.btn.value=\'' . esc_attr($data) . '\';this.form.act.value=\'delete\';if (!confirm(\'';
+        echo esc_attr(esc_js(__('Proceed with delete?', 'newsletter')));
+        echo '\')) return false;"';
+        if (empty($label)) {
+            echo 'title="', esc_attr(__('Delete', 'newsletter')), '"';
+        }
+        echo '>';
+        echo '<i class="fas fa-times"></i>';
+        if (is_null($label)) {
+            echo ' ' , esc_html(__('Delete', 'newsletter'));
+        } else {
+            if (!empty($label)) {
+                echo ' ' , $label;
+            }
+        }
         echo '</button>';
     }
 
@@ -853,6 +924,10 @@ class NewsletterControls {
 
         echo '<input class="button-primary" type="button" value="' . esc_attr($label) . '" onclick="this.form.btn.value=\'' . esc_attr($data) . '\';this.form.act.value=\'' . esc_attr($action) . '\';if (confirm(\'' .
         esc_attr(esc_js($message)) . '\')) this.form.submit()"/>';
+    }
+    
+    function button_statistics($url) {
+        echo '<a class="button-primary" href="' . $url . '" title="Statistics"><i class="fas fa-chart-bar"></i></a>';
     }
 
     function editor($name, $rows = 5, $cols = 75) {
@@ -996,9 +1071,11 @@ class NewsletterControls {
         echo '</div>';
     }
 
-    function color($name) {
+    function color($name, $default = '') {
 
         $value = $this->get_value($name);
+        if (empty($value) && $default) $value = $default;
+
         //echo '<input id="options-', esc_attr($name), '" class="tnp-controls-color" name="options[' . $name . ']" type="text" value="';
         echo '<input id="options-', esc_attr($name), '" name="options[' . $name . ']" type="color" value="';
         echo esc_attr($value);
@@ -1105,12 +1182,12 @@ class NewsletterControls {
     }
 
     /**
-     * Creates a single select with the active preferences. 
+     * Creates a single select with the active preferences.
      */
     function preferences_select($name = 'preference', $empty_label = null) {
         $lists = $this->get_list_options($empty_label);
         $this->select($name, $lists);
-        echo ' <a href="admin.php?page=newsletter_subscription_lists" target="_blank"><i class="fa fa-edit"></i></a>';
+        echo ' <a href="admin.php?page=newsletter_subscription_lists" target="_blank"><i class="fas fa-edit"></i></a>';
     }
 
     function lists_select($name = 'list', $empty_label = null) {
@@ -1357,7 +1434,7 @@ class NewsletterControls {
      * Attributes:
      * weight: [true|false]
      * color: [true|false]
-     * 
+     *
      * @param string $name
      * @param array $attrs
      */
@@ -1396,7 +1473,7 @@ class NewsletterControls {
         echo '<select id="options-' . esc_attr($name) . '" name="options[' . esc_attr($name) . ']">';
         foreach ($fonts as $key => $font) {
             echo '<option value="', esc_attr($key), '"';
-            if ($value == $font) {
+            if ($value == $key) {
                 echo ' selected';
             }
             echo '>', esc_html($font), '</option>';
@@ -1407,16 +1484,23 @@ class NewsletterControls {
     function css_font_family($name = 'font_family') {
         $value = $this->get_value($name);
 
-        $fonts = array('Helvetica, Arial, sans-serif', 'Arial Black, Gadget, sans-serif', 'Garamond, serif', 'Courier, monospace', 'Comic Sans MS, cursive', 'Impact, Charcoal, sans-serif',
-            'Tahoma, Geneva, sans-serif', 'Times New Roman, Times, serif', 'Verdana, Geneva, sans-serif');
+        $fonts = array('Helvetica, Arial, sans-serif'=>'Helvetica, Arial',
+            'Arial Black, Gadget, sans-serif'=>'Arial Black, Gadget',
+            'Garamond, serif'=>'Garamond',
+            'Courier, monospace'=>'Courier',
+            'Comic Sans MS, cursive'=>'Comic Sans MS',
+            'Impact, Charcoal, sans-serif'=>'Impact, Charcoal',
+            'Tahoma, Geneva, sans-serif'=>'Tahoma, Geneva',
+            'Times New Roman, Times, serif'=>'Times New Roman',
+            'Verdana, Geneva, sans-serif'=>'Verdana, Geneva');
 
         echo '<select id="options-' . esc_attr($name) . '" name="options[' . esc_attr($name) . ']">';
-        foreach ($fonts as $font) {
+        foreach ($fonts as $font=>$label) {
             echo '<option value="', esc_attr($font), '"';
             if ($value == $font) {
                 echo ' selected';
             }
-            echo '>', esc_html($font), '</option>';
+            echo '>', esc_html($label), '</option>';
         }
         echo '</select>';
     }
@@ -1459,7 +1543,7 @@ class NewsletterControls {
 
     /**
      * Media selector using the media library of WP. Produces a field which values is an array containing 'id' and 'url'.
-     * 
+     *
      * @param string $name
      */
     function media($name) {
@@ -1476,9 +1560,9 @@ class NewsletterControls {
             $media = array('', '', '');
             $media_full = array('', '', '');
             $media_id = 0;
-            echo '<img style="max-width: 200px; max-height: 200px; width: 100px;" id="' . esc_attr($name) . '_img" src="' . plugins_url('newsletter') . '/images/nomedia.png" onclick="newsletter_media(\'' . esc_attr($name) . '\')">';
+            echo '<img style="max-width: 200px; max-height: 150px; width: 100px;" id="' . esc_attr($name) . '_img" src="' . plugins_url('newsletter') . '/images/nomedia.png" onclick="newsletter_media(\'' . esc_attr($name) . '\')">';
         } else {
-            echo '<img style="max-width: 200px; max-height: 200px;" id="' . esc_attr($name) . '_img" src="' . esc_attr($media[0]) . '" onclick="newsletter_media(\'' . esc_attr($name) . '\')">';
+            echo '<img style="max-width: 200px; max-height: 150px;" id="' . esc_attr($name) . '_img" src="' . esc_attr($media[0]) . '" onclick="newsletter_media(\'' . esc_attr($name) . '\')">';
         }
 
         echo '</div>';
@@ -1519,7 +1603,7 @@ class NewsletterControls {
     /**
      * Creates a checkbox group with all active languages. Each checkbox is named
      * $name[] and values with the relative language code.
-     * 
+     *
      * @param string $name
      */
     function languages($name = 'languages') {
@@ -1541,7 +1625,7 @@ class NewsletterControls {
     /**
      * Prints a formatted date using the formats and timezone of WP, including the current date and time and the
      * time left to the passed time.
-     * 
+     *
      * @param int $time
      * @param int $now
      * @param bool $left
@@ -1554,7 +1638,7 @@ class NewsletterControls {
         if ($time == false) {
             $buffer = 'none';
         } else {
-            $buffer = gmdate(get_option('date_format') . ' ' . get_option('time_format'), $time + get_option('gmt_offset') * 3600);
+            $buffer = date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $time + get_option('gmt_offset') * 3600);
         }
         if ($now) {
             $buffer .= ' (now: ' . gmdate(get_option('date_format') . ' ' .
@@ -1570,28 +1654,39 @@ class NewsletterControls {
         }
         return $buffer;
     }
-
+    
+    static function delta_time($delta = 0) {
+        $seconds = $delta % 60;
+        $minutes = floor(($delta/60) % 60);
+        $hours =  floor(($delta/(60*60)) % 24);
+        $days = floor($delta / (24*60*60));
+        
+        
+        return $days . ' day(s), ' . $hours . ' hour(s), ' . $minutes . ' minute(s)';
+        
+    }
+    
     /**
      * Prints the help button near a form field. The label is used as icon title.
-     * 
+     *
      * @param string $url
      * @param string $label
      */
     static function help($url, $label = '') {
-        echo '<a href="', $url, '" target="_blank" title="', esc_attr($label), '"><i class="fa fa-question-circle-o"></i></a>';
+        echo '<a href="', $url, '" target="_blank" title="', esc_attr($label), '"><i class="fas fa-question-circle-o"></i></a>';
     }
 
     static function idea($url, $label = '') {
-        echo '<a href="', $url, '" target="_blank" title="', esc_attr($label), '"><i class="fa fa-lightbulb-o"></i></a>';
+        echo '<a href="', $url, '" target="_blank" title="', esc_attr($label), '"><i class="fas fa-lightbulb-o"></i></a>';
     }
 
     static function field_help($url, $text = '') {
-        echo '<a href="', $url, '" target="_blank" style="text-decoration: none" title="' . esc_attr(__('Read more', 'newsletter')) . '"><i class="fa fa-question-circle"></i>&nbsp;', $text, '</a>';
+        echo '<a href="', $url, '" target="_blank" style="text-decoration: none" title="' . esc_attr(__('Read more', 'newsletter')) . '"><i class="fas fa-question-circle"></i>&nbsp;', $text, '</a>';
     }
 
     /**
      * Prints a panel link to the documentation.
-     * 
+     *
      * @param type $url
      * @param type $text
      */
@@ -1635,6 +1730,11 @@ class NewsletterControls {
         echo '</div>';
     }
 
+    /**
+     * Adds the fields used by the composer (version 1) in the page form.
+     *
+     * @param type $name
+     */
     function composer_fields($name = 'body') {
 
         // body
@@ -1659,7 +1759,7 @@ class NewsletterControls {
         $value = str_replace('"', '&quot;', $value);
         $value = str_replace('<', '&lt;', $value);
         $value = str_replace('>', '&gt;', $value);
-        echo '<input type="hidden" name="options[', esc_attr($name), ']" id="options-', esc_attr($name), '" value="', $value, '">';
+        echo '<input type="hidden" name="options[', esc_attr($name), ']" id="options-', esc_attr($name), '" value="', esc_attr($value), '">';
 
         // Used by composer to rebuild the full HTML
         $css = NewsletterEmails::instance()->get_composer_css();
@@ -1667,10 +1767,10 @@ class NewsletterControls {
 
         // subject
         $value = $this->get_value('subject');
-        echo '<input type="hidden" name="options[subject]" id="options-subject" value="', $value, '">';
+        echo '<input type="hidden" name="options[subject]" id="options-subject" value="', esc_attr($value), '">';
     }
 
-    function composer_load($name = 'body', $show_subject = false, $show_test = true) {
+    function composer_load($name = 'body', $show_subject = false, $show_test = true, $context_type = '') {
 
         global $controls;
         global $tnpc_show_subject;
@@ -1679,6 +1779,24 @@ class NewsletterControls {
         wp_enqueue_style('tnpc-style', plugins_url('newsletter') . '/emails/tnp-composer/_css/newsletter-builder.css', array(), time());
 
         include NEWSLETTER_DIR . '/emails/tnp-composer/index.php';
+    }
+
+    /**
+     * Adds the fields used by the composer (version 2) in the page form.
+     */
+    function composer_fields_v2($name = 'message') {
+        $this->hidden('subject');
+        $this->hidden('message');
+    }
+
+    function composer_load_v2($show_subject = false, $show_test = true, $context_type = '') {
+
+        global $tnpc_show_subject;
+        $tnpc_show_subject = $show_subject;
+
+        wp_enqueue_style('tnpc-style', plugins_url('newsletter') . '/emails/tnp-composer/_css/newsletter-builder-v2.css', array(), time());
+        $controls = $this;
+        include NEWSLETTER_DIR . '/emails/tnp-composer/index-v2.php';
     }
 
 }

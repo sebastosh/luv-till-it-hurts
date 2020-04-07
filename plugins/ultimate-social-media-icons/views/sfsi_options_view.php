@@ -82,48 +82,64 @@
 
     <!-- Top content area of plugin -->
     <div class="main_contant">
+        <div class="row">
+            <div class="col-7 col-md-9 col-lg-12 ">
+                <h1>Welcome to the Ultimate Social Icons and Share Plugin!</h1>
 
-        <h1>Welcome to the Ultimate Social Icons and Share Plugin!</h1>
-
-        <div class="welcometext">
-
-            <p>Simply answer the questions below (at least the first 3) - that`s it! Start by clicking on them</p>
-
-            <p><a style="text-decoration: none;" href="javascript:void(0)"><?php _e('New:'); ?> </a><?php _e('Our new Premium Plugin allows many more placement options, better sharing features (e.g. define which text &amp; images will get shared), optimization for mobile, <a class="sfsi_unbold_link" target="_blank" href="https://www.ultimatelysocial.com/extra-icon-style/">more icon design styles</a>, <a class="sfsi_unbold_link" target="_blank" href="https://www.ultimatelysocial.com/animated-social-media-icons/">animated icons</a>, <a class="sfsi_unbold_link" target="_blank" href="https://www.ultimatelysocial.com/themed-icons-search/">themed icons</a>, and <a class="sfsi_unbold_link" href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmplus_settings_page&utm_campaign=notification_banner&utm_medium=banner" target="_blank">much more</a>.'); ?>
-                <a class="pop-up" href="#" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)">
-                    <?php _e('Go premium now'); ?>
-                </a>
-            </p>
-            <p><?php _e('Please'); ?> <a target="_blank" style="text-decoration: underline;" href="https://goo.gl/auxJ9C#no-topic-0"><?php _e('give us feedback,'); ?></a><?php _e(' and tell us how we can make the plugin better. Thank you!.'); ?></p>
-
-        </div>
-        <!-- <div class="welcometext">
-           
-           <p>Simple answer the questions below (at least the first 3) by clicking on them - that's it! </p>
-
-           <p>If you want more features like <a target="_blank" href="https://www.ultimatelysocial.com/all-platforms/">more platform icons</a>, <a target="_blank" href="https://www.ultimatelysocial.com/themed-icons-search/">themed icons</a>, <a target="_blank" href="https://www.ultimatelysocial.com/animated-social-media-icons/">animated icons</a>, more design options, better sharing features, mobile optimization, faster loading, full support and <a target="_blank" href="https://www.ultimatelysocial.com/usm-premium/">much more</a>, then please check out our <a target="_blank" href="https://www.ultimatelysocial.com/checkout?edd_action=add_to_cart&download_id=150&edd_options[price_id]=2">Premium Plugin</a>. Pricing is really fair (24.98 USD).</p> 
-           <p>For questions and suggestions please raise a ticket in the <a target="_blank" href="https://goo.gl/auxJ9C#no-topic-0">Support Forum.</a></p> 
-
-        </div> -->
-
-        <div class="supportforum">
-            <div class="support-container">
-                <div class="have-questions">
-                    <img src="<?php echo SFSI_PLUGURL ?>images/question.png" alt="error">
-                    <p class="have-quest">Have questions?</p>
-                    <!-- <p class="ask-question">Ask them in the...</p> -->
+                <div class="">
+                    <div class="row">
+                        <div class="col-12 col-lg-8 col-xxl-10">
+                            <p class='sfsi-top-header-subheading font-italic'>Simply answer the questions below <span class='sfsi-top-banner-no-decoration'>(at least the first 3)</span> - that`s it!</p>
+                            <p class="">If you face any issue, please ask in <a target="_blank" href="http://bit.ly/USM_SUPPORT_FORUM" class="sfsi-top-banner-no-decoration text-success">Support Forum</a>. We'll try to respond quickly. Thank you!</p>
+                            <div class="d-none d-lg-flex row">
+                                <div class="col-9 col-xxl-10">
+                                    <p class="sfsi-top-banner-higligted-text">If you want <span class='font-weight-bold font-italic'>more likes & shares</span>, more placement options, better sharing features (eg: define the text and image that gets shared), optimization for mobile, <a target="_blank" href="https://www.ultimatelysocial.com/extra-icon-styles/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" class="font-italic text-success" style="font-family: helvetica-light;">more icon design styles,</a> <a target="_blank" href="https://www.ultimatelysocial.com/animated-social-media-icons/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" class=" text-success font-italic" style="font-family:helvetica-light">animated icons,</a> <a target="_blank" href="https://www.ultimatelysocial.com/themed-icons-search/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" class=' text-success font-italic' style="font-family: helvetica-light;">themed icons,</a> and <a href="https://www.ultimatelysocial.com/themed-icons-search/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" target="_blank" class=" text-success font-italic" style="font-family: helvetica-light;">much more</a>, then <a href="https://www.ultimatelysocial.com/usm-premium/?withqp=1&utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" style="cursor:pointer; color: #12a252 !important;border-bottom: 1px solid #12a252;text-decoration: none;font-weight: bold;" target="_blank">
+                                        go premium</a>.</p>
+                                </div>
+                                <div class="col-3 text-center px-0 col-xxl-2">
+                                    <div class='d-table' style='width:100%;height:100%'>
+                                        <div class='d-table-row'>
+                                            <div class='d-table-cell align-middle'>
+                                                <div class='sfsi-premium-btn'>
+                                                    <a target="_blank" href="https://www.ultimatelysocial.com/usm-premium/?withqp=1&utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" class="btn btn-success" style="font-family:helveticabold;font-size: 17px;text-decoration: none;">Go Premium</a>
+                                                </div>
+                                                <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" style="text-decoration: none;color:#414951;font-family: helveticaneue-light;" target='_blank'>Learn More</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-none d-lg-flex col-4 col-lg-4 col-xxl-2">
+                            <div class='d-table' style='width:100%;height:100%'>
+                                <div class='d-table-row'>
+                                    <div class='d-table-cell align-bottom'>
+                                        <a href="https://www.ultimatelysocial.com/usm-premium/?playvideo=1&utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" target="_blank"><img target="_blank" src="<?php echo SFSI_PLUGURL; ?>images/sfsi-video-play.png" style='width:100%'></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="support-forum-green-div">
-                    <a target="_blank" href="#" onclick="event.preventDefault();sfsi_open_chat(event)" class="support-forum-green-bg">
-                        <p class="support-forum">Chat with us!</p>
-                    </a>
+            </div>
+            <div class="col-5 col-md-3 d-lg-none">
+                <div style="position:relative;padding-top:56.25%;">
+                    <iframe src="https://video.inchev.com/videos/embed/c952d896-34be-45bc-8142-ba14694c1bd0" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
                 </div>
-                <!-- <div class="respond-text">
-                    <p>We'll try to respond ASAP!</p>
-                </div> -->
+                <div class="text-center mt-5">
+                    <div class='sfsi-premium-btn'>
+                        <button class="btn btn-success ">Go Premium</button>
+                    </div>
+                    <span>Learn more</span>
+                </div>
             </div>
         </div>
-    </div> <!-- END Top content area of plugin -->
+        <div class="d-lg-none row">
+            <div class="col">
+                <p class="sfsi-top-banner-higligted-text">If you want <span class='font-weight-bold font-italic'>more likes & shares</span>, more placement options, better sharing features (eg: define the text and image that gets shared), optimization for mobile, <a target="_blank" href="https://www.ultimatelysocial.com/extra-icon-styles/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" class="font-italic text-success">more icon design styles,</a> <a target="_blank" href="https://www.ultimatelysocial.com/animated-social-media-icons/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" class=" text-success font-italic">animated icons,</a> <a target="_blank" href="https://www.ultimatelysocial.com/themed-icons-search/" class=' text-success font-italic'>themed icons,</a> and <a href="https://www.ultimatelysocial.com/themed-icons-search/?utm_source=usmi_settings_page&utm_campaign=top_banner&utm_medium=link" target="_blank" class=" text-success font-italic">much more</a>, then ...</p>
+            </div>
+        </div>
+    </div><!-- END Top content area of plugin -->
 
     <!-- step 1 end  here -->
     <div id="accordion">
@@ -178,19 +194,36 @@
     </div>
 
     <div class="tab10">
-        <div class="save_button">
-            <img src="<?php echo SFSI_PLUGURL; ?>images/ajax-loader.gif" class="loader-img" alt="error" />
-            <a href="javascript:;" id="save_all_settings" title="Save All Settings">Save All Settings</a>
-        </div>
-        <p class="red_txt errorMsg" style="display:none"> </p>
-        <p class="green_txt sucMsg" style="display:none"> </p>
+        <div class="save_export">
+            <div class="save_button">
 
-        <?php include(SFSI_DOCROOT . '/views/sfsi_affiliate_banner.php'); ?><?php include(SFSI_DOCROOT . '/views/sfsi_section_for_premium.php'); ?>
+                <img src="<?php echo SFSI_PLUGURL; ?>images/ajax-loader.gif" class="loader-img" alt="error" />
+
+                <a href="javascript:;" id="save_all_settings" title="Save All Settings">Save All Settings</a>
+
+            </div>
+            <?php $nonce = wp_create_nonce("sfsi_save_export"); ?>
+
+            <div class="export_selections">
+                <div class="export" id="sfsi_save_export" data-nonce="<?php echo $nonce; ?>">
+                    Export
+                </div>
+
+                <div>selections</div>
+
+            </div>
+        </div>
+        <p class="red_txt errorMsg" style="display:none;font-size:21px"> </p>
+        <p class="green_txt sucMsg" style="display:none;font-size:21px"> </p>
+
+        <?php // include(SFSI_DOCROOT . '/views/sfsi_affiliate_banner.php'); 
+        ?><?php include(SFSI_DOCROOT . '/views/sfsi_section_for_premium.php'); ?>
 
         <!--<p class="bldtxtmsg">Need top-notch Wordpress development work at a competitive price? Visit us at <a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=footer_credit&utm_medium=banner">ultimatelysocial.com</a></p>-->
     </div>
     <!-- all pops of plugin under sfsi_pop_content.php file -->
     <?php include(SFSI_DOCROOT . '/views/sfsi_pop_content.php'); ?>
+
 </div> <!-- START Admin view for plugin-->
 <?php if (in_array(get_site_url(), array('http://www.managingio.com', 'http://blog-latest.socialshare.com'))) : ?>
     <div style="text-align:center">

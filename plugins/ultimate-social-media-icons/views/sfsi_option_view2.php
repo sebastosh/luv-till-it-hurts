@@ -165,14 +165,14 @@ if ("id" == $option2['sfsi_youtubeusernameorid'] && isset($option2['sfsi_youtube
     <!-- EMAIL ICON -->
     <?php
     $feedId         = sanitize_text_field(get_option('sfsi_feed_id', false));
-    $connectToFeed     = "http://www.specificfeeds.com/?" . base64_encode("userprofile=wordpress&feed_id=" . $feedId);
+    $connectToFeed     = "http://api.follow.it/?" . base64_encode("userprofile=wordpress&feed_id=" . $feedId);
     ?>
     <div class="row email_section">
         <h2 class="sfsicls_email">Email</h2>
 
         <div class="inr_cont">
             <p>
-                It allows your visitors to subscribe to your site (on <a href="http://www.specificfeeds.com/widgets/emailSubscribeEncFeed/<?php echo $feedId; ?>/<?php echo base64_encode(8); ?>" target="new">this screen</a>) and receive new posts automatically by email.
+                It allows your visitors to subscribe to your site (on <a href="http://api.follow.it/widgets/emailSubscribeEncFeed/<?php echo $feedId; ?>/<?php echo base64_encode(8); ?>" target="new">this screen</a>) and receive new posts automatically by email.
             </p>
             <p>Please pick which icon type you want to use:</p>
             <ul class="tab_2_email_sec">
@@ -186,13 +186,13 @@ if ("id" == $option2['sfsi_youtubeusernameorid'] && isset($option2['sfsi_youtube
                     <div class="sfsiicnsdvwrp">
                         <input name="sfsi_rss_icons" <?php echo ($option2['sfsi_rss_icons'] == 'subscribe') ?  'checked="true"' : ''; ?> type="radio" value="subscribe" class="styled" /><span class="subscribe_icn"></span>
                     </div>
-                    <label>Follow icon<span class="sficndesc"> (increases sign-ups)</span></label>
+                    <label>Email + Follow text<span class="sficndesc"> </span></label>
                 </li>
                 <li>
                     <div class="sfsiicnsdvwrp">
                         <input name="sfsi_rss_icons" <?php echo ($option2['sfsi_rss_icons'] == 'sfsi') ?  'checked="true"' : ''; ?> type="radio" value="sfsi" class="styled" /><span class="sf_arow"></span>
                     </div>
-                    <label>SpecificFeeds icon<span class="sfplsdesc"> (provider of the service)</span></label>
+                    <label>follow.it icon<span class="sfplsdesc"> (provider of the service)</span></label>
                 </li>
             </ul>
             <p>The service offers many (more) advantages: </p>
@@ -206,14 +206,14 @@ if ("id" == $option2['sfsi_youtubeusernameorid'] && isset($option2['sfsi_youtube
                 </div>
                 <div class='sfsi_service_column'>
                     <ul>
-                        <li><span>Get more traffic</span> by being listed in the SF directory</li>
+                        <li><span>Get more traffic</span> by being listed in the follow.it directory</li>
                         <li><span>Get alerts</span> when people subscribe or unsubscribe</li>
                         <li><span>Tailor the sender name & subject line</span> of the emails </li>
                     </ul>
                 </div>
             </div>
 
-            <form id="calimingOptimizationForm" method="get" action="https://www.specificfeeds.com/wpclaimfeeds/getFullAccess" target="_blank">
+            <form id="calimingOptimizationForm" method="get" action="https://api.follow.it/wpclaimfeeds/getFullAccess" target="_blank">
                 <div class="sfsi_inputbtn">
                     <input type="hidden" name="feed_id" value="<?php echo sanitize_text_field(get_option('sfsi_feed_id', false)); ?>" />
                     <input type="email" name="email" value="<?php echo bloginfo('admin_email'); ?>" />
@@ -226,12 +226,13 @@ if ("id" == $option2['sfsi_youtubeusernameorid'] && isset($option2['sfsi_youtube
             </form>
 
             <p class='sfsi_email_last_paragraph'>
-                This will create your FREE account on SpecificFeeds, using the above email. <br>
+                This will create your FREE account on follow.it, using above email. <br>
                 All data will be treated highly confidentially, see the
-                <a href="https://www.specificfeeds.com/page/privacy-policy" target="new">
+                <a href="https://follow.it/info/privacy" target="new">
                     Privacy Policy.
                 </a>
-            </p>            <div class="sfsi_new_prmium_follw">
+            </p>
+            <div class="sfsi_new_prmium_follw">
                 <p><b>New:</b> In our Premium Plugin you can now give your email icon other functions too, e.g. <b>contact you </b>(email), <b>share by email,</b> and <b>link to a certain page </b>(e.g. your contact form or newsletter sign-up site). <a style="cursor:pointer" class="pop-up" data-id="sfsi_quickpay-overlay" onclick="sfsi_open_quick_checkout(event)" class="sfisi_font_bold" target="_blank">Go premium now</a><a href="https://www.ultimatelysocial.com/usm-premium/?utm_source=usmi_settings_page&utm_campaign=more_functions_email_icon&utm_medium=banner" class="sfsi_font_inherit" target="_blank"> or learn more.</a>
             </div>
         </div>

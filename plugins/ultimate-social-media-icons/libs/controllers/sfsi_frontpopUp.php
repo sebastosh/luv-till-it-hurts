@@ -64,7 +64,7 @@ window.addEventListener('sfsi_functions_loaded', function() {
 window.addEventListener('sfsi_functions_loaded', function() {
     if (typeof sfsi_responsive_toggle == 'function') {
         sfsi_responsive_toggle(<?php echo $time_popUp ?>);
-        console.log('sfsi_responsive_toggle');
+        // console.log('sfsi_responsive_toggle');
 
     }
 })
@@ -86,7 +86,7 @@ window.addEventListener('sfsi_functions_loaded', function() {
 window.addEventListener('sfsi_functions_loaded', function() {
     if (typeof sfsi_social_pop_up == 'function') {
         sfsi_social_pop_up(<?php echo $time_popUp ?>);
-        console.log('sfsi_social_pop_up');
+        // console.log('sfsi_social_pop_up');
     }
 })
 </script>

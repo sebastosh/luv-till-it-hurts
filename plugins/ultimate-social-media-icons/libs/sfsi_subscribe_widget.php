@@ -77,24 +77,22 @@ function sfsi_get_subscriberForm()
 	$option8 = unserialize(get_option('sfsi_section8_options',false));
 	$sfsi_feediid = sanitize_text_field(get_option('sfsi_feed_id'));
 	if($sfsi_feediid == ""){
-		$url = "https://www.specificfeeds.com/subscribe?pub=boTZa2n0OIjC4D8PkiyzByH-uKEJSZgqMW-sJiFwbuEnoxENjKva2A";
+		$url = "https://api.follow.it/subscription-form/";
 	}else{
-		$url = "https://www.specificfeeds.com/widgets/subscribeWidget/";
+		$url = "https://api.follow.it/subscription-form/";
 		$url = $url.$sfsi_feediid.'/8/';	
 
 	}
-
 	$return = '';
 	$return .= '<div class="sfsi_subscribe_Popinner">
 					<form method="post" onsubmit="return sfsi_processfurther(this);" target="popupwindow" action="'.$url.'">
 						<h5>'.trim(sanitize_text_field($option8['sfsi_form_heading_text'])).'</h5>
 						<div class="sfsi_subscription_form_field">
-							<input type="email" name="data[Widget][email]" value="" placeholder="'.trim($option8['sfsi_form_field_text']).'"/>
+						<input type="hidden" name="action" value="followPub">
+							<input type="email" name="email" value="" placeholder="'.trim($option8['sfsi_form_field_text']).'"/>
 						</div>
 						<div class="sfsi_subscription_form_field">
-							<input type="hidden" name="data[Widget][feed_id]" value="'.$sfsi_feediid.'">
-							<input type="hidden" name="data[Widget][feedtype]" value="8">
-							<input type="submit" name="subscribe" @click="sfsi_plus_handle_subscription_form" value="'.sanitize_text_field($option8['sfsi_form_button_text']).'" />
+							<input type="submit" name="subscribe" />
 						</div>
 					</form>
 				</div>';

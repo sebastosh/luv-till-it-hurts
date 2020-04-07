@@ -212,9 +212,9 @@ if (empty($page_exists)) {
                             </div>
                             <div class="tnp-col-3-boxed">
                                 <p><?php _e('You can also follow us through our social accounts', 'newsletter'); ?> :)</p>
-                                <a href="" target="_blank"><i class="fa fa-facebook fa-3x" style="color:#fff;" aria-hidden="true"></i></a>
-                                <a href="" target="_blank"><i class="fa fa-youtube fa-3x" style="color:#fff; margin-left: 40px;" aria-hidden="true"></i></a>
-                                <a href="" target="_blank"><i class="fa fa-twitter fa-3x" style="color:#fff; margin-left: 40px;" aria-hidden="true"></i></a>
+                                <a href="" target="_blank"><i class="fab fa-facebook-f fa-3x" style="color:#fff;" aria-hidden="true"></i></a>
+                                <a href="" target="_blank"><i class="fab fa-youtube fa-3x" style="color:#fff; margin-left: 40px;" aria-hidden="true"></i></a>
+                                <a href="" target="_blank"><i class="fab fa-twitter fa-3x" style="color:#fff; margin-left: 40px;" aria-hidden="true"></i></a>
 
                             </div>
                             <div class="tnp-col-3-boxed">

@@ -22,7 +22,7 @@
         });
 
         jQuery(".tnp-popup-close").click(function () {
-            $(this).parent().parent().hide();
+            jQuery(this).parent().parent().hide();
 
         });
     });
